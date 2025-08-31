@@ -1,13 +1,17 @@
 // API Configuration
 export const API_CONFIG = {
   // Base URL for your API
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7000',
   
   // API Endpoints
   ENDPOINTS: {
     PRODUCTS: '/api/products',
     CATEGORIES: '/api/categories',
     PRODUCT_DETAIL: '/api/products/:id',
+    BOARDGAME: {
+      ADD: '/api/Boardgame/Add-Boardgame',
+      ADD_OWNER: '/api/Boardgame/Add-Boardgame-Owner',
+    },
   },
   
   // Request timeout (in milliseconds)

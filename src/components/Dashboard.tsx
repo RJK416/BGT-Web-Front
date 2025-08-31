@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
+import AddBoardGameModal from './AddBoardGameModal';
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -20,8 +21,11 @@ export default function Dashboard() {
     }>
   });
 
+  // Modal state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   // Sample board games data for the right sidebar
-  const [boardGames] = useState([
+  const [boardGames, setBoardGames] = useState([
     {
       id: 1,
       name: "Catan",
@@ -166,6 +170,12 @@ export default function Dashboard() {
     removeAuthToken();
     // Redirect to login page
     router.push('/');
+  };
+
+  const handleAddGameSuccess = () => {
+    // Refresh the board games list or add the new game
+    // For now, we'll just close the modal
+    setIsAddModalOpen(false);
   };
 
   if (isLoading) {
@@ -367,7 +377,10 @@ export default function Dashboard() {
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 sticky top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-amber-400">Board Games</h2>
-                <button className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300">
+                <button 
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
@@ -459,6 +472,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Add Board Game Modal */}
+      <AddBoardGameModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={handleAddGameSuccess}
+      />
     </div>
   );
 } 
