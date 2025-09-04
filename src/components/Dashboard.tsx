@@ -20,8 +20,9 @@ export default function Dashboard() {
     }>
   });
 
+
   // Sample board games data for the right sidebar
-  const [boardGames] = useState([
+  const [boardGames, setBoardGames] = useState([
     {
       id: 1,
       name: "Catan",
@@ -168,6 +169,7 @@ export default function Dashboard() {
     router.push('/');
   };
 
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400 flex items-center justify-center">
@@ -207,6 +209,12 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-purple-200">Welcome, {user?.username}</span>
+              <button
+                onClick={() => router.push('/settings')}
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+              >
+                Settings
+              </button>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300"
@@ -367,7 +375,10 @@ export default function Dashboard() {
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 sticky top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-amber-400">Board Games</h2>
-                <button className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300">
+                <button 
+                  onClick={() => console.log('Add game clicked')}
+                  className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
@@ -459,6 +470,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
     </div>
   );
 } 
