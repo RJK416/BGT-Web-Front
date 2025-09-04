@@ -48,11 +48,13 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     
     clearTimeout(timeoutId);
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
     }
     
-    return await response.json();
+    return data;
   } catch (error) {
     clearTimeout(timeoutId);
     throw error;

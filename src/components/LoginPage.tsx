@@ -60,14 +60,14 @@ export default function LoginPage() {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       if (data.status !== 200) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.error || data.message || 'Login failed');
       }
 
       const jwtToken = data.data || data.token || data.jwt;
@@ -114,14 +114,14 @@ export default function LoginPage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       if (data.status !== 200) {
-        throw new Error(data.error || 'Failed to send OTP');
+        throw new Error(data.error || data.message || 'Failed to send OTP');
       }
 
       setSuccess('OTP sent to your email! Please check and enter the code.');
@@ -153,14 +153,14 @@ export default function LoginPage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       if (data.status !== 200) {
-        throw new Error(data.error || 'OTP verification failed');
+        throw new Error(data.error || data.message || 'OTP verification failed');
       }
 
       setSuccess('Account created successfully! You can now login.');
