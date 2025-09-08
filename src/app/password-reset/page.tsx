@@ -26,14 +26,14 @@ export default function PasswordResetPage() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       if (data.status !== 200) {
-        throw new Error(data.error || 'Password reset failed');
+        throw new Error(data.error || data.message || 'Password reset failed');
       }
 
       setSuccess('Password reset email sent! Please check your email for instructions.');

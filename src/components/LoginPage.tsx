@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { setAuthToken } from '@/utils/auth';
+import { API_CONFIG, apiRequest } from '@/config/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,7 +14,11 @@ export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null); // Stores session ID from step 1, then JWT token from step 2
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
   const validatePassword = (password: string) => {
@@ -22,6 +27,15 @@ export default function LoginPage() {
       return false;
     }
     setPasswordError(null);
+    return true;
+  };
+
+  const validateConfirmPassword = (password: string, confirmPassword: string) => {
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
+      return false;
+    }
+    setConfirmPasswordError(null);
     return true;
   };
 
@@ -52,22 +66,13 @@ export default function LoginPage() {
         password: password,
       };
       
-      const response = await fetch('https://localhost:7056/Account/Login', {
+      const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.LOGIN}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.status !== 200) {
-        throw new Error(data.message || 'Login failed');
+      if (!data.ok || data.status !== 200) {
+        throw new Error(data.error || data.message || 'Login failed');
       }
 
       const jwtToken = data.data || data.token || data.jwt;
@@ -75,12 +80,16 @@ export default function LoginPage() {
         setAuthToken(jwtToken, rememberMe);
       }
 
-      window.location.href = '/dashboard';
+      // Display the message from the server
+      setSuccess(data.message || 'Login successful!');
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
       
     } catch (err) {
       console.error('Login error:', err);
       if (err instanceof Error && err.message.includes('Failed to fetch')) {
-        setError('Cannot connect to server. Please start your backend API on https://localhost:7056');
+        setError(`Cannot connect to server. Please start your backend API on ${API_CONFIG.BASE_URL}`);
       } else {
         setError(err instanceof Error ? err.message : 'Login failed');
       }
@@ -92,8 +101,19 @@ export default function LoginPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate password before submitting
-    if (!validatePassword(password)) {
+    if (!username || !email) {
+      setError('Please enter both username and email');
+      return;
+    }
+    
+    // Validate minimum length requirements
+    if (username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return;
+    }
+    
+    if (email.length < 3) {
+      setError('Email must be at least 3 characters long');
       return;
     }
     
@@ -101,30 +121,51 @@ export default function LoginPage() {
     setError(null);
     
     try {
-      // Send OTP for account creation - update the URL to match your API
-      const response = await fetch('https://localhost:7056/Account/OtpSender', {
+      // Step 1: Send OTP for account creation (email/username only)
+      const requestBody = {
+        username: username,
+        mail: email,
+        Purpose: 1, // Registration
+        TtlMinutes: 5,
+        Identifier: username // Add identifier field
+      };
+      
+      console.log('Sending OTP request:', requestBody);
+      console.log('Full URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.REGISTER}`);
+      
+      // Test if the endpoint is reachable first
+      try {
+        const testResponse = await fetch(`${API_CONFIG.BASE_URL}/Account/Universal-OtpSender`, {
+          method: 'OPTIONS'
+        });
+        console.log('OPTIONS test response:', testResponse.status);
+      } catch (testError) {
+        console.error('OPTIONS test failed:', testError);
+      }
+      
+      const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.REGISTER}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          Username: username,
-          Mail: email,
-          Password: password, // In production, hash this on client side
-        }),
+        body: JSON.stringify(requestBody),
       });
+      
+      console.log('OTP response received:', data);
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (!data.ok || data.status !== 200) {
+        console.error('OTP request failed:', data);
+        throw new Error(data.error || data.message || 'Failed to send OTP');
       }
 
-      const data = await response.json();
-
-      if (data.status !== 200) {
-        throw new Error(data.error || 'Failed to send OTP');
+      // Store the session ID from the response
+      // The session ID is directly in data.data, not data.data.sessionId
+      if (data.data) {
+        setSessionId(data.data);
+        console.log('Session ID stored:', data.data);
+      } else {
+        console.error('No session ID found in response:', data);
       }
 
-      setSuccess('OTP sent to your email! Please check and enter the code.');
+      // Display the message from the server
+      setSuccess(data.message || 'OTP sent to your email! Please check and enter the code.');
       setShowOtpInput(true);
       
     } catch (err) {
@@ -139,33 +180,57 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     
+    console.log('Starting OTP verification...');
+    console.log('Current sessionId:', sessionId);
+    console.log('Current OTP:', otp);
+    
     try {
-      // The API expects: [FromBody] OtpRequest otpRequest
-      // So we send both Otp and UserName in the request body
-      const response = await fetch('https://localhost:7056/Account/OtpVerifier', {
+      // Step 2: Verify OTP using the session ID from step 1
+      if (!sessionId) {
+        console.error('No session ID available for OTP verification');
+        throw new Error('Session expired. Please start registration again.');
+      }
+
+      // Validate OTP format (6 digits)
+      if (!/^\d{6}$/.test(otp)) {
+        setError('OTP must be a 6-digit code');
+        setIsLoading(false);
+        return;
+      }
+
+      const requestBody = {
+        sessionId: sessionId,
+        otp: otp,
+        purpose: 1 // Registration
+      };
+      
+      console.log('Sending OTP verification request:', requestBody);
+
+      const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.VERIFY_OTP}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          Otp: otp,
-          UserName: username,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.log('OTP verification response:', data);
+
+      if (!data.ok || data.status !== 200) {
+        console.error('OTP verification failed:', data);
+        throw new Error(data.error || data.message || 'OTP verification failed');
       }
 
-      const data = await response.json();
-
-      if (data.status !== 200) {
-        throw new Error(data.error || 'OTP verification failed');
+      // Store the JWT token from the response as the reset token
+      if (data.data) {
+        setSessionId(data.data); // Store JWT token as sessionId for use as ResetToken
+        console.log('JWT token stored for account creation:', data.data);
+      } else {
+        console.error('No JWT token found in OTP verification response:', data);
       }
 
-      setSuccess('Account created successfully! You can now login.');
+      // Display the message from the server
+      console.log('OTP verification successful, transitioning to password step');
+      setSuccess(data.message || 'OTP verified! Now please set your password.');
       setShowOtpInput(false);
-      setIsRegistering(false);
+      setShowPasswordInput(true);
       setOtp('');
       
     } catch (err) {
@@ -175,7 +240,74 @@ export default function LoginPage() {
     }
   };
 
+  const handlePasswordCompletion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    console.log('Starting password completion...');
+    console.log('Current sessionId:', sessionId);
+    console.log('Password length:', password.length);
+    console.log('Confirm password length:', confirmPassword.length);
+    
+    // Validate passwords
+    if (!validatePassword(password)) {
+      return;
+    }
+    
+    if (!validateConfirmPassword(password, confirmPassword)) {
+      return;
+    }
+    
+    if (!sessionId) {
+      console.error('No session ID available for account creation');
+      setError('Session expired. Please start registration again.');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Step 3: Complete registration with password and JWT token as ResetToken
+      const requestBody = {
+        ResetToken: sessionId, // The JWT token from step 2 acts as the reset token
+        NewPassword: password,
+        ConfirmNewPassword: confirmPassword
+      };
+      
+      console.log('Sending account creation request:', requestBody);
+      console.log('ResetToken length:', requestBody.ResetToken?.length);
+      console.log('ResetToken starts with:', requestBody.ResetToken?.substring(0, 20) + '...');
+      console.log('Full URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`);
+      
+      const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      });
+      
+      console.log('Account creation response:', data);
 
+      if (!data.ok || data.status !== 200) {
+        const errorMessage = data.error || data.message || 'Account creation failed';
+        const details = data.details ? `\nDetails: ${data.details}` : '';
+        const stackTrace = data.stackTrace ? `\nStack Trace: ${data.stackTrace}` : '';
+        throw new Error(`${errorMessage}${details}${stackTrace}`);
+      }
+
+      // Display the message from the server
+      console.log('Account creation successful, resetting form state');
+      setSuccess(data.message || 'Account created successfully! You can now login.');
+      setShowPasswordInput(false);
+      setIsRegistering(false);
+      setPassword('');
+      setConfirmPassword('');
+      setSessionId(null);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Account creation failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-purple-800 relative overflow-hidden" suppressHydrationWarning>
@@ -310,7 +442,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mb-4">
-              {/* Enhanced Medieval Shield Icon */}
+              {/* Classic Heater Shield Icon */}
               <div className="inline-flex items-center justify-center w-28 h-28 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 rounded-full mb-4 shadow-2xl border-4 border-amber-300 relative">
                 {/* Shield glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-300 to-amber-500 rounded-full blur-sm opacity-50 animate-pulse"></div>
@@ -386,10 +518,18 @@ x                     {/* Form */}
             {/* Form header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-amber-400 mb-2">
-                {isRegistering ? 'Join the Realm' : 'Enter the Realm'}
+                {isRegistering ? (
+                  showPasswordInput ? 'Set Your Password' : 
+                  showOtpInput ? 'Verify Your Email' : 
+                  'Join the Realm'
+                ) : 'Enter the Realm'}
               </h2>
               <p className="text-purple-200 text-sm">
-                {isRegistering ? 'Create your account to start tracking' : 'Sign in to track your board game collection'}
+                {isRegistering ? (
+                  showPasswordInput ? 'Complete your account setup' :
+                  showOtpInput ? 'Enter the code sent to your email' :
+                  'Create your account to start tracking'
+                ) : 'Sign in to track your board game collection'}
               </p>
             </div>
 
@@ -407,8 +547,8 @@ x                     {/* Form */}
               </div>
             )}
 
-            {!showOtpInput ? (
-                             <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-6 relative z-[70]">
+            {!showOtpInput && !showPasswordInput && (
+              <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-6 relative z-[70]">
                 {/* Username field (for registration) */}
                 {isRegistering && (
                   <div>
@@ -481,33 +621,35 @@ x                     {/* Form */}
                   </div>
                 )}
 
-                {/* Password field */}
-                <div>
-                  <label className="block text-amber-300 text-sm font-medium mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+                {/* Password field (for login only) */}
+                {!isRegistering && (
+                  <div>
+                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
+                          passwordError ? 'border-red-400' : 'border-amber-400/40'
+                        }`}
+                        placeholder="••••••••"
+                        required
+                        minLength={6}
+                      />
+                      {passwordError && (
+                        <p className="text-red-300 text-xs mt-1">{passwordError}</p>
+                      )}
                     </div>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                      className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
-                        passwordError ? 'border-red-400' : 'border-amber-400/40'
-                      }`}
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                    {passwordError && (
-                      <p className="text-red-300 text-xs mt-1">{passwordError}</p>
-                    )}
                   </div>
-                </div>
+                )}
 
                                  {/* Remember me (only for login) */}
                  {!isRegistering && (
@@ -548,9 +690,11 @@ x                     {/* Form */}
                 
 
               </form>
-            ) : (
-                             /* OTP Verification Form */
-               <form onSubmit={handleOtpVerification} className="space-y-6 relative z-[70]">
+            )}
+
+            {showOtpInput && (
+              /* OTP Verification Form */
+              <form onSubmit={handleOtpVerification} className="space-y-6 relative z-[70]">
                 <div>
                   <label className="block text-amber-300 text-sm font-medium mb-2">
                     Enter OTP
@@ -589,6 +733,90 @@ x                     {/* Form */}
               </form>
             )}
 
+            {showPasswordInput && (
+              /* Password Setup Form */
+              <form onSubmit={handlePasswordCompletion} className="space-y-6 relative z-[70]">
+                {/* Password field */}
+                <div>
+                  <label className="block text-amber-300 text-sm font-medium mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
+                        passwordError ? 'border-red-400' : 'border-amber-400/40'
+                      }`}
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                    />
+                    {passwordError && (
+                      <p className="text-red-300 text-xs mt-1">{passwordError}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Confirm Password field */}
+                <div>
+                  <label className="block text-amber-300 text-sm font-medium mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        const newConfirmPassword = e.target.value;
+                        setConfirmPassword(newConfirmPassword);
+                        if (newConfirmPassword.length > 0) {
+                          validateConfirmPassword(password, newConfirmPassword);
+                        } else {
+                          setConfirmPasswordError(null);
+                        }
+                      }}
+                      className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
+                        confirmPasswordError ? 'border-red-400' : 'border-amber-400/40'
+                      }`}
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                    />
+                    {confirmPasswordError && (
+                      <p className="text-red-300 text-xs mt-1">{confirmPasswordError}</p>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      Creating Account...
+                    </div>
+                  ) : (
+                    'Complete Registration'
+                  )}
+                </button>
+              </form>
+            )}
+
                          {/* Toggle between login and register */}
              <div className="mt-6 text-center relative z-[70]">
               <p className="text-purple-200 text-sm">
@@ -599,6 +827,12 @@ x                     {/* Form */}
                      setError(null);
                      setSuccess(null);
                      setShowOtpInput(false);
+                     setShowPasswordInput(false);
+                     setSessionId(null);
+                     setPassword('');
+                     setConfirmPassword('');
+                     setPasswordError(null);
+                     setConfirmPasswordError(null);
                    }}
                    className="text-amber-400 hover:text-amber-300 font-medium transition-colors relative z-[80]"
                  >
