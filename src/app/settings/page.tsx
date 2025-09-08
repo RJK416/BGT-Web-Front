@@ -64,7 +64,7 @@ export default function SettingsPage() {
       }
 
       const response = await fetch('https://localhost:7056/Account/PasswordChange', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
