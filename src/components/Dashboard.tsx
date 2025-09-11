@@ -182,13 +182,47 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-32 h-32 border-2 border-amber-400 rounded-full"></div>
-        <div className="absolute top-20 right-20 w-24 h-24 border-2 border-amber-400 transform rotate-45"></div>
-        <div className="absolute bottom-20 left-20 w-20 h-20 border-2 border-amber-400 rounded-full"></div>
-        <div className="absolute bottom-10 right-10 w-28 h-28 border-2 border-amber-400 transform rotate-45"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
+      {/* Cosmic Background */}
+      <div className="absolute inset-0">
+        {/* Stars */}
+        <div className="absolute inset-0">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Star Clusters */}
+        <div className="absolute top-20 left-20 w-4 h-4 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-32 left-16 w-2 h-2 bg-cyan-200 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-28 left-24 w-3 h-3 bg-cyan-400 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.8s' }} />
+        
+        <div className="absolute top-40 right-32 w-3 h-3 bg-blue-300 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-52 right-28 w-2 h-2 bg-blue-200 rounded-full opacity-90 animate-pulse" style={{ animationDelay: '0.3s' }} />
+        <div className="absolute top-44 right-36 w-4 h-4 bg-blue-400 rounded-full opacity-40 animate-pulse" style={{ animationDelay: '2.1s' }} />
+        
+        <div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
+        <div className="absolute bottom-40 left-36 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
+        <div className="absolute bottom-36 left-44 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
+        
+        {/* Cosmic Dust/Nebula */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-purple-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-radial from-blue-400/8 via-cyan-400/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        
+        {/* Shooting Stars */}
+        <div className="absolute top-20 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
+        <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-blue-300 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '1.5s' }} />
       </div>
 
       {/* Header */}
@@ -233,7 +267,7 @@ export default function Dashboard() {
           <div className="flex-1">
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30">
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-amber-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,7 +281,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30">
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-green-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +295,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30">
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-blue-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,7 +309,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30">
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
                 <div className="flex items-center">
                   <div className="p-3 bg-purple-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,43 +324,211 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Recent Games */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30">
+            {/* Leaderboard */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-amber-400">Recent Games</h2>
+                <h2 className="text-2xl font-bold text-amber-400">Top Players</h2>
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search players..."
+                    className="pl-8 pr-4 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all w-64"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {/* Top 3 Players */}
+                {[
+                  { id: 1, nickname: "DragonSlayer", guild: "Ultra Chad Guild", level: 12, xp: 2700, xpToNext: 10000, achievements: { mvp: true, bestPlayer: true, tournamentWinner: false }, score: 14 },
+                  { id: 2, nickname: "ChessMaster", guild: "Clock Master Guild", level: 11, xp: 7500, xpToNext: 10000, achievements: { mvp: false, bestPlayer: false, tournamentWinner: true }, score: 16 },
+                  { id: 3, nickname: "BoardGameKing", guild: null, level: 9, xp: 5200, xpToNext: 10000, achievements: { mvp: false, bestPlayer: true, tournamentWinner: false }, score: 15 }
+                ].map((player, index) => {
+                  const xpPercentage = Math.round((player.xp / player.xpToNext) * 100);
+                  return (
+                    <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
+                      <div className="flex items-center space-x-4">
+                        {/* Rank */}
+                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-bold text-purple-900">{index + 1}</span>
+                        </div>
+                        
+                        {/* Profile Picture */}
+                        <div className="relative">
+                          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+                            <span className="text-lg font-bold text-purple-900">
+                              {player.nickname.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          {player.guild && (
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
+                              <span className="text-xs font-bold text-white">G</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Player Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-bold text-amber-300">
+                              {player.nickname}
+                            </h3>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              player.guild 
+                                ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30'
+                                : 'bg-red-500/20 text-red-300 border border-red-400/30'
+                            }`}>
+                              {player.guild || "No guild member"}
+                            </span>
+                          </div>
+
+                          {/* Level and XP Bar */}
+                          <div className="flex items-center space-x-3">
+                            <span className="text-sm font-bold text-amber-400">
+                              LVL {player.level}
+                            </span>
+                            <div className="flex-1 bg-purple-900/50 rounded-full h-3 overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
+                                style={{ width: `${xpPercentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs font-medium text-amber-300">
+                              {xpPercentage}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Achievements and Score */}
+                        <div className="flex items-center space-x-3">
+                          {/* Achievement Icons */}
+                          <div className="flex space-x-1">
+                            {player.achievements.mvp && (
+                              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center" title="MVP">
+                                <span className="text-yellow-900 text-sm">⭐</span>
+                              </div>
+                            )}
+                            {player.achievements.bestPlayer && (
+                              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center" title="Best Player">
+                                <span className="text-white text-sm">🏆</span>
+                              </div>
+                            )}
+                            {player.achievements.tournamentWinner && (
+                              <div className="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center" title="Tournament Winner">
+                                <span className="text-yellow-100 text-sm">👑</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Score */}
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-amber-400">
+                              +{player.score}
+                            </div>
+                            <div className="text-xs text-purple-300">
+                              points
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Your Player Card */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-amber-400">Your Profile</h2>
                 <button className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300">
-                  Add New Game
+                  Edit Profile
                 </button>
               </div>
               
-              <div className="space-y-4">
-                {stats.recentGames.map((game, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-purple-900/50 rounded-lg border border-purple-700/30">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-3 h-3 rounded-full ${game.result === 'Won' ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <div>
-                        <h3 className="text-amber-300 font-medium">{game.name}</h3>
-                        <p className="text-purple-300 text-sm">{game.date}</p>
+              <div className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-6 border border-amber-400/20">
+                <div className="flex items-center space-x-6">
+                  {/* Profile Picture */}
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+                      <span className="text-2xl font-bold text-purple-900">
+                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
+                      <span className="text-xs font-bold text-white">G</span>
+                    </div>
+                      </div>
+
+                  {/* Player Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-4 mb-3">
+                      <h3 className="text-2xl font-bold text-amber-300">
+                        {user?.username || 'AdventureSeeker'}
+                      </h3>
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30">
+                        Elite Guild
+                      </span>
+                    </div>
+
+                    {/* Level and XP Bar */}
+                    <div className="flex items-center space-x-4 mb-4">
+                      <span className="text-xl font-bold text-amber-400">
+                        LVL 8
+                      </span>
+                      <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
+                          style={{ width: '65%' }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium text-amber-300">
+                        65%
+                      </span>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-amber-400">{stats.gamesPlayed}</div>
+                        <div className="text-xs text-purple-300">Games Played</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-400">{stats.gamesWon}</div>
+                        <div className="text-xs text-purple-300">Games Won</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-400">{stats.winRate}%</div>
+                        <div className="text-xs text-purple-300">Win Rate</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        game.result === 'Won' 
-                          ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
-                          : 'bg-red-500/20 text-red-300 border border-red-400/30'
-                      }`}>
-                        {game.result}
-                      </span>
-                      <p className="text-purple-300 text-sm mt-1">{game.score}</p>
+                  </div>
+
+                  {/* Achievements */}
+                  <div className="flex flex-col space-y-2">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-amber-400">+12</div>
+                      <div className="text-xs text-purple-300">Total Points</div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center" title="MVP">
+                        <span className="text-yellow-900 text-sm">⭐</span>
+                      </div>
+                      <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center" title="Best Player">
+                        <span className="text-white text-sm">🏆</span>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
 
             {/* Quick Actions */}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-300 text-left">
+              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-amber-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,7 +542,7 @@ export default function Dashboard() {
                 </div>
               </button>
 
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-300 text-left">
+              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-green-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,7 +556,7 @@ export default function Dashboard() {
                 </div>
               </button>
 
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-300 text-left">
+              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-blue-500/20 rounded-lg">
                     <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,8 +573,25 @@ export default function Dashboard() {
           </div>
 
           {/* Right Sidebar - Board Games List */}
-          <div className="w-80 flex-shrink-0">
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 sticky top-8">
+          <div className="w-80 flex-shrink-0 relative">
+            {/* Stardust around Board Games */}
+            <div className="absolute -top-4 -left-4 w-6 h-6 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
+            <div className="absolute -top-2 -right-2 w-3 h-3 bg-blue-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute top-8 -left-6 w-2 h-2 bg-purple-300 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '2.2s' }} />
+            <div className="absolute top-16 -right-4 w-4 h-4 bg-cyan-200 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.3s' }} />
+            <div className="absolute top-24 -left-2 w-1 h-1 bg-white rounded-full opacity-90 animate-pulse" style={{ animationDelay: '1.8s' }} />
+            <div className="absolute top-32 -right-6 w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '2.7s' }} />
+            
+            {/* Floating stardust particles */}
+            <div className="absolute top-12 left-2 w-1 h-1 bg-cyan-400 rounded-full opacity-80 animate-ping" style={{ animationDuration: '3s', animationDelay: '1.2s' }} />
+            <div className="absolute top-20 right-1 w-1 h-1 bg-purple-400 rounded-full opacity-70 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '2.8s' }} />
+            <div className="absolute top-28 left-1 w-1 h-1 bg-blue-300 rounded-full opacity-90 animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+            
+            {/* Cosmic dust near board games */}
+            <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-radial from-cyan-500/5 via-blue-500/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+            <div className="absolute -top-4 -right-8 w-24 h-24 bg-gradient-radial from-purple-500/6 via-cyan-500/2 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '2.5s' }} />
+            
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 sticky top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-amber-400">Board Games</h2>
                 <button 
@@ -406,7 +625,7 @@ export default function Dashboard() {
                 {boardGames.map((game) => (
                   <div
                     key={game.id}
-                    className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border border-purple-700/30 hover:border-amber-400/50 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg"
+                    className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg"
                   >
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
