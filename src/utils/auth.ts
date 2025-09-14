@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 // JWT Token Management
 export const setAuthToken = (token: string, rememberMe: boolean = false) => {
@@ -27,18 +28,11 @@ export const isAuthenticated = (): boolean => {
   return !!token;
 };
 
-// Decode JWT token (basic implementation)
+// Decode JWT token using jwt-decode library
 export const decodeToken = (token: string) => {
   try {
-    // In a real app, you'd use a JWT library like 'jsonwebtoken'
-    // For now, we'll do a basic decode
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    
-    return JSON.parse(jsonPayload);
+    const decoded = jwtDecode(token);
+    return decoded;
   } catch (error) {
     console.error('Error decoding token:', error);
     return null;

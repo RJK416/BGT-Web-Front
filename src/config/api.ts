@@ -16,8 +16,11 @@ export const API_CONFIG = {
     },
     // Board Game Service Endpoints
     BOARDGAME: {
-      ADD: '/api/Boardgame/Add-Boardgame',
-      ADD_OWNER: '/api/Boardgame/Add-Boardgame-Owner',
+      ADD: '/Boardgame/Add-Boardgame',
+      ADD_OWNER: '/Boardgame/Add-Boardgame-Owner',
+      GET_LEADERBOARD: '/Boardgame/Get-Leaderboard',
+      GET_BOARDGAMES: '/Boardgame/Get-Boardgames',
+      GET_USER_PLAYER: '/Boardgame/Get-User-Player',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',

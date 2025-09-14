@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { setAuthToken } from '@/utils/auth';
+import { setAuthToken, decodeToken } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
+import Leaderboard from '@/components/Leaderboard';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -76,8 +77,20 @@ export default function LoginPage() {
       }
 
       const jwtToken = data.data || data.token || data.jwt;
+      console.log('🔍 Login response data:', data);
+      console.log('🔍 Extracted JWT token:', jwtToken);
+      
       if (jwtToken) {
         setAuthToken(jwtToken, rememberMe);
+        
+        // Debug: Decode the token to see what's inside
+        try {
+          const decodedToken = decodeToken(jwtToken);
+          console.log('🔍 Decoded JWT token:', decodedToken);
+          console.log('🔍 Available claims:', Object.keys(decodedToken));
+        } catch (error) {
+          console.error('🔍 Error decoding token:', error);
+        }
       }
 
       // Display the message from the server
@@ -438,7 +451,10 @@ export default function LoginPage() {
 
              {/* Main content */}
        <div className="relative z-50 flex items-center justify-center min-h-screen p-6">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="flex gap-8 items-center">
+            {/* Left side - Login Form */}
+            <div className="flex-1 max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mb-4">
@@ -847,6 +863,13 @@ x                     {/* Form */}
             <p className="text-purple-400 text-sm">
               © 2024 Board Games Tracker • All rights reserved Biber
             </p>
+          </div>
+            </div>
+
+            {/* Right side - Leaderboard */}
+            <div className="hidden lg:block w-96 flex-shrink-0">
+              <Leaderboard limit={5} showTitle={true} />
+            </div>
           </div>
         </div>
       </div>

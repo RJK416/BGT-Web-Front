@@ -29,8 +29,8 @@ export default function SettingsPage() {
     const userFromToken = getUserFromToken();
     if (userFromToken) {
       setUser({
-        username: userFromToken.unique_name || userFromToken.sub || 'AdventureSeeker',
-        email: userFromToken.email || 'adventure@realm.com',
+        username: userFromToken.name || userFromToken.unique_name || userFromToken.sub || 'User',
+        email: userFromToken.email || 'user@realm.com',
         joinDate: '2024-01-15'
       });
     }

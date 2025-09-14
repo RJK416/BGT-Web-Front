@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
+import { API_CONFIG, apiRequest } from '@/config/api';
+import Leaderboard from '@/components/Leaderboard';
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -21,91 +23,74 @@ export default function Dashboard() {
   });
 
 
-  // Sample board games data for the right sidebar
-  const [boardGames, setBoardGames] = useState([
-    {
-      id: 1,
-      name: "Catan",
-      category: "Strategy",
-      players: "3-4",
-      duration: "60-90 min",
-      rating: 4.8,
-      image: "🏰",
-      status: "Owned"
-    },
-    {
-      id: 2,
-      name: "Ticket to Ride",
-      category: "Family",
-      players: "2-5",
-      duration: "45-60 min",
-      rating: 4.6,
-      image: "🚂",
-      status: "Owned"
-    },
-    {
-      id: 3,
-      name: "Pandemic",
-      category: "Cooperative",
-      players: "2-4",
-      duration: "45-60 min",
-      rating: 4.7,
-      image: "🦠",
-      status: "Wishlist"
-    },
-    {
-      id: 4,
-      name: "Carcassonne",
-      category: "Tile Placement",
-      players: "2-5",
-      duration: "30-45 min",
-      rating: 4.5,
-      image: "🏛️",
-      status: "Owned"
-    },
-    {
-      id: 5,
-      name: "Settlers of Catan",
-      category: "Strategy",
-      players: "3-4",
-      duration: "60-90 min",
-      rating: 4.9,
-      image: "🌾",
-      status: "Owned"
-    },
-    {
-      id: 6,
-      name: "Azul",
-      category: "Abstract",
-      players: "2-4",
-      duration: "30-45 min",
-      rating: 4.4,
-      image: "🧩",
-      status: "Wishlist"
-    },
-    {
-      id: 7,
-      name: "Wingspan",
-      category: "Engine Building",
-      players: "1-5",
-      duration: "40-70 min",
-      rating: 4.8,
-      image: "🦅",
-      status: "Owned"
-    },
-    {
-      id: 8,
-      name: "Gloomhaven",
-      category: "RPG",
-      players: "1-4",
-      duration: "90-150 min",
-      rating: 4.9,
-      image: "⚔️",
-      status: "Wishlist"
-    }
-  ]);
+
+  // Real board games data from API
+  const [boardGames, setBoardGames] = useState([]);
+  const [boardGamesLoading, setBoardGamesLoading] = useState(true);
+
+  // Real user player data from API
+  const [userPlayer, setUserPlayer] = useState<any>(null);
+  const [userPlayerLoading, setUserPlayerLoading] = useState(true);
 
   const router = useRouter();
+
+  // Fetch board games from API
+  const fetchBoardGames = async () => {
+    try {
+      setBoardGamesLoading(true);
+      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_BOARDGAMES}?page=1&pageSize=10`, {
+        method: 'GET',
+      });
+
+      if (response.ok && response.status === 200) {
+        setBoardGames(response.data?.items || []);
+      } else {
+        console.error('Failed to fetch board games:', response);
+        setBoardGames([]);
+      }
+    } catch (error) {
+      console.error('Error fetching board games:', error);
+      setBoardGames([]);
+    } finally {
+      setBoardGamesLoading(false);
+    }
+  };
+
+  // Fetch user player data from API
+  const fetchUserPlayer = async () => {
+    try {
+      setUserPlayerLoading(true);
+      const token = getAuthToken();
+      
+      if (!token) {
+        console.error('No auth token found');
+        setUserPlayer(null);
+        return;
+      }
+
+      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_USER_PLAYER}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      console.log('User player response:', response);
+
+      if (response.ok && response.status === 200) {
+        setUserPlayer(response.data);
+        console.log('User player data set:', response.data);
+      } else {
+        console.error('Failed to fetch user player:', response);
+        setUserPlayer(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user player:', error);
+      setUserPlayer(null);
+    } finally {
+      setUserPlayerLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check authentication
@@ -127,11 +112,17 @@ export default function Dashboard() {
         }
 
         console.log('🔍 User from JWT token:', userFromToken);
+        console.log('🔍 Available JWT claims:', Object.keys(userFromToken));
+        console.log('🔍 name claim:', userFromToken.name);
+        console.log('🔍 unique_name claim:', userFromToken.unique_name);
+        console.log('🔍 sub claim:', userFromToken.sub);
+        console.log('🔍 email claim:', userFromToken.email);
 
         // Set user data from token (using the actual JWT payload structure)
+        // Backend stores username in 'name' claim, user ID in 'sub' claim, email in 'email' claim
         setUser({
-          username: userFromToken.unique_name || userFromToken.sub || 'AdventureSeeker',
-          email: userFromToken.email || 'adventure@realm.com',
+          username: userFromToken.name || userFromToken.unique_name || userFromToken.sub || 'User',
+          email: userFromToken.email || 'user@realm.com',
           joinDate: '2024-01-15'
         });
 
@@ -151,6 +142,12 @@ export default function Dashboard() {
           });
           setIsLoading(false);
         }, 1000);
+
+        // Fetch board games data
+        fetchBoardGames();
+        
+        // Fetch user player data
+        fetchUserPlayer();
       } catch (error) {
         console.error('Failed to load user data:', error);
         // If there's an error, clear token and redirect to login
@@ -325,120 +322,7 @@ export default function Dashboard() {
             </div>
 
             {/* Leaderboard */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-amber-400">Top Players</h2>
-                <div className="flex items-center space-x-2">
-                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Search players..."
-                    className="pl-8 pr-4 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all w-64"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                {/* Top 3 Players */}
-                {[
-                  { id: 1, nickname: "DragonSlayer", guild: "Ultra Chad Guild", level: 12, xp: 2700, xpToNext: 10000, achievements: { mvp: true, bestPlayer: true, tournamentWinner: false }, score: 14 },
-                  { id: 2, nickname: "ChessMaster", guild: "Clock Master Guild", level: 11, xp: 7500, xpToNext: 10000, achievements: { mvp: false, bestPlayer: false, tournamentWinner: true }, score: 16 },
-                  { id: 3, nickname: "BoardGameKing", guild: null, level: 9, xp: 5200, xpToNext: 10000, achievements: { mvp: false, bestPlayer: true, tournamentWinner: false }, score: 15 }
-                ].map((player, index) => {
-                  const xpPercentage = Math.round((player.xp / player.xpToNext) * 100);
-                  return (
-                    <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
-                      <div className="flex items-center space-x-4">
-                        {/* Rank */}
-                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-purple-900">{index + 1}</span>
-                        </div>
-                        
-                        {/* Profile Picture */}
-                        <div className="relative">
-                          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                            <span className="text-lg font-bold text-purple-900">
-                              {player.nickname.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          {player.guild && (
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
-                              <span className="text-xs font-bold text-white">G</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Player Info */}
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-lg font-bold text-amber-300">
-                              {player.nickname}
-                            </h3>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              player.guild 
-                                ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30'
-                                : 'bg-red-500/20 text-red-300 border border-red-400/30'
-                            }`}>
-                              {player.guild || "No guild member"}
-                            </span>
-                          </div>
-
-                          {/* Level and XP Bar */}
-                          <div className="flex items-center space-x-3">
-                            <span className="text-sm font-bold text-amber-400">
-                              LVL {player.level}
-                            </span>
-                            <div className="flex-1 bg-purple-900/50 rounded-full h-3 overflow-hidden">
-                              <div 
-                                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
-                                style={{ width: `${xpPercentage}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-xs font-medium text-amber-300">
-                              {xpPercentage}%
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Achievements and Score */}
-                        <div className="flex items-center space-x-3">
-                          {/* Achievement Icons */}
-                          <div className="flex space-x-1">
-                            {player.achievements.mvp && (
-                              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center" title="MVP">
-                                <span className="text-yellow-900 text-sm">⭐</span>
-                              </div>
-                            )}
-                            {player.achievements.bestPlayer && (
-                              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center" title="Best Player">
-                                <span className="text-white text-sm">🏆</span>
-                              </div>
-                            )}
-                            {player.achievements.tournamentWinner && (
-                              <div className="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center" title="Tournament Winner">
-                                <span className="text-yellow-100 text-sm">👑</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Score */}
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-amber-400">
-                              +{player.score}
-                            </div>
-                            <div className="text-xs text-purple-300">
-                              points
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <Leaderboard limit={10} showPagination={true} showSearch={true} className="mb-8 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
 
             {/* Your Player Card */}
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
@@ -467,41 +351,66 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-3">
                       <h3 className="text-2xl font-bold text-amber-300">
-                        {user?.username || 'AdventureSeeker'}
+                        {userPlayer?.nickname || user?.username || 'User'}
                       </h3>
                       <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30">
-                        Elite Guild
+                        {userPlayer?.guild || 'Elite Guild'}
                       </span>
                     </div>
 
                     {/* Level and XP Bar */}
                     <div className="flex items-center space-x-4 mb-4">
                       <span className="text-xl font-bold text-amber-400">
-                        LVL 8
+                        LVL {userPlayer?.level || 1}
                       </span>
                       <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
-                          style={{ width: '65%' }}
-                        ></div>
+                        {userPlayer ? (() => {
+                          // Calculate XP percentage
+                          const xpForCurrentLevel = userPlayer.level * 1000;
+                          const xpForNextLevel = (userPlayer.level + 1) * 1000;
+                          const xpInCurrentLevel = userPlayer.xp - xpForCurrentLevel;
+                          const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)));
+                          
+                          return (
+                            <>
+                              <div 
+                                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
+                                style={{ width: `${xpPercentage}%` }}
+                              ></div>
+                            </>
+                          );
+                        })() : (
+                          <div 
+                            className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
+                            style={{ width: '65%' }}
+                          ></div>
+                        )}
                       </div>
                       <span className="text-sm font-medium text-amber-300">
-                        65%
+                        {userPlayer ? (() => {
+                          const xpForCurrentLevel = userPlayer.level * 1000;
+                          const xpForNextLevel = (userPlayer.level + 1) * 1000;
+                          const xpInCurrentLevel = userPlayer.xp - xpForCurrentLevel;
+                          const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)));
+                          return `${xpPercentage}%`;
+                        })() : '65%'}
                       </span>
                     </div>
 
                     {/* Stats Row */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-amber-400">{stats.gamesPlayed}</div>
+                        <div className="text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || stats.gamesPlayed}</div>
                         <div className="text-xs text-purple-300">Games Played</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">{stats.gamesWon}</div>
+                        <div className="text-2xl font-bold text-green-400">{userPlayer?.wins || stats.gamesWon}</div>
                         <div className="text-xs text-purple-300">Games Won</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-400">{stats.winRate}%</div>
+                        <div className="text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : stats.winRate}%</div>
                         <div className="text-xs text-purple-300">Win Rate</div>
                       </div>
                     </div>
@@ -510,16 +419,30 @@ export default function Dashboard() {
                   {/* Achievements */}
                   <div className="flex flex-col space-y-2">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-amber-400">+12</div>
+                      <div className="text-2xl font-bold text-amber-400">+{userPlayer?.totalScore || 0}</div>
                       <div className="text-xs text-purple-300">Total Points</div>
                     </div>
                     <div className="flex space-x-2">
-                      <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center" title="MVP">
-                        <span className="text-yellow-900 text-sm">⭐</span>
-                      </div>
-                      <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center" title="Best Player">
-                        <span className="text-white text-sm">🏆</span>
-                      </div>
+                      {userPlayer?.mvps > 0 && (
+                        <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center" title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}>
+                          <span className="text-yellow-900 text-sm">⭐</span>
+                        </div>
+                      )}
+                      {userPlayer?.tournamentsWon > 0 && (
+                        <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center" title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}>
+                          <span className="text-yellow-100 text-sm">👑</span>
+                        </div>
+                      )}
+                      {userPlayer?.wins > 0 && (
+                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center" title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}>
+                          <span className="text-white text-sm">🏆</span>
+                        </div>
+                      )}
+                      {(!userPlayer || (userPlayer.mvps === 0 && userPlayer.tournamentsWon === 0 && userPlayer.wins === 0)) && (
+                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center" title="No achievements yet">
+                          <span className="text-gray-300 text-sm">🎯</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -622,7 +545,12 @@ export default function Dashboard() {
 
               {/* Games List */}
               <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                {boardGames.map((game) => (
+                {boardGamesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
+                    <p className="text-amber-400 text-lg">Loading board games...</p>
+                  </div>
+                ) : boardGames.length > 0 ? boardGames.map((game) => (
                   <div
                     key={game.id}
                     className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg"
@@ -630,7 +558,7 @@ export default function Dashboard() {
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
                       <div className="text-3xl bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg p-2 flex-shrink-0">
-                        {game.image}
+🎲
                       </div>
                       
                       {/* Game Info */}
@@ -638,7 +566,7 @@ export default function Dashboard() {
                         <h3 className="text-amber-300 font-semibold text-sm truncate group-hover:text-amber-200 transition-colors">
                           {game.name}
                         </h3>
-                        <p className="text-purple-300 text-xs mb-1">{game.category}</p>
+                        <p className="text-purple-300 text-xs mb-1">{game.description || 'Board Game'}</p>
                         
                         {/* Game Details */}
                         <div className="flex items-center space-x-3 text-xs text-purple-400">
@@ -646,37 +574,42 @@ export default function Dashboard() {
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            {game.players}
+                            {game.minPlayers}-{game.maxPlayers} players
                           </span>
                           <span className="flex items-center">
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {game.duration}
+                            Difficulty: {game.diff}
                           </span>
                         </div>
                         
-                        {/* Rating and Status */}
+                        {/* Status */}
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center space-x-1">
                             <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            <span className="text-amber-400 text-xs font-medium">{game.rating}</span>
+                            <span className="text-amber-400 text-xs font-medium">{game.recentGames} recent</span>
                           </div>
                           
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            game.status === 'Owned' 
+                            game.ownerCount > 0 
                               ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
                               : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
                           }`}>
-                            {game.status}
+                            {game.ownerCount > 0 ? 'Available' : 'Not Available'}
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <div className="text-purple-300 text-lg">No board games available</div>
+                    <div className="text-purple-400 text-sm mt-2">Games will appear here as they are added</div>
+                  </div>
+                )}
               </div>
 
               {/* View All Button */}
