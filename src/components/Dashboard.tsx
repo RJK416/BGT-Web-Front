@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import Leaderboard from '@/components/Leaderboard';
+import { useRef } from 'react';
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -30,9 +31,77 @@ export default function Dashboard() {
 
   // Real user player data from API
   const [userPlayer, setUserPlayer] = useState<any>(null);
+  const isGM = userPlayer?.role === 'GM';
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
 
   const router = useRouter();
+
+  function CreateTournamentForm() {
+    const [name, setName] = useState('');
+    const [game, setGame] = useState('');
+    const [tournamentDate, setTournamentDate] = useState('');
+    const [maxMembers, setMaxMembers] = useState<number>(8);
+    const [memberCount, setMemberCount] = useState<number>(0);
+    const [creating, setCreating] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const submit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setCreating(true);
+      setMessage(null);
+      try {
+        const token = getAuthToken();
+        const body = {
+          Name: name,
+          Game: game,
+          TournamentDate: tournamentDate,
+          MaxMembers: maxMembers,
+          MemberCount: memberCount,
+        };
+        const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.CREATE_TOURNAMENT}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(res.error || res.message || 'Failed');
+        setMessage(res.message || 'Tournament created');
+        setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0);
+      } catch (err: any) {
+        setMessage(err.message || 'Failed to create tournament');
+      } finally {
+        setCreating(false);
+      }
+    };
+
+    return (
+      <form onSubmit={submit} className="space-y-4">
+        {message && <div className="text-sm text-amber-300">{message}</div>}
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">Name</label>
+          <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">Game</label>
+          <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-amber-300 text-sm mb-1">Date</label>
+            <input type="date" value={tournamentDate} onChange={e=>setTournamentDate(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          </div>
+          <div>
+            <label className="block text-amber-300 text-sm mb-1">Max Members</label>
+            <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          </div>
+          <div>
+            <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
+            <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          </div>
+        </div>
+        <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">{creating? 'Creating...' : 'Create Tournament'}</button>
+      </form>
+    );
+  }
 
   // Fetch board games from API
   const fetchBoardGames = async () => {
@@ -323,6 +392,14 @@ export default function Dashboard() {
 
             {/* Leaderboard */}
             <Leaderboard limit={10} showPagination={true} showSearch={true} className="mb-8 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
+
+            {/* GM: Create Tournament Panel */}
+            {isGM && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-amber-400/40 shadow-lg shadow-amber-400/20 mb-8">
+                <h2 className="text-xl font-bold text-amber-400 mb-4">Create Tournament</h2>
+                <CreateTournamentForm />
+              </div>
+            )}
 
             {/* Your Player Card */}
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
