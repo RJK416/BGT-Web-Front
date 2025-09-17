@@ -10,6 +10,7 @@ import { useRef } from 'react';
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [myTournaments, setMyTournaments] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalGames: 0,
     gamesPlayed: 0,
@@ -254,7 +255,7 @@ export default function Dashboard() {
   };
 
 
-  const [myTournaments, setMyTournaments] = useState<any[]>([]);
+  
 
   if (isLoading) {
     return (
