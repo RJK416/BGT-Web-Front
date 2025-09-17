@@ -217,6 +217,22 @@ export default function Dashboard() {
         // Fetch tournaments data
         fetchTournaments();
         
+        // Fetch GM-owned tournaments if GM
+        if (isGM) {
+          (async () => {
+            try {
+              const token = getAuthToken();
+              const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              if (res.ok) {
+                setMyTournaments(res.data || res.result || []);
+              }
+            } catch {}
+          })();
+        }
+        
         // Fetch user player data
         fetchUserPlayer();
       } catch (error) {
@@ -237,6 +253,8 @@ export default function Dashboard() {
     router.push('/');
   };
 
+
+  const [myTournaments, setMyTournaments] = useState<any[]>([]);
 
   if (isLoading) {
     return (
@@ -400,6 +418,26 @@ export default function Dashboard() {
               <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-amber-400/40 shadow-lg shadow-amber-400/20 mb-8">
                 <h2 className="text-xl font-bold text-amber-400 mb-4">Create Tournament</h2>
                 <CreateTournamentForm />
+              </div>
+            )}
+
+            {/* GM: Your Tournaments */}
+            {isGM && myTournaments.length > 0 && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-amber-400/40 shadow-lg shadow-amber-400/20 mb-8">
+                <h2 className="text-xl font-bold text-amber-400 mb-4">Your Tournaments</h2>
+                <div className="space-y-3">
+                  {myTournaments.map(t => (
+                    <div key={t.id} className="bg-purple-900/50 rounded-lg p-4 border border-amber-400/20 flex items-center justify-between">
+                      <div>
+                        <div className="text-amber-300 font-semibold">{t.name}</div>
+                        <div className="text-purple-300 text-sm">{t.game} • {new Date(t.tournamentDate).toLocaleDateString()} • {t.memberCount}/{t.maxMembers}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="px-3 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-400/30 text-xs">Manage</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
