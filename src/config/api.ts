@@ -21,6 +21,7 @@ export const API_CONFIG = {
       GET_LEADERBOARD: '/Boardgame/Get-Leaderboard',
       GET_BOARDGAMES: '/Boardgame/Get-Boardgames', // legacy
       GET_TOURNAMENTS: '/Boardgame/Get-Tournaments',
+      GET_TOURNAMENT_MEMBERS: '/Boardgame/Get-Tournament-Members',
       GET_USER_PLAYER: '/Boardgame/Get-User-Player',
       CREATE_TOURNAMENT: '/Boardgame/Create-Boardgame-Tournament',
     },

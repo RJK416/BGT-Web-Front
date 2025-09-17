@@ -680,6 +680,25 @@ export default function Dashboard() {
                             {t.memberCount < t.maxMembers ? 'Open' : 'Full'}
                           </span>
                         </div>
+
+                        {/* Members button */}
+                        <div className="mt-3">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENT_MEMBERS}/${t.id}`, { method: 'GET' });
+                                if (!res.ok) throw new Error(res.error || res.message || 'Failed to load members');
+                                const members = res.data || res.result || res.items || [];
+                                alert(members.map((m: any) => `${m.nickname}${m.placement ? ` (#${m.placement})` : ''}`).join('\n') || 'No members');
+                              } catch (e: any) {
+                                alert(e.message || 'Failed');
+                              }
+                            }}
+                            className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-xs"
+                          >
+                            View Members
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
