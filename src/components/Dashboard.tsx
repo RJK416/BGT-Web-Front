@@ -25,9 +25,9 @@ export default function Dashboard() {
 
 
 
-  // Real board games data from API
-  const [boardGames, setBoardGames] = useState([]);
-  const [boardGamesLoading, setBoardGamesLoading] = useState(true);
+  // Tournaments data from API
+  const [tournaments, setTournaments] = useState([]);
+  const [tournamentsLoading, setTournamentsLoading] = useState(true);
 
   // Real user player data from API
   const [userPlayer, setUserPlayer] = useState<any>(null);
@@ -105,25 +105,25 @@ export default function Dashboard() {
     );
   }
 
-  // Fetch board games from API
-  const fetchBoardGames = async () => {
+  // Fetch tournaments from API
+  const fetchTournaments = async () => {
     try {
-      setBoardGamesLoading(true);
-      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_BOARDGAMES}?page=1&pageSize=10`, {
+      setTournamentsLoading(true);
+      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENTS}?page=1&pageSize=10`, {
         method: 'GET',
       });
 
       if (response.ok && response.status === 200) {
-        setBoardGames(response.data?.items || []);
+        setTournaments(response.items || response.data?.items || []);
       } else {
-        console.error('Failed to fetch board games:', response);
-        setBoardGames([]);
+        console.error('Failed to fetch tournaments:', response);
+        setTournaments([]);
       }
     } catch (error) {
-      console.error('Error fetching board games:', error);
-      setBoardGames([]);
+      console.error('Error fetching tournaments:', error);
+      setTournaments([]);
     } finally {
-      setBoardGamesLoading(false);
+      setTournamentsLoading(false);
     }
   };
 
@@ -214,8 +214,8 @@ export default function Dashboard() {
           setIsLoading(false);
         }, 1000);
 
-        // Fetch board games data
-        fetchBoardGames();
+        // Fetch tournaments data
+        fetchTournaments();
         
         // Fetch user player data
         fetchUserPlayer();
@@ -574,7 +574,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right Sidebar - Board Games List */}
+          {/* Right Sidebar - Tournaments List */}
           <div className="w-80 flex-shrink-0 relative">
             {/* Stardust around Board Games */}
             <div className="absolute -top-4 -left-4 w-6 h-6 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
@@ -595,9 +595,9 @@ export default function Dashboard() {
             
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 sticky top-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-amber-400">Board Games</h2>
+                <h2 className="text-xl font-bold text-amber-400">Tournaments</h2>
                 <button 
-                  onClick={() => console.log('Add game clicked')}
+                  onClick={() => console.log('Add tournament clicked')}
                   className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -611,7 +611,7 @@ export default function Dashboard() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search games..."
+                    placeholder="Search tournaments..."
                     className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -622,30 +622,30 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Games List */}
+              {/* Tournaments List */}
               <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                {boardGamesLoading ? (
+                {tournamentsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
-                    <p className="text-amber-400 text-lg">Loading board games...</p>
+                    <p className="text-amber-400 text-lg">Loading tournaments...</p>
                   </div>
-                ) : boardGames.length > 0 ? boardGames.map((game) => (
+                ) : tournaments.length > 0 ? tournaments.map((t: any) => (
                   <div
-                    key={game.id}
+                    key={t.id}
                     className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg"
                   >
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
                       <div className="text-3xl bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg p-2 flex-shrink-0">
-🎲
+🏟️
                       </div>
                       
                       {/* Game Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-amber-300 font-semibold text-sm truncate group-hover:text-amber-200 transition-colors">
-                          {game.name}
+                          {t.name}
                         </h3>
-                        <p className="text-purple-300 text-xs mb-1">{game.description || 'Board Game'}</p>
+                        <p className="text-purple-300 text-xs mb-1">{t.game}</p>
                         
                         {/* Game Details */}
                         <div className="flex items-center space-x-3 text-xs text-purple-400">
@@ -653,13 +653,13 @@ export default function Dashboard() {
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            {game.minPlayers}-{game.maxPlayers} players
+                            {t.memberCount}/{t.maxMembers} members
                           </span>
                           <span className="flex items-center">
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Difficulty: {game.diff}
+                            {new Date(t.tournamentDate).toLocaleDateString()}
                           </span>
                         </div>
                         
@@ -669,15 +669,15 @@ export default function Dashboard() {
                             <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            <span className="text-amber-400 text-xs font-medium">{game.recentGames} recent</span>
+                            <span className="text-amber-400 text-xs font-medium">{t.name}</span>
                           </div>
                           
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            game.ownerCount > 0 
+                            t.memberCount < t.maxMembers 
                               ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
                               : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
                           }`}>
-                            {game.ownerCount > 0 ? 'Available' : 'Not Available'}
+                            {t.memberCount < t.maxMembers ? 'Open' : 'Full'}
                           </span>
                         </div>
                       </div>
@@ -685,8 +685,8 @@ export default function Dashboard() {
                   </div>
                 )) : (
                   <div className="text-center py-8">
-                    <div className="text-purple-300 text-lg">No board games available</div>
-                    <div className="text-purple-400 text-sm mt-2">Games will appear here as they are added</div>
+                    <div className="text-purple-300 text-lg">No tournaments available</div>
+                    <div className="text-purple-400 text-sm mt-2">Tournaments will appear here as they are created</div>
                   </div>
                 )}
               </div>
@@ -694,7 +694,7 @@ export default function Dashboard() {
               {/* View All Button */}
               <div className="mt-6 pt-4 border-t border-purple-700/30">
                 <button className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">
-                  View All Games
+                  View All Tournaments
                 </button>
               </div>
             </div>

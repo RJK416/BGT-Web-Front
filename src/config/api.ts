@@ -19,7 +19,8 @@ export const API_CONFIG = {
       ADD: '/Boardgame/Add-Boardgame',
       ADD_OWNER: '/Boardgame/Add-Boardgame-Owner',
       GET_LEADERBOARD: '/Boardgame/Get-Leaderboard',
-      GET_BOARDGAMES: '/Boardgame/Get-Boardgames',
+      GET_BOARDGAMES: '/Boardgame/Get-Boardgames', // legacy
+      GET_TOURNAMENTS: '/Boardgame/Get-Tournaments',
       GET_USER_PLAYER: '/Boardgame/Get-User-Player',
       CREATE_TOURNAMENT: '/Boardgame/Create-Boardgame-Tournament',
     },
