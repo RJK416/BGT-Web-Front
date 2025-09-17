@@ -51,10 +51,12 @@ export default function Dashboard() {
       setMessage(null);
       try {
         const token = getAuthToken();
+        // Ensure UTC date (input type="date" gives YYYY-MM-DD)
+        const utcIsoDate = new Date(`${tournamentDate}T00:00:00Z`).toISOString();
         const body = {
           Name: name,
           Game: game,
-          TournamentDate: tournamentDate,
+          TournamentDate: utcIsoDate,
           MaxMembers: maxMembers,
           MemberCount: memberCount,
         };
