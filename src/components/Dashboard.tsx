@@ -11,18 +11,6 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [myTournaments, setMyTournaments] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    totalGames: 0,
-    gamesPlayed: 0,
-    gamesWon: 0,
-    winRate: 0,
-    recentGames: [] as Array<{
-      name: string;
-      date: string;
-      result: string;
-      score: string;
-    }>
-  });
 
 
 
@@ -34,6 +22,15 @@ export default function Dashboard() {
   const [userPlayer, setUserPlayer] = useState<any>(null);
   const isGM = userPlayer?.role === 'GM';
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
+  const [isCreateTournamentExpanded, setIsCreateTournamentExpanded] = useState(false);
+  
+  // Tournament modal state
+  const [selectedTournament, setSelectedTournament] = useState<any>(null);
+  const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
+  const [tournamentMembers, setTournamentMembers] = useState<any[]>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [addPlayerUsername, setAddPlayerUsername] = useState('');
+  const [addingPlayer, setAddingPlayer] = useState(false);
 
   const router = useRouter();
 
@@ -43,6 +40,8 @@ export default function Dashboard() {
     const [tournamentDate, setTournamentDate] = useState('');
     const [maxMembers, setMaxMembers] = useState<number>(8);
     const [memberCount, setMemberCount] = useState<number>(0);
+    const [xpReward, setXpReward] = useState<number>(100);
+    const [mvpXpReward, setMvpXpReward] = useState<number>(50);
     const [creating, setCreating] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -60,6 +59,8 @@ export default function Dashboard() {
           TournamentDate: utcIsoDate,
           MaxMembers: maxMembers,
           MemberCount: memberCount,
+          XpReward: xpReward,
+          MvpXpReward: mvpXpReward,
         };
         const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.CREATE_TOURNAMENT}`, {
           method: 'POST',
@@ -68,7 +69,12 @@ export default function Dashboard() {
         });
         if (!res.ok) throw new Error(res.error || res.message || 'Failed');
         setMessage(res.message || 'Tournament created');
-        setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0);
+        setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
+        
+        // Refresh my tournaments list
+        if (typeof fetchMyTournaments === 'function') {
+          fetchMyTournaments();
+        }
       } catch (err: any) {
         setMessage(err.message || 'Failed to create tournament');
       } finally {
@@ -87,7 +93,7 @@ export default function Dashboard() {
           <label className="block text-amber-300 text-sm mb-1">Game</label>
           <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-amber-300 text-sm mb-1">Date</label>
             <input type="date" value={tournamentDate} onChange={e=>setTournamentDate(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
@@ -99,6 +105,16 @@ export default function Dashboard() {
           <div>
             <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
             <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          </div>
+          <div>
+            <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
+            <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
+            <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
           </div>
         </div>
         <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">{creating? 'Creating...' : 'Create Tournament'}</button>
@@ -198,41 +214,10 @@ export default function Dashboard() {
           joinDate: '2024-01-15'
         });
 
-        // Simulate loading user data
-        setTimeout(() => {
-          setStats({
-            totalGames: 24,
-            gamesPlayed: 18,
-            gamesWon: 12,
-            winRate: 66.7,
-            recentGames: [
-              { name: 'Catan', date: '2024-01-20', result: 'Won', score: '10-7-5' },
-              { name: 'Ticket to Ride', date: '2024-01-18', result: 'Lost', score: '98-105' },
-              { name: 'Pandemic', date: '2024-01-15', result: 'Won', score: 'Team Victory' },
-              { name: 'Carcassonne', date: '2024-01-12', result: 'Won', score: '78-65' }
-            ]
-          });
           setIsLoading(false);
-        }, 1000);
 
         // Fetch tournaments data
         fetchTournaments();
-        
-        // Fetch GM-owned tournaments if GM
-        if (isGM) {
-          (async () => {
-            try {
-              const token = getAuthToken();
-              const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-              });
-              if (res.ok) {
-                setMyTournaments(res.data || res.result || []);
-              }
-            } catch {}
-          })();
-        }
         
         // Fetch user player data
         fetchUserPlayer();
@@ -247,6 +232,120 @@ export default function Dashboard() {
     checkAuth();
   }, [router]);
 
+  // Function to fetch my tournaments
+  const fetchMyTournaments = async () => {
+    if (!userPlayer || !isGM) return;
+    
+    try {
+      const token = getAuthToken();
+      console.log('🔍 Fetching my tournaments for GM user...');
+      console.log('🔍 Token exists:', !!token);
+      console.log('🔍 API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`);
+      console.log('🔍 User player role:', userPlayer.role);
+      console.log('🔍 Is GM:', isGM);
+      
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      console.log('🔍 My tournaments response:', res);
+      console.log('🔍 Response ok:', res.ok);
+      console.log('🔍 Response status:', res.status);
+      console.log('🔍 Response data:', res.data);
+      console.log('🔍 Response result:', res.result);
+      
+      if (res.ok) {
+        const tournaments = res.data || res.result || [];
+        console.log('🔍 Setting my tournaments:', tournaments);
+        setMyTournaments(tournaments);
+      } else {
+        console.error('🔍 Failed to fetch my tournaments:', res);
+      }
+    } catch (error) {
+      console.error('🔍 Error fetching my tournaments:', error);
+    }
+  };
+
+  // Fetch my tournaments when userPlayer is loaded and user is GM
+  useEffect(() => {
+    fetchMyTournaments();
+  }, [userPlayer, isGM]);
+
+  // Function to open tournament modal and fetch members
+  const openTournamentModal = async (tournament: any) => {
+    setSelectedTournament(tournament);
+    setIsTournamentModalOpen(true);
+    setMembersLoading(true);
+    
+    try {
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENT_MEMBERS}/${tournament.id}`, { 
+        method: 'GET' 
+      });
+      
+      if (res.ok) {
+        setTournamentMembers(res.data || res.result || []);
+      } else {
+        console.error('Failed to fetch tournament members:', res);
+        setTournamentMembers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching tournament members:', error);
+      setTournamentMembers([]);
+    } finally {
+      setMembersLoading(false);
+    }
+  };
+
+  // Function to close tournament modal
+  const closeTournamentModal = () => {
+    setIsTournamentModalOpen(false);
+    setSelectedTournament(null);
+    setTournamentMembers([]);
+    setAddPlayerUsername('');
+  };
+
+  // Function to add player to tournament
+  const addPlayerToTournament = async () => {
+    if (!selectedTournament || !addPlayerUsername.trim()) return;
+
+    setAddingPlayer(true);
+    try {
+      const token = getAuthToken();
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.ADD_TOURNAMENT_MEMBER}`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          TournamentId: selectedTournament.id,
+          Username: addPlayerUsername.trim()
+        })
+      });
+
+      if (res.ok) {
+        setAddPlayerUsername('');
+        // Refresh members list
+        const membersRes = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENT_MEMBERS}/${selectedTournament.id}`, { 
+          method: 'GET' 
+        });
+        if (membersRes.ok) {
+          setTournamentMembers(membersRes.data || membersRes.result || []);
+        }
+        // Refresh my tournaments list
+        fetchMyTournaments();
+        alert(res.message || 'Player added successfully!');
+      } else {
+        alert(res.error || res.message || 'Failed to add player');
+      }
+    } catch (error: any) {
+      alert(error.message || 'Failed to add player');
+    } finally {
+      setAddingPlayer(false);
+    }
+  };
+
   const handleLogout = () => {
     // Remove the JWT token
     removeAuthToken();
@@ -255,7 +354,7 @@ export default function Dashboard() {
   };
 
 
-  
+
 
   if (isLoading) {
     return (
@@ -330,17 +429,6 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-purple-200">Welcome, {user?.username}</span>
-              {isGM && (
-                <button
-                  onClick={() => {
-                    // TODO: Navigate to tournaments management page or open modal
-                    console.log('Manage tournaments clicked');
-                  }}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
-                >
-                  🏟️ Manage Tournaments
-                </button>
-              )}
               <button
                 onClick={() => router.push('/settings')}
                 className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
@@ -363,74 +451,106 @@ export default function Dashboard() {
         <div className="flex gap-8">
           {/* Left Content Area */}
           <div className="flex-1">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
-                <div className="flex items-center">
-                  <div className="p-3 bg-amber-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-purple-200 text-sm font-medium">Total Games</p>
-                    <p className="text-2xl font-bold text-amber-400">{stats.totalGames}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
-                <div className="flex items-center">
-                  <div className="p-3 bg-green-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-purple-200 text-sm font-medium">Games Won</p>
-                    <p className="text-2xl font-bold text-green-400">{stats.gamesWon}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
-                <div className="flex items-center">
-                  <div className="p-3 bg-blue-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-purple-200 text-sm font-medium">Win Rate</p>
-                    <p className="text-2xl font-bold text-blue-400">{stats.winRate}%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20">
-                <div className="flex items-center">
-                  <div className="p-3 bg-purple-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-purple-200 text-sm font-medium">Games Played</p>
-                    <p className="text-2xl font-bold text-purple-400">{stats.gamesPlayed}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Leaderboard */}
             <Leaderboard limit={10} showPagination={true} showSearch={true} className="mb-8 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
 
+            {/* GM: Manage Tournaments Panel */}
+            {isGM && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-amber-400">My Tournaments</h2>
+                    <button
+                      onClick={fetchMyTournaments}
+                      className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  
+                  {/* My Tournaments List */}
+                  <div className="space-y-3 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden">
+                    {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
+                      <div
+                        key={tournament.id}
+                        onClick={() => openTournamentModal(tournament)}
+                        className="bg-gradient-to-r from-purple-800/40 to-purple-700/40 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border border-sky-200/30 hover:border-sky-200/50 transition-all duration-300 cursor-pointer"
+                      >
+                        <div className="flex items-start justify-between min-w-0">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <h3 className="text-amber-300 font-semibold text-sm truncate">{tournament.name}</h3>
+                            <p className="text-purple-300 text-xs truncate">{tournament.game}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-purple-400">
+                              <span className="whitespace-nowrap">{tournament.memberCount}/{tournament.maxMembers} members</span>
+                              <span className="whitespace-nowrap">{new Date(tournament.tournamentDate).toLocaleDateString()}</span>
+                              <span className="whitespace-nowrap">{tournament.xpReward || 100} XP</span>
+                              <span className="whitespace-nowrap">{tournament.mvpXpReward || 50} MVP XP</span>
+                  </div>
+                            <div className="mt-1">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                tournament.phase === 0 ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
+                                tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
+                                tournament.phase === 2 ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30' :
+                                tournament.phase === 3 ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30' :
+                                'bg-red-500/20 text-red-300 border border-red-400/30'
+                              }`}>
+                                {tournament.phase === 0 ? 'Registration' :
+                                 tournament.phase === 1 ? 'Started' :
+                                 tournament.phase === 2 ? 'Finished' :
+                                 tournament.phase === 3 ? 'Postponed' : 'Cancelled'}
+                              </span>
+                </div>
+              </div>
+                          <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                              tournament.memberCount < tournament.maxMembers 
+                                ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
+                                : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                            }`}>
+                              {tournament.memberCount < tournament.maxMembers ? 'Open' : 'Full'}
+                            </span>
+                            <span className="text-xs text-purple-400 whitespace-nowrap">Click to manage</span>
+                  </div>
+                </div>
+              </div>
+                    )) : (
+                      <div className="text-center py-8">
+                        <div className="text-purple-300 text-lg">No tournaments created yet</div>
+                        <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
+                  </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* GM: Create Tournament Panel */}
             {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-amber-400/40 shadow-lg shadow-amber-400/20 mb-8">
-                <h2 className="text-xl font-bold text-amber-400 mb-4">Create Tournament</h2>
-                <CreateTournamentForm />
-              </div>
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
+                {/* Expandable Button */}
+                <button
+                  onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                >
+                  <span className="text-lg font-bold">Create Tournament</span>
+                  <svg 
+                    className={`w-5 h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                {/* Expandable Form */}
+                {isCreateTournamentExpanded && (
+                  <div className="p-6 border-t border-sky-200/20">
+                    <CreateTournamentForm />
+                  </div>
+                )}
+                  </div>
             )}
 
 
@@ -512,15 +632,15 @@ export default function Dashboard() {
                     {/* Stats Row */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || stats.gamesPlayed}</div>
+                        <div className="text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || 0}</div>
                         <div className="text-xs text-purple-300">Games Played</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">{userPlayer?.wins || stats.gamesWon}</div>
+                        <div className="text-2xl font-bold text-green-400">{userPlayer?.wins || 0}</div>
                         <div className="text-xs text-purple-300">Games Won</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : stats.winRate}%</div>
+                        <div className="text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
                         <div className="text-xs text-purple-300">Win Rate</div>
                       </div>
                     </div>
@@ -606,7 +726,7 @@ export default function Dashboard() {
           </div>
 
           {/* Right Sidebar - Tournaments List */}
-          <div className="w-80 flex-shrink-0 relative">
+          <div className="w-96 flex-shrink-0 relative">
             {/* Stardust around Board Games */}
             <div className="absolute -top-4 -left-4 w-6 h-6 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
             <div className="absolute -top-2 -right-2 w-3 h-3 bg-blue-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.5s' }} />
@@ -654,7 +774,7 @@ export default function Dashboard() {
               </div>
 
               {/* Tournaments List */}
-              <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+              <div className="space-y-4 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden">
                 {tournamentsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
@@ -663,7 +783,7 @@ export default function Dashboard() {
                 ) : tournaments.length > 0 ? tournaments.map((t: any) => (
                   <div
                     key={t.id}
-                    className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg"
+                    className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-5 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
@@ -678,32 +798,47 @@ export default function Dashboard() {
                         </h3>
                         <p className="text-purple-300 text-xs mb-1">{t.game}</p>
                         
-                        {/* Game Details */}
-                        <div className="flex items-center space-x-3 text-xs text-purple-400">
-                          <span className="flex items-center">
-                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Game Details - Flexible layout */}
+                        <div className="space-y-2">
+                          {/* Details with flex-wrap */}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-purple-400">
+                            <span className="flex items-center whitespace-nowrap">
+                              <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            {t.memberCount}/{t.maxMembers} members
+                              {t.memberCount}/{t.maxMembers} members
                           </span>
-                          <span className="flex items-center">
-                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span className="flex items-center whitespace-nowrap">
+                              <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {new Date(t.tournamentDate).toLocaleDateString()}
+                              {new Date(t.tournamentDate).toLocaleDateString()}
+                            </span>
+                            <span className="flex items-center whitespace-nowrap">
+                              <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                              </svg>
+                              {t.xpReward || 100} XP
+                            </span>
+                            <span className="flex items-center whitespace-nowrap">
+                              <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {t.mvpXpReward || 50} MVP XP
                           </span>
+                          </div>
                         </div>
                         
                         {/* Status */}
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="flex items-center space-x-1">
-                            <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center justify-between mt-2 min-w-0">
+                          <div className="flex items-center space-x-1 min-w-0 flex-1">
+                            <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            <span className="text-amber-400 text-xs font-medium">{t.name}</span>
+                            <span className="text-amber-400 text-xs font-medium truncate">{t.name}</span>
                           </div>
                           
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
                             t.memberCount < t.maxMembers 
                               ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
                               : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
@@ -751,6 +886,181 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Tournament Management Modal */}
+      {isTournamentModalOpen && selectedTournament && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-2xl shadow-sky-200/20 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-sky-200/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-amber-400">{selectedTournament.name}</h2>
+                  <p className="text-purple-300">{selectedTournament.game}</p>
+                </div>
+                <button
+                  onClick={closeTournamentModal}
+                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all duration-300"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Tournament Stats */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-amber-400">Tournament Stats</h3>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
+                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.memberCount}</div>
+                      <div className="text-xs text-purple-300 truncate">Current Members</div>
+                    </div>
+                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
+                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.maxMembers}</div>
+                      <div className="text-xs text-purple-300 truncate">Max Members</div>
+                    </div>
+                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
+                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.xpReward || 100}</div>
+                      <div className="text-xs text-purple-300 truncate">XP Reward</div>
+                    </div>
+                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
+                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.mvpXpReward || 50}</div>
+                      <div className="text-xs text-purple-300 truncate">MVP XP Reward</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
+                    <div className="text-sm text-purple-300 mb-2">Tournament Date</div>
+                    <div className="text-amber-400 font-semibold">
+                      {new Date(selectedTournament.tournamentDate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
+                    <div className="text-sm text-purple-300 mb-2">Status</div>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedTournament.memberCount < selectedTournament.maxMembers 
+                        ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
+                        : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                    }`}>
+                      {selectedTournament.memberCount < selectedTournament.maxMembers ? 'Open for Registration' : 'Tournament Full'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tournament Members */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-amber-400">Tournament Members</h3>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        placeholder="Enter username..."
+                        value={addPlayerUsername}
+                        onChange={(e) => setAddPlayerUsername(e.target.value)}
+                        className="px-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 text-sm w-40"
+                        onKeyPress={(e) => e.key === 'Enter' && addPlayerToTournament()}
+                      />
+                      <button
+                        onClick={addPlayerToTournament}
+                        disabled={addingPlayer || !addPlayerUsername.trim()}
+                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 text-purple-900 rounded-lg text-sm font-medium transition-all duration-300"
+                      >
+                        {addingPlayer ? 'Adding...' : 'Add Player'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-purple-800/40 rounded-lg border border-sky-200/20 max-h-80 overflow-y-auto">
+                    {membersLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
+                        <p className="text-amber-400">Loading members...</p>
+                      </div>
+                    ) : tournamentMembers.length > 0 ? (
+                      <div className="space-y-2 p-4">
+                        {tournamentMembers.map((member: any, index: number) => (
+                          <div key={member.id} className="flex items-center justify-between bg-purple-700/30 rounded-lg p-3 min-w-0">
+                            <div className="flex items-center space-x-3 min-w-0 flex-1">
+                              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="text-sm font-bold text-purple-900">
+                                  {member.nickname?.charAt(0).toUpperCase() || 'P'}
+                                </span>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-amber-300 font-medium text-sm truncate">{member.nickname}</div>
+                                <div className="text-purple-400 text-xs truncate">
+                                  Joined: {new Date(member.joinedAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1 flex-shrink-0">
+                              {member.placement && (
+                                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs whitespace-nowrap">
+                                  #{member.placement}
+                                </span>
+                              )}
+                              {member.score && (
+                                <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs whitespace-nowrap">
+                                  {member.score} pts
+                                </span>
+                              )}
+                              <button className="p-1 text-red-400 hover:text-red-300 transition-colors flex-shrink-0">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-purple-300 text-lg">No members yet</div>
+                        <div className="text-purple-400 text-sm mt-2">Players will appear here when they join</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 pt-6 border-t border-sky-200/20">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-medium text-sm">
+                      Start Tournament
+                    </button>
+                    <button className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium text-sm">
+                      Edit Tournament
+                    </button>
+                    <button className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-medium text-sm">
+                      End Tournament
+                    </button>
+                  </div>
+                  <button
+                    onClick={closeTournamentModal}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium text-sm"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

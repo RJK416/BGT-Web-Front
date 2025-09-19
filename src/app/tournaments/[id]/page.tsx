@@ -41,7 +41,7 @@ export default function TournamentDetailPage() {
           <div className="space-y-2">
             {members.map(m => (
               <div key={m.id} className="bg-purple-900/50 rounded-lg p-4 border border-amber-400/20 flex items-center justify-between">
-                <div>
+                <div> 
                   <div className="text-amber-300 font-semibold">{m.nickname}</div>
                   <div className="text-purple-300 text-sm">Joined: {new Date(m.joinedAt).toLocaleString()}</div>
                 </div>
