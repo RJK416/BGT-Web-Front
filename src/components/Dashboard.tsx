@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import Leaderboard from '@/components/Leaderboard';
+import UpdateTournamentModal from '@/components/UpdateTournamentModal';
+import EndTournamentModal from '@/components/EndTournamentModal';
+import TournamentMembersModal from '@/components/TournamentMembersModal';
+import { getPhaseDisplayName } from '@/types/tournament';
 import { useRef } from 'react';
 
 export default function Dashboard() {
@@ -31,6 +35,16 @@ export default function Dashboard() {
   const [membersLoading, setMembersLoading] = useState(false);
   const [addPlayerUsername, setAddPlayerUsername] = useState('');
   const [addingPlayer, setAddingPlayer] = useState(false);
+  
+  // Update tournament modal state
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  
+  // End tournament modal state
+  const [isEndModalOpen, setIsEndModalOpen] = useState(false);
+  
+  // Tournament members modal state
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [membersModalTournament, setMembersModalTournament] = useState<{id: number, name: string} | null>(null);
 
   const router = useRouter();
 
@@ -126,7 +140,7 @@ export default function Dashboard() {
   const fetchTournaments = async () => {
     try {
       setTournamentsLoading(true);
-      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENTS}?page=1&pageSize=10`, {
+      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENTS_WITH_GM}?page=1&pageSize=10`, {
         method: 'GET',
       });
 
@@ -240,11 +254,11 @@ export default function Dashboard() {
       const token = getAuthToken();
       console.log('🔍 Fetching my tournaments for GM user...');
       console.log('🔍 Token exists:', !!token);
-      console.log('🔍 API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`);
+      console.log('🔍 API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`);
       console.log('🔍 User player role:', userPlayer.role);
       console.log('🔍 Is GM:', isGM);
       
-      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS}`, {
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -303,6 +317,48 @@ export default function Dashboard() {
     setSelectedTournament(null);
     setTournamentMembers([]);
     setAddPlayerUsername('');
+  };
+
+  // Function to open update tournament modal
+  const openUpdateModal = () => {
+    setIsUpdateModalOpen(true);
+  };
+
+  // Function to open end tournament modal
+  const openEndModal = () => {
+    setIsEndModalOpen(true);
+  };
+
+  // Function to open tournament members modal
+  const openMembersModal = (tournament: any) => {
+    setMembersModalTournament({ id: tournament.id, name: tournament.name });
+    setIsMembersModalOpen(true);
+  };
+
+  // Function to handle successful tournament update
+  const handleUpdateSuccess = () => {
+    // Refresh tournaments data
+    fetchMyTournaments();
+    // Close the update modal
+    setIsUpdateModalOpen(false);
+    // Close the main tournament modal and reopen it to show updated data
+    closeTournamentModal();
+    if (selectedTournament) {
+      openTournamentModal(selectedTournament);
+    }
+  };
+
+  // Function to handle successful tournament end
+  const handleEndSuccess = () => {
+    // Refresh tournaments data
+    fetchMyTournaments();
+    // Close the end modal
+    setIsEndModalOpen(false);
+    // Close the main tournament modal and reopen it to show updated data
+    closeTournamentModal();
+    if (selectedTournament) {
+      openTournamentModal(selectedTournament);
+    }
   };
 
   // Function to add player to tournament
@@ -783,6 +839,7 @@ export default function Dashboard() {
                 ) : tournaments.length > 0 ? tournaments.map((t: any) => (
                   <div
                     key={t.id}
+                    onClick={() => openTournamentModal(t)}
                     className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-5 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start space-x-3">
@@ -796,7 +853,13 @@ export default function Dashboard() {
                         <h3 className="text-amber-300 font-semibold text-sm truncate group-hover:text-amber-200 transition-colors">
                           {t.name}
                         </h3>
+                        <p className="text-purple-300 text-xs mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Click to view tournament details
+                        </p>
                         <p className="text-purple-300 text-xs mb-1">{t.game}</p>
+                        <p className="text-purple-400 text-xs">
+                          GM: {t.gameMasterUsername || 'Unknown'}
+                        </p>
                         
                         {/* Game Details - Flexible layout */}
                         <div className="space-y-2">
@@ -850,15 +913,9 @@ export default function Dashboard() {
                         {/* Members button */}
                         <div className="mt-3">
                           <button
-                            onClick={async () => {
-                              try {
-                                const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENT_MEMBERS}/${t.id}`, { method: 'GET' });
-                                if (!res.ok) throw new Error(res.error || res.message || 'Failed to load members');
-                                const members = res.data || res.result || res.items || [];
-                                alert(members.map((m: any) => `${m.nickname}${m.placement ? ` (#${m.placement})` : ''}`).join('\n') || 'No members');
-                              } catch (e: any) {
-                                alert(e.message || 'Failed');
-                              }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openMembersModal(t);
                             }}
                             className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-xs"
                           >
@@ -950,12 +1007,25 @@ export default function Dashboard() {
                   <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
                     <div className="text-sm text-purple-300 mb-2">Status</div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedTournament.memberCount < selectedTournament.maxMembers 
+                      selectedTournament.phase === 0 
                         ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
-                        : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                        : selectedTournament.phase === 1
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                        : selectedTournament.phase === 2
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30'
+                        : selectedTournament.phase === 3
+                        ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-400/30'
                     }`}>
-                      {selectedTournament.memberCount < selectedTournament.maxMembers ? 'Open for Registration' : 'Tournament Full'}
+                      {getPhaseDisplayName(selectedTournament.phase)}
                     </span>
+                  </div>
+
+                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
+                    <div className="text-sm text-purple-300 mb-2">Game Master</div>
+                    <div className="text-amber-400 font-semibold">
+                      {selectedTournament.gameMasterUsername || 'Unknown GM'}
+                    </div>
                   </div>
                 </div>
 
@@ -1042,11 +1112,17 @@ export default function Dashboard() {
                     <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-medium text-sm">
                       Start Tournament
                     </button>
-                    <button className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium text-sm">
+                    <button 
+                      onClick={openUpdateModal}
+                      className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium text-sm"
+                    >
                       Edit Tournament
                     </button>
-                    <button className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-medium text-sm">
-                      End Tournament
+                    <button 
+                      onClick={openEndModal}
+                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg font-medium text-sm"
+                    >
+                      Finish Tournament
                     </button>
                   </div>
                   <button
@@ -1060,6 +1136,40 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Update Tournament Modal */}
+      {selectedTournament && (
+        <UpdateTournamentModal
+          tournament={selectedTournament}
+          isOpen={isUpdateModalOpen}
+          onClose={() => setIsUpdateModalOpen(false)}
+          onSuccess={handleUpdateSuccess}
+        />
+      )}
+
+      {/* End Tournament Modal */}
+      {selectedTournament && (
+        <EndTournamentModal
+          tournament={selectedTournament}
+          tournamentMembers={tournamentMembers}
+          isOpen={isEndModalOpen}
+          onClose={() => setIsEndModalOpen(false)}
+          onSuccess={handleEndSuccess}
+        />
+      )}
+
+      {/* Tournament Members Modal */}
+      {membersModalTournament && (
+        <TournamentMembersModal
+          tournamentId={membersModalTournament.id}
+          tournamentName={membersModalTournament.name}
+          isOpen={isMembersModalOpen}
+          onClose={() => {
+            setIsMembersModalOpen(false);
+            setMembersModalTournament(null);
+          }}
+        />
       )}
 
     </div>

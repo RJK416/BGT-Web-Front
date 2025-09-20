@@ -21,11 +21,14 @@ export const API_CONFIG = {
       GET_LEADERBOARD: '/Boardgame/Get-Leaderboard',
       GET_BOARDGAMES: '/Boardgame/Get-Boardgames', // legacy
       GET_TOURNAMENTS: '/Boardgame/Get-Tournaments',
+      GET_TOURNAMENTS_WITH_GM: '/Boardgame/Get-Tournaments-With-GM',
       GET_TOURNAMENT_MEMBERS: '/Boardgame/Get-Tournament-Members',
       GET_MY_TOURNAMENTS: '/Boardgame/Get-My-Tournaments',
+      GET_MY_TOURNAMENTS_WITH_GM: '/Boardgame/My-Tournaments-With-GM',
       GET_USER_PLAYER: '/Boardgame/Get-User-Player',
       CREATE_TOURNAMENT: '/Boardgame/Create-Boardgame-Tournament',
       ADD_TOURNAMENT_MEMBER: '/Boardgame/Add-Tournament-Member',
+      UPDATE_TOURNAMENT: '/Boardgame/Update-Tournament',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',

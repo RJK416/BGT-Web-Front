@@ -124,11 +124,11 @@ export default function LoginModal() {
     
     try {
       const requestBody = {
-        identifier: null,
-        mail: email,
         username: username,
-        purpose: 1, // Registration
-        ttlMinutes: 5
+        mail: email,
+        Purpose: 1, // Registration
+        TtlMinutes: 5,
+        Identifier: username
       };
 
       const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.REGISTER}`, {
@@ -179,7 +179,9 @@ export default function LoginModal() {
 
       setSessionId(data.data);
       setSuccess('OTP verified! Please enter your password.');
+      setShowOtpInput(false);
       setShowPasswordInput(true);
+      setOtp(''); // Clear the OTP field
       
     } catch (err) {
       console.error('OTP verification error:', err);
