@@ -633,7 +633,8 @@ export default function Dashboard() {
                     </div>
                       </div>
 
-                  {/* Player Info */}
+
+                  {/* Player Info Added by me */}
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-3">
                       <h3 className="text-2xl font-bold text-amber-300">
