@@ -130,7 +130,7 @@ export default function EndTournamentModal({
             >
               <option value="">Select Winner</option>
               {tournamentMembers.map((member) => (
-                <option key={member.id} value={member.id}>
+                <option key={member.id} value={member.playerId}>
                   {member.nickname}
                 </option>
               ))}
@@ -148,7 +148,7 @@ export default function EndTournamentModal({
             >
               <option value="">Select MVP (Optional)</option>
               {tournamentMembers.map((member) => (
-                <option key={member.id} value={member.id}>
+                <option key={member.id} value={member.playerId}>
                   {member.nickname}
                 </option>
               ))}

@@ -8,6 +8,7 @@ import Leaderboard from '@/components/Leaderboard';
 import UpdateTournamentModal from '@/components/UpdateTournamentModal';
 import EndTournamentModal from '@/components/EndTournamentModal';
 import TournamentMembersModal from '@/components/TournamentMembersModal';
+import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
 import { useRef } from 'react';
 
@@ -24,7 +25,13 @@ export default function Dashboard() {
 
   // Real user player data from API
   const [userPlayer, setUserPlayer] = useState<any>(null);
-  const isGM = userPlayer?.role === 'GM';
+  const isGM = (() => {
+    const r = userPlayer?.role;
+    if (r == null) return false;
+    if (typeof r === 'string') return r.toUpperCase() === 'GM';
+    // Assume enum numeric mapping: 1 => GM
+    return r === 1;
+  })();
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
   const [isCreateTournamentExpanded, setIsCreateTournamentExpanded] = useState(false);
   
@@ -35,6 +42,8 @@ export default function Dashboard() {
   const [membersLoading, setMembersLoading] = useState(false);
   const [addPlayerUsername, setAddPlayerUsername] = useState('');
   const [addingPlayer, setAddingPlayer] = useState(false);
+  const [isFromMyTournaments, setIsFromMyTournaments] = useState(false);
+  
   
   // Update tournament modal state
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -45,6 +54,7 @@ export default function Dashboard() {
   // Tournament members modal state
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [membersModalTournament, setMembersModalTournament] = useState<{id: number, name: string} | null>(null);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -59,14 +69,29 @@ export default function Dashboard() {
     const [creating, setCreating] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
+    const parseEuropeanDateToIsoUtc = (value: string) => {
+      // expected DD.MM.YYYY
+      const parts = value.trim().split('.');
+      if (parts.length !== 3) return '';
+      const [dd, mm, yyyy] = parts.map(p => p.trim());
+      const day = parseInt(dd, 10);
+      const month = parseInt(mm, 10);
+      const year = parseInt(yyyy, 10);
+      if (!day || !month || !year) return '';
+      // Construct UTC date
+      const iso = new Date(Date.UTC(year, month - 1, day, 0, 0, 0)).toISOString();
+      return iso;
+    };
+
     const submit = async (e: React.FormEvent) => {
       e.preventDefault();
       setCreating(true);
       setMessage(null);
       try {
         const token = getAuthToken();
-        // Ensure UTC date (input type="date" gives YYYY-MM-DD)
-        const utcIsoDate = new Date(`${tournamentDate}T00:00:00Z`).toISOString();
+        // Parse European date DD.MM.YYYY to UTC ISO
+        const utcIsoDate = parseEuropeanDateToIsoUtc(tournamentDate);
+        if (!utcIsoDate) throw new Error('Please enter a valid date as DD.MM.YYYY');
         const body = {
           Name: name,
           Game: game,
@@ -109,26 +134,35 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-amber-300 text-sm mb-1">Date</label>
-            <input type="date" value={tournamentDate} onChange={e=>setTournamentDate(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+            <label className="block text-amber-300 text-sm mb-1">Date (DD.MM.YYYY)</label>
+            <input 
+              type="text" 
+              placeholder="dd.mm.yyyy"
+              value={tournamentDate} 
+              onChange={e=>setTournamentDate(e.target.value)} 
+              className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100"
+              pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
+              title="Enter date as DD.MM.YYYY"
+              required 
+            />
           </div>
           <div>
             <label className="block text-amber-300 text-sm mb-1">Max Members</label>
-            <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+            <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
           </div>
           <div>
             <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
-            <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+            <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
           </div>
           <div>
             <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
-            <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+            <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
-            <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+            <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
           </div>
         </div>
         <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">{creating? 'Creating...' : 'Create Tournament'}</button>
@@ -287,8 +321,9 @@ export default function Dashboard() {
   }, [userPlayer, isGM]);
 
   // Function to open tournament modal and fetch members
-  const openTournamentModal = async (tournament: any) => {
+  const openTournamentModal = async (tournament: any, fromMyTournaments: boolean = false) => {
     setSelectedTournament(tournament);
+    setIsFromMyTournaments(fromMyTournaments);
     setIsTournamentModalOpen(true);
     setMembersLoading(true);
     
@@ -317,6 +352,7 @@ export default function Dashboard() {
     setSelectedTournament(null);
     setTournamentMembers([]);
     setAddPlayerUsername('');
+    setIsFromMyTournaments(false);
   };
 
   // Function to open update tournament modal
@@ -333,6 +369,11 @@ export default function Dashboard() {
   const openMembersModal = (tournament: any) => {
     setMembersModalTournament({ id: tournament.id, name: tournament.name });
     setIsMembersModalOpen(true);
+  };
+
+  const openAddMemberModal = (tournament: any) => {
+    setSelectedTournament(tournament);
+    setIsAddMemberModalOpen(true);
   };
 
   // Function to handle successful tournament update
@@ -401,6 +442,7 @@ export default function Dashboard() {
       setAddingPlayer(false);
     }
   };
+
 
   const handleLogout = () => {
     // Remove the JWT token
@@ -530,7 +572,7 @@ export default function Dashboard() {
                     {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
                       <div
                         key={tournament.id}
-                        onClick={() => openTournamentModal(tournament)}
+                        onClick={() => openTournamentModal(tournament, true)}
                         className="bg-gradient-to-r from-purple-800/40 to-purple-700/40 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border border-sky-200/30 hover:border-sky-200/50 transition-all duration-300 cursor-pointer"
                       >
                         <div className="flex items-start justify-between min-w-0">
@@ -566,7 +608,9 @@ export default function Dashboard() {
                             }`}>
                               {tournament.memberCount < tournament.maxMembers ? 'Open' : 'Full'}
                             </span>
-                            <span className="text-xs text-purple-400 whitespace-nowrap">Click to manage</span>
+                            <div className="flex flex-col items-end space-y-1">
+                              <span className="text-xs text-purple-400 whitespace-nowrap">Click to manage</span>
+                            </div>
                   </div>
                 </div>
               </div>
@@ -650,22 +694,18 @@ export default function Dashboard() {
                       <span className="text-xl font-bold text-amber-400">
                         LVL {userPlayer?.level || 1}
                       </span>
-                      <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden">
+                      <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden border-2 border-amber-400/60">
                         {userPlayer ? (() => {
-                          // Calculate XP percentage
-                          const xpForCurrentLevel = userPlayer.level * 1000;
-                          const xpForNextLevel = (userPlayer.level + 1) * 1000;
-                          const xpInCurrentLevel = userPlayer.xp - xpForCurrentLevel;
-                          const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
-                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)));
-                          
+                          // Derive from actual XP to avoid mismatch with level calc
+                          const xp = Math.max(0, userPlayer.xp || 0);
+                          const levelBase = Math.floor(xp / 1000) * 1000;
+                          const xpInCurrentLevel = xp - levelBase;
+                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
                           return (
-                            <>
-                              <div 
-                                className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
-                                style={{ width: `${xpPercentage}%` }}
-                              ></div>
-                            </>
+                            <div 
+                              className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
+                              style={{ width: `${xpPercentage}%` }}
+                            ></div>
                           );
                         })() : (
                           <div 
@@ -676,11 +716,10 @@ export default function Dashboard() {
                       </div>
                       <span className="text-sm font-medium text-amber-300">
                         {userPlayer ? (() => {
-                          const xpForCurrentLevel = userPlayer.level * 1000;
-                          const xpForNextLevel = (userPlayer.level + 1) * 1000;
-                          const xpInCurrentLevel = userPlayer.xp - xpForCurrentLevel;
-                          const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
-                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)));
+                          const xp = Math.max(0, userPlayer.xp || 0);
+                          const levelBase = Math.floor(xp / 1000) * 1000;
+                          const xpInCurrentLevel = xp - levelBase;
+                          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
                           return `${xpPercentage}%`;
                         })() : '65%'}
                       </span>
@@ -840,7 +879,7 @@ export default function Dashboard() {
                 ) : tournaments.length > 0 ? tournaments.map((t: any) => (
                   <div
                     key={t.id}
-                    onClick={() => openTournamentModal(t)}
+                    onClick={() => openTournamentModal(t, false)}
                     className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-5 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start space-x-3">
@@ -1034,23 +1073,17 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-amber-400">Tournament Members</h3>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="text"
-                        placeholder="Enter username..."
-                        value={addPlayerUsername}
-                        onChange={(e) => setAddPlayerUsername(e.target.value)}
-                        className="px-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 text-sm w-40"
-                        onKeyPress={(e) => e.key === 'Enter' && addPlayerToTournament()}
-                      />
-                      <button
-                        onClick={addPlayerToTournament}
-                        disabled={addingPlayer || !addPlayerUsername.trim()}
-                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 text-purple-900 rounded-lg text-sm font-medium transition-all duration-300"
-                      >
-                        {addingPlayer ? 'Adding...' : 'Add Player'}
-                      </button>
-                    </div>
+                    {/* Only show Add Player functionality for tournaments from My Tournaments section and not finished */}
+                    {selectedTournament && isFromMyTournaments && selectedTournament.phase !== 2 && (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => openAddMemberModal(selectedTournament)}
+                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm font-medium transition-all duration-300"
+                        >
+                          Add Member
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-purple-800/40 rounded-lg border border-sky-200/20 max-h-80 overflow-y-auto">
@@ -1106,24 +1139,46 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Tournament Finished Banner */}
+              {selectedTournament.phase === 2 && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-purple-800/50 to-purple-700/50 border border-purple-400/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+                      <svg className="w-5 h-5 text-purple-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-amber-300 font-semibold">Tournament Finished</h3>
+                      <p className="text-purple-300 text-sm">This tournament has been completed. XP rewards have been distributed and no further changes can be made.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="mt-6 pt-6 border-t border-sky-200/20">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap gap-2">
-                    <button className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-medium text-sm">
-                      Start Tournament
+                    <button 
+                      disabled={selectedTournament.phase === 2}
+                      className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
+                    >
+                      {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Start Tournament'}
                     </button>
                     <button 
                       onClick={openUpdateModal}
-                      className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium text-sm"
+                      disabled={selectedTournament.phase === 2}
+                      className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
                     >
-                      Edit Tournament
+                      {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Edit Tournament'}
                     </button>
                     <button 
                       onClick={openEndModal}
-                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg font-medium text-sm"
+                      disabled={selectedTournament.phase === 2}
+                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-purple-900 rounded-lg font-medium text-sm transition-all duration-300"
                     >
-                      Finish Tournament
+                      {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Finish Tournament'}
                     </button>
                   </div>
                   <button
@@ -1169,6 +1224,24 @@ export default function Dashboard() {
           onClose={() => {
             setIsMembersModalOpen(false);
             setMembersModalTournament(null);
+          }}
+        />
+      )}
+
+      {/* Add Tournament Member Modal */}
+      {selectedTournament && (
+        <AddTournamentMemberModal
+          tournamentId={selectedTournament.id}
+          tournamentName={selectedTournament.name}
+          isOpen={isAddMemberModalOpen}
+          onClose={() => setIsAddMemberModalOpen(false)}
+          onAdded={async () => {
+            // refresh members list in modal
+            try {
+              const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENT_MEMBERS}/${selectedTournament.id}`, { method: 'GET' });
+              if (res.ok) setTournamentMembers(res.data || res.result || []);
+              fetchMyTournaments();
+            } catch {}
           }}
         />
       )}

@@ -180,13 +180,12 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       
       <div className="space-y-3">
         {filteredLeaderboard.length > 0 ? filteredLeaderboard.map((player, index) => {
-          // Calculate XP percentage (assuming 1000 XP per level)
-          const xpForCurrentLevel = player.level * 1000;
-          const xpForNextLevel = (player.level + 1) * 1000;
-          const xpInCurrentLevel = player.xp - xpForCurrentLevel;
-          const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
-          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)));
-          
+          // Derive progress directly from XP to avoid backend level curve mismatch
+          const xp = Math.max(0, player.xp || 0);
+          const levelBase = Math.floor(xp / 1000) * 1000;
+          const xpInCurrentLevel = xp - levelBase;
+          const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
+
           return (
             <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
               <div className="flex items-center space-x-4">
@@ -229,7 +228,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                     <span className="text-sm font-bold text-amber-400">
                       LVL {player.level}
                     </span>
-                    <div className="flex-1 bg-purple-900/50 rounded-full h-3 overflow-hidden">
+                    <div className="flex-1 bg-purple-900/60 rounded-full h-3 overflow-hidden border-2 border-amber-400/60">
                       <div 
                         className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
                         style={{ width: `${xpPercentage}%` }}

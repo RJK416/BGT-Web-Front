@@ -52,6 +52,7 @@ export const getPhaseDisplayName = (phase: TournamentPhase): string => {
 
 export interface TournamentMember {
   id: number;
+  playerId: number;
   nickname: string;
   joinedAt: string;
   placement?: number;
