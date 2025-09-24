@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Base URL for your API
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7056',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://a9mykszmmd.eu-central-1.awsapprunner.com',
   
   // API Endpoints
   ENDPOINTS: {

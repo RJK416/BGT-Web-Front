@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
+import { API_CONFIG } from '@/config/api';
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
@@ -63,7 +64,7 @@ export default function SettingsPage() {
         return;
       }
 
-      const response = await fetch('https://localhost:7056/Account/PasswordChange', {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.CHANGE_PASSWORD}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +96,7 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Password change error:', error);
       if (error instanceof Error && error.message.includes('Failed to fetch')) {
-        setPasswordError('Cannot connect to server. Please start your backend API on https://localhost:7056');
+        setPasswordError(`Cannot connect to server. Please check your backend at ${API_CONFIG.BASE_URL}`);
       } else {
         setPasswordError(error instanceof Error ? error.message : 'Failed to change password. Please try again.');
       }
