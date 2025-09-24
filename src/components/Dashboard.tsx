@@ -12,6 +12,12 @@ import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
 import { useRef } from 'react';
 
+type MyJwtPayload = import('jwt-decode').JwtPayload & {
+  name?: string;
+  unique_name?: string;
+  email?: string;
+};
+
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -246,19 +252,20 @@ export default function Dashboard() {
           router.push('/');
           return;
         }
+                const typedToken = userFromToken as MyJwtPayload;
 
-        console.log('🔍 User from JWT token:', userFromToken);
-        console.log('🔍 Available JWT claims:', Object.keys(userFromToken));
-        console.log('🔍 name claim:', userFromToken.name);
-        console.log('🔍 unique_name claim:', userFromToken.unique_name);
-        console.log('🔍 sub claim:', userFromToken.sub);
-        console.log('🔍 email claim:', userFromToken.email);
+        console.log('🔍 User from JWT token:', typedToken);
+        console.log('🔍 Available JWT claims:', Object.keys(typedToken as Record<string, unknown>));
+        console.log('🔍 name claim:', typedToken.name);
+        console.log('🔍 unique_name claim:', typedToken.unique_name);
+        console.log('🔍 sub claim:', typedToken.sub);
+        console.log('🔍 email claim:', typedToken.email);
 
-        // Set user data from token (using the actual JWT payload structure)
-        // Backend stores username in 'name' claim, user ID in 'sub' claim, email in 'email' claim
+
+                // Set user data from token (using the actual JWT payload structure)
         setUser({
-          username: userFromToken.name || userFromToken.unique_name || userFromToken.sub || 'User',
-          email: userFromToken.email || 'user@realm.com',
+          username: typedToken.name ?? typedToken.unique_name ?? typedToken.sub ?? 'User',
+          email: typedToken.email ?? 'user@realm.com',
           joinDate: '2024-01-15'
         });
 
