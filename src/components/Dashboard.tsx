@@ -141,6 +141,7 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
+    
 
     checkAuth();
   }, [router]); 
