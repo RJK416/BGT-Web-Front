@@ -122,7 +122,7 @@ export default function PasswordResetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400 relative overflow-hidden" suppressHydrationWarning>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden" suppressHydrationWarning>
       {/* Curtain-like background elements */}
       <div className="absolute inset-0">
         {/* Top curtain */}
@@ -152,10 +152,51 @@ export default function PasswordResetPage() {
         <div className="absolute bottom-20 left-20 w-20 h-20 border-2 border-amber-400 rounded-full"></div>
         <div className="absolute bottom-10 right-10 w-28 h-28 border-2 border-amber-400 transform rotate-45"></div>
         
+        {/* Additional geometric shapes */}
+        <div className="absolute top-1/3 left-1/3 w-20 h-20 border-2 border-amber-300 transform rotate-30 rounded-lg"></div>
+        <div className="absolute top-2/3 right-1/3 w-16 h-16 border-2 border-amber-500 transform -rotate-45 rounded-full"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-24 h-24 border-2 border-amber-400 transform rotate-60 rounded-lg"></div>
+        <div className="absolute top-1/2 right-1/4 w-14 h-14 border-2 border-amber-300 transform -rotate-30 rounded-full"></div>
+        
         {/* Floating orbs */}
         <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-amber-400 rounded-full animate-pulse"></div>
         <div className="absolute top-3/4 right-1/4 w-3 h-3 bg-amber-300 rounded-full animate-pulse delay-1000"></div>
         <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-amber-500 rounded-full animate-pulse delay-500"></div>
+        <div className="absolute top-1/2 right-1/2 w-3 h-3 bg-amber-400 rounded-full animate-pulse delay-700"></div>
+        <div className="absolute bottom-1/2 left-1/2 w-2 h-2 bg-amber-300 rounded-full animate-pulse delay-300"></div>
+        
+        {/* Dice shapes */}
+        <div className="absolute top-32 left-32 dice dice-4 animate-float">
+          <div className="dice-dots">
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+          </div>
+        </div>
+        <div className="absolute top-48 right-48 dice dice-2 animate-float-delayed">
+          <div className="dice-dots">
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+          </div>
+        </div>
+        <div className="absolute bottom-32 left-48 dice dice-6 animate-float-slow">
+          <div className="dice-dots">
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+          </div>
+        </div>
+        <div className="absolute bottom-48 right-32 dice dice-3 animate-float">
+          <div className="dice-dots">
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+            <div className="dice-dot"></div>
+          </div>
+        </div>
         
         {/* Additional curtain decorations */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 to-amber-600 opacity-70"></div>

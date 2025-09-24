@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #1e3a8a;
   --foreground: #171717;
 }
 
@@ -14,8 +14,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1e40af;
+    --foreground: #171717;
   }
 }
 
@@ -118,6 +118,150 @@ input.no-spinner[type=number] {
 /* Cosmic Background Utilities */
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Dice Shapes */
+.dice {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
+}
+
+.dice::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 6px;
+}
+
+/* Dice dots */
+.dice-dots {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.dice-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #1f2937;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Dice face 1 */
+.dice-1 .dice-dot:nth-child(1) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Dice face 2 */
+.dice-2 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-2 .dice-dot:nth-child(2) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 3 */
+.dice-3 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-3 .dice-dot:nth-child(2) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.dice-3 .dice-dot:nth-child(3) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 4 */
+.dice-4 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-4 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-4 .dice-dot:nth-child(3) {
+  top: 70%;
+  left: 30%;
+}
+.dice-4 .dice-dot:nth-child(4) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 5 */
+.dice-5 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-5 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-5 .dice-dot:nth-child(3) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.dice-5 .dice-dot:nth-child(4) {
+  top: 70%;
+  left: 30%;
+}
+.dice-5 .dice-dot:nth-child(5) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 6 */
+.dice-6 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-6 .dice-dot:nth-child(3) {
+  top: 50%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(4) {
+  top: 50%;
+  left: 70%;
+}
+.dice-6 .dice-dot:nth-child(5) {
+  top: 70%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(6) {
+  top: 70%;
+  left: 70%;
 }
 
 /* Chain Link Structure */

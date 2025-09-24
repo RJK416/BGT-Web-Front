@@ -117,7 +117,7 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
           <p className="text-amber-400 text-lg">Loading settings...</p>
@@ -127,7 +127,61 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
+      {/* Background decorative shapes */}
+      <div className="absolute inset-0 opacity-20">
+        {/* Geometric shapes */}
+        <div className="absolute top-20 left-20 w-24 h-24 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
+        <div className="absolute top-40 right-20 w-20 h-20 border-2 border-amber-300 transform -rotate-12 rounded-full"></div>
+        <div className="absolute bottom-40 left-20 w-28 h-28 border-2 border-amber-500 transform rotate-30 rounded-lg"></div>
+        <div className="absolute bottom-20 right-40 w-16 h-16 border-2 border-amber-400 transform -rotate-45 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/4 w-18 h-18 border-2 border-amber-300 transform rotate-60 rounded-lg"></div>
+        <div className="absolute top-1/3 right-1/4 w-14 h-14 border-2 border-amber-500 transform -rotate-30 rounded-full"></div>
+        
+        {/* Floating orbs */}
+        <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-amber-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-2/3 right-1/3 w-2 h-2 bg-amber-300 rounded-full animate-pulse delay-700"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-4 h-4 bg-amber-500 rounded-full animate-pulse delay-300"></div>
+        
+        {/* Dice pairs */}
+        <div className="absolute top-24 left-24 flex gap-2">
+          <div className="dice dice-6 animate-float">
+            <div className="dice-dots">
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+            </div>
+          </div>
+          <div className="dice dice-1 animate-float-delayed">
+            <div className="dice-dots">
+              <div className="dice-dot"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-40 left-24 flex gap-2">
+          <div className="dice dice-3 animate-float-slow">
+            <div className="dice-dots">
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+            </div>
+          </div>
+          <div className="dice dice-5 animate-float">
+            <div className="dice-dots">
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+              <div className="dice-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* Header */}
       <header className="bg-gradient-to-r from-purple-950/90 to-purple-900/90 backdrop-blur-sm border-b border-amber-400/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

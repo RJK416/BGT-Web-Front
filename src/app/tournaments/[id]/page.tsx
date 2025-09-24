@@ -60,8 +60,56 @@ export default function TournamentDetailPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400" /></div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-6 relative overflow-hidden">
+      {/* Background decorative shapes */}
+      <div className="absolute inset-0 opacity-20">
+        {/* Geometric shapes */}
+        <div className="absolute top-20 left-20 w-20 h-20 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 border-2 border-amber-300 transform -rotate-12 rounded-full"></div>
+        <div className="absolute bottom-40 left-20 w-24 h-24 border-2 border-amber-500 transform rotate-30 rounded-lg"></div>
+        <div className="absolute bottom-20 right-40 w-14 h-14 border-2 border-amber-400 transform -rotate-45 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/4 w-16 h-16 border-2 border-amber-300 transform rotate-60 rounded-lg"></div>
+        
+        {/* Floating orbs */}
+        <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-amber-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-2/3 right-1/3 w-2 h-2 bg-amber-300 rounded-full animate-pulse delay-500"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-4 h-4 bg-amber-500 rounded-full animate-pulse delay-1000"></div>
+        
+        {/* Stars */}
+        <div className="absolute inset-0">
+          {[...Array(18)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Star Clusters */}
+        <div className="absolute top-20 left-20 w-3 h-3 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-32 left-16 w-2 h-2 bg-cyan-200 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-28 left-24 w-3 h-3 bg-cyan-400 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.8s' }} />
+        
+        <div className="absolute bottom-40 left-20 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
+        <div className="absolute bottom-48 left-16 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
+        <div className="absolute bottom-44 left-24 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
+        
+        {/* Cosmic Dust/Nebula */}
+        <div className="absolute top-1/3 left-1/3 w-48 h-48 bg-gradient-radial from-cyan-500/6 via-blue-500/3 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-1/3 right-1/3 w-32 h-32 bg-gradient-radial from-purple-500/4 via-blue-500/2 to-transparent rounded-full blur-lg animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+        
+        {/* Shooting Stars */}
+        <div className="absolute top-20 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
+        <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
+      </div>
+      
+      <div className="max-w-3xl mx-auto relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-amber-400">

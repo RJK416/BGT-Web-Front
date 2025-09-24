@@ -333,7 +333,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-purple-800 relative overflow-hidden" suppressHydrationWarning>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden" suppressHydrationWarning>
              {/* Medieval Fantasy Background Artwork */}
        <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Distant Castle Silhouette */}
@@ -377,6 +377,80 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-20 w-12 h-28">
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-20 bg-purple-600 rounded-full"></div>
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-purple-500 rounded-full opacity-80"></div>
+          </div>
+        </div>
+
+        {/* Additional Geometric Shapes */}
+        <div className="absolute inset-0 opacity-15">
+          {/* Modern geometric shapes */}
+          <div className="absolute top-1/4 left-1/4 w-20 h-20 border-2 border-amber-300 transform rotate-45 rounded-lg"></div>
+          <div className="absolute top-3/4 right-1/4 w-16 h-16 border-2 border-amber-400 transform -rotate-12 rounded-full"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-24 h-24 border-2 border-amber-500 transform rotate-30 rounded-lg"></div>
+          <div className="absolute top-1/2 right-1/3 w-12 h-12 border-2 border-amber-300 transform -rotate-45 rounded-full"></div>
+          <div className="absolute bottom-1/4 right-1/2 w-18 h-18 border-2 border-amber-400 transform rotate-60 rounded-lg"></div>
+          
+          {/* Floating geometric orbs */}
+          <div className="absolute top-1/3 right-1/3 w-4 h-4 bg-amber-400 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-1/3 left-1/2 w-3 h-3 bg-amber-300 rounded-full animate-pulse delay-500"></div>
+          <div className="absolute top-2/3 left-1/4 w-2 h-2 bg-amber-500 rounded-full animate-pulse delay-1000"></div>
+          
+          {/* Stars */}
+          <div className="absolute inset-0">
+            {[...Array(25)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Star Clusters */}
+          <div className="absolute top-40 left-40 w-3 h-3 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-52 left-36 w-2 h-2 bg-cyan-200 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.2s' }} />
+          <div className="absolute top-48 left-44 w-3 h-3 bg-cyan-400 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.8s' }} />
+          
+          <div className="absolute bottom-40 left-60 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
+          <div className="absolute bottom-48 left-56 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
+          <div className="absolute bottom-44 left-64 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
+          
+          {/* Cosmic Dust/Nebula */}
+          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-gradient-radial from-cyan-500/8 via-blue-500/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-1/3 left-1/2 w-48 h-48 bg-gradient-radial from-purple-500/6 via-blue-500/3 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+          
+          {/* Shooting Stars */}
+          <div className="absolute top-40 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
+          <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
+          
+          {/* Draco Constellation */}
+          <div className="absolute top-1/4 right-1/4 opacity-60">
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-0 left-0"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-2 left-3"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-4 left-6"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-6 left-9"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-8 left-12"></div>
+            {/* Connecting lines */}
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-1 left-0"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-3 left-3"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-5 left-6"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-7 left-9"></div>
+          </div>
+          
+          {/* Cygnus (Northern Cross) */}
+          <div className="absolute bottom-1/4 left-1/4 opacity-60">
+            <div className="absolute w-2 h-2 bg-white rounded-full top-0 left-8"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-4 left-0"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-4 left-16"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-8 left-8"></div>
+            {/* Connecting lines */}
+            <div className="absolute w-8 h-px bg-blue-400/30 top-1 left-8"></div>
+            <div className="absolute w-16 h-px bg-blue-400/30 top-5 left-0"></div>
+            <div className="absolute w-8 h-px bg-blue-400/30 top-9 left-8"></div>
           </div>
         </div>
 
