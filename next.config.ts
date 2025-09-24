@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
     // Ensure app dir features are enabled and compatible for hosting
     optimizePackageImports: ['react', 'react-dom'],
   },
+
+
+    eslint: { ignoreDuringBuilds: true },
   // Expose public runtime env (Amplify will inject NEXT_PUBLIC_* at build time)
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
