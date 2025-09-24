@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG } from '@/config/api';
 
+type MyJwtPayload = import('jwt-decode').JwtPayload & {
+  name?: string;
+  unique_name?: string;
+  email?: string;
+};
+
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,14 +33,18 @@ export default function SettingsPage() {
     }
 
     // Get user info from JWT token
-    const userFromToken = getUserFromToken();
-    if (userFromToken) {
-      setUser({
-        username: userFromToken.name || userFromToken.unique_name || userFromToken.sub || 'User',
-        email: userFromToken.email || 'user@realm.com',
-        joinDate: '2024-01-15'
-      });
-    }
+    const userFromToken = getUserFromToken() as MyJwtPayload | null;
+                          if (userFromToken) {
+                            setUser({
+                              username:
+                                userFromToken.name ??
+                                userFromToken.unique_name ??
+                                userFromToken.sub ??
+                                'User',
+                              email: userFromToken.email ?? 'user@realm.com',
+                              joinDate: '2024-01-15',
+                            });
+}
     
     setIsLoading(false);
   }, [router]);
