@@ -13,6 +13,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  type MyJwtPayload = {
+    [k: string]: unknown;
+    sub?: string | undefined;
+    name?: string | undefined;
+    unique_name?: string | undefined;
+    email?: string | undefined;
+}
+
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
@@ -80,14 +89,15 @@ export default function LoginPage() {
       console.log('🔍 Login response data:', data);
       console.log('🔍 Extracted JWT token:', jwtToken);
       
+      
       if (jwtToken) {
         setAuthToken(jwtToken, rememberMe);
         
         // Debug: Decode the token to see what's inside
         try {
-          const decodedToken = decodeToken(jwtToken);
+          const decodedToken = decodeToken(jwtToken) as MyJwtPayload | null;
+          console.log('🔍 Available claims:', Object.keys(decodedToken ?? {}));
           console.log('🔍 Decoded JWT token:', decodedToken);
-          console.log('🔍 Available claims:', Object.keys(decodedToken));
         } catch (error) {
           console.error('🔍 Error decoding token:', error);
         }
