@@ -10,8 +10,9 @@ import EndTournamentModal from '@/components/EndTournamentModal';
 import TournamentMembersModal from '@/components/TournamentMembersModal';
 import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
-import { useRef } from 'react';
+// import { useRef } from 'react'; // ← not used, remove
 
+// ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
   name?: string;
   unique_name?: string;
@@ -22,26 +23,19 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [myTournaments, setMyTournaments] = useState<any[]>([]);
-
-
-
-  // Tournaments data from API
-  const [tournaments, setTournaments] = useState([]);
+  const [tournaments, setTournaments] = useState<any[]>([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
 
-  // Real user player data from API
   const [userPlayer, setUserPlayer] = useState<any>(null);
   const isGM = (() => {
     const r = userPlayer?.role;
     if (r == null) return false;
     if (typeof r === 'string') return r.toUpperCase() === 'GM';
-    // Assume enum numeric mapping: 1 => GM
-    return r === 1;
+    return r === 1; // numeric enum fallback
   })();
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
   const [isCreateTournamentExpanded, setIsCreateTournamentExpanded] = useState(false);
-  
-  // Tournament modal state
+
   const [selectedTournament, setSelectedTournament] = useState<any>(null);
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
   const [tournamentMembers, setTournamentMembers] = useState<any[]>([]);
@@ -49,140 +43,23 @@ export default function Dashboard() {
   const [addPlayerUsername, setAddPlayerUsername] = useState('');
   const [addingPlayer, setAddingPlayer] = useState(false);
   const [isFromMyTournaments, setIsFromMyTournaments] = useState(false);
-  
-  
-  // Update tournament modal state
+
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  
-  // End tournament modal state
   const [isEndModalOpen, setIsEndModalOpen] = useState(false);
-  
-  // Tournament members modal state
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
-  const [membersModalTournament, setMembersModalTournament] = useState<{id: number, name: string} | null>(null);
+  const [membersModalTournament, setMembersModalTournament] = useState<{ id: number; name: string } | null>(null);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
   const router = useRouter();
 
-  function CreateTournamentForm() {
-    const [name, setName] = useState('');
-    const [game, setGame] = useState('');
-    const [tournamentDate, setTournamentDate] = useState('');
-    const [maxMembers, setMaxMembers] = useState<number>(8);
-    const [memberCount, setMemberCount] = useState<number>(0);
-    const [xpReward, setXpReward] = useState<number>(100);
-    const [mvpXpReward, setMvpXpReward] = useState<number>(50);
-    const [creating, setCreating] = useState(false);
-    const [message, setMessage] = useState<string | null>(null);
-
-    const parseEuropeanDateToIsoUtc = (value: string) => {
-      // expected DD.MM.YYYY
-      const parts = value.trim().split('.');
-      if (parts.length !== 3) return '';
-      const [dd, mm, yyyy] = parts.map(p => p.trim());
-      const day = parseInt(dd, 10);
-      const month = parseInt(mm, 10);
-      const year = parseInt(yyyy, 10);
-      if (!day || !month || !year) return '';
-      // Construct UTC date
-      const iso = new Date(Date.UTC(year, month - 1, day, 0, 0, 0)).toISOString();
-      return iso;
-    };
-
-    const submit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setCreating(true);
-      setMessage(null);
-      try {
-        const token = getAuthToken();
-        // Parse European date DD.MM.YYYY to UTC ISO
-        const utcIsoDate = parseEuropeanDateToIsoUtc(tournamentDate);
-        if (!utcIsoDate) throw new Error('Please enter a valid date as DD.MM.YYYY');
-        const body = {
-          Name: name,
-          Game: game,
-          TournamentDate: utcIsoDate,
-          MaxMembers: maxMembers,
-          MemberCount: memberCount,
-          XpReward: xpReward,
-          MvpXpReward: mvpXpReward,
-        };
-        const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.CREATE_TOURNAMENT}`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error(res.error || res.message || 'Failed');
-        setMessage(res.message || 'Tournament created');
-        setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
-        
-        // Refresh my tournaments list
-        if (typeof fetchMyTournaments === 'function') {
-          fetchMyTournaments();
-        }
-      } catch (err: any) {
-        setMessage(err.message || 'Failed to create tournament');
-      } finally {
-        setCreating(false);
-      }
-    };
-
-    return (
-      <form onSubmit={submit} className="space-y-4">
-        {message && <div className="text-sm text-amber-300">{message}</div>}
-        <div>
-          <label className="block text-amber-300 text-sm mb-1">Name</label>
-          <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-        </div>
-        <div>
-          <label className="block text-amber-300 text-sm mb-1">Game</label>
-          <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-amber-300 text-sm mb-1">Date (DD.MM.YYYY)</label>
-            <input 
-              type="text" 
-              placeholder="dd.mm.yyyy"
-              value={tournamentDate} 
-              onChange={e=>setTournamentDate(e.target.value)} 
-              className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100"
-              pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
-              title="Enter date as DD.MM.YYYY"
-              required 
-            />
-          </div>
-          <div>
-            <label className="block text-amber-300 text-sm mb-1">Max Members</label>
-            <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-          </div>
-          <div>
-            <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
-            <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-          </div>
-          <div>
-            <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
-            <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
-            <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
-          </div>
-        </div>
-        <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">{creating? 'Creating...' : 'Create Tournament'}</button>
-      </form>
-    );
-  }
-
-  // Fetch tournaments from API
+  // --- fetchers (unchanged logic, shown for completeness) ---
   const fetchTournaments = async () => {
     try {
       setTournamentsLoading(true);
-      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENTS_WITH_GM}?page=1&pageSize=10`, {
-        method: 'GET',
-      });
+      const response = await apiRequest(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_TOURNAMENTS_WITH_GM}?page=1&pageSize=10`,
+        { method: 'GET' }
+      );
 
       if (response.ok && response.status === 200) {
         setTournaments(response.items || response.data?.items || []);
@@ -198,30 +75,22 @@ export default function Dashboard() {
     }
   };
 
-  // Fetch user player data from API
   const fetchUserPlayer = async () => {
     try {
       setUserPlayerLoading(true);
       const token = getAuthToken();
-      
       if (!token) {
         console.error('No auth token found');
         setUserPlayer(null);
         return;
       }
-
       const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_USER_PLAYER}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      console.log('User player response:', response);
 
       if (response.ok && response.status === 200) {
         setUserPlayer(response.data);
-        console.log('User player data set:', response.data);
       } else {
         console.error('Failed to fetch user player:', response);
         setUserPlayer(null);
@@ -234,8 +103,8 @@ export default function Dashboard() {
     }
   };
 
+  // ✅ Fixed useEffect: single place to do auth, set user, then fetch data
   useEffect(() => {
-    // Check authentication
     const checkAuth = async () => {
       if (!isAuthenticated()) {
         router.push('/');
@@ -243,49 +112,38 @@ export default function Dashboard() {
       }
 
       try {
-        // Get user info from JWT token
+        const jwtToken = getAuthToken();
         const userFromToken = getUserFromToken();
-        
-        if (!userFromToken) {
-          // Invalid token, redirect to login
+
+        if (!jwtToken || !userFromToken) {
           removeAuthToken();
           router.push('/');
           return;
         }
-                const typedToken = userFromToken as MyJwtPayload;
 
-        console.log('🔍 User from JWT token:', typedToken);
-        console.log('🔍 Available JWT claims:', Object.keys(typedToken as Record<string, unknown>));
-        console.log('🔍 name claim:', typedToken.name);
-        console.log('🔍 unique_name claim:', typedToken.unique_name);
-        console.log('🔍 sub claim:', typedToken.sub);
-        console.log('🔍 email claim:', typedToken.email);
+        const typed = userFromToken as MyJwtPayload;
 
+        console.log('🔍 Decoded JWT token:', typed);
+        console.log('🔍 Available claims:', Object.keys(typed as Record<string, unknown>));
+        console.log('🔍 name claim:', typed.name);
+        console.log('🔍 unique_name claim:', typed.unique_name);
+        console.log('🔍 sub claim:', typed.sub);
+        console.log('🔍 email claim:', typed.email);
 
-                // Set user data from token (using the actual JWT payload structure)
         setUser({
-          username: typedToken.name ?? typedToken.unique_name ?? typedToken.sub ?? 'User',
-          email: typedToken.email ?? 'user@realm.com',
-          joinDate: '2024-01-15'
+          username: typed.name ?? typed.unique_name ?? typed.sub ?? 'User',
+          email: typed.email ?? 'user@realm.com',
+          joinDate: '2024-01-15',
         });
 
-          setIsLoading(false);
-
-        // Fetch tournaments data
-        fetchTournaments();
-        
-        // Fetch user player data
-        fetchUserPlayer();
-      } catch (error) {
-        console.error('Failed to load user data:', error);
-        // If there's an error, clear token and redirect to login
-        removeAuthToken();
-        router.push('/');
+        await Promise.all([fetchUserPlayer(), fetchTournaments()]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router]); 
 
   // Function to fetch my tournaments
   const fetchMyTournaments = async () => {
