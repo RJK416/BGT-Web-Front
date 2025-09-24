@@ -141,7 +141,7 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-    
+
 
     checkAuth();
   }, [router]); 
@@ -180,6 +180,114 @@ export default function Dashboard() {
       console.error('🔍 Error fetching my tournaments:', error);
     }
   };
+
+
+  function CreateTournamentForm() {
+  const [name, setName] = useState('');
+  const [game, setGame] = useState('');
+  const [tournamentDate, setTournamentDate] = useState('');
+  const [maxMembers, setMaxMembers] = useState<number>(8);
+  const [memberCount, setMemberCount] = useState<number>(0);
+  const [xpReward, setXpReward] = useState<number>(100);
+  const [mvpXpReward, setMvpXpReward] = useState<number>(50);
+  const [creating, setCreating] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const parseEuropeanDateToIsoUtc = (value: string) => {
+    const parts = value.trim().split('.');
+    if (parts.length !== 3) return '';
+    const [dd, mm, yyyy] = parts.map(p => p.trim());
+    const day = parseInt(dd, 10);
+    const month = parseInt(mm, 10);
+    const year = parseInt(yyyy, 10);
+    if (!day || !month || !year) return '';
+    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0)).toISOString();
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    setMessage(null);
+    try {
+      const token = getAuthToken();
+      const utcIsoDate = parseEuropeanDateToIsoUtc(tournamentDate);
+      if (!utcIsoDate) throw new Error('Please enter a valid date as DD.MM.YYYY');
+      const body = {
+        Name: name,
+        Game: game,
+        TournamentDate: utcIsoDate,
+        MaxMembers: maxMembers,
+        MemberCount: memberCount,
+        XpReward: xpReward,
+        MvpXpReward: mvpXpReward,
+      };
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.CREATE_TOURNAMENT}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(res.error || res.message || 'Failed');
+      setMessage(res.message || 'Tournament created');
+      setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
+      // refresh list if available
+      if (typeof fetchMyTournaments === 'function') fetchMyTournaments();
+    } catch (err: any) {
+      setMessage(err.message || 'Failed to create tournament');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      {message && <div className="text-sm text-amber-300">{message}</div>}
+      <div>
+        <label className="block text-amber-300 text-sm mb-1">Name</label>
+        <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+      </div>
+      <div>
+        <label className="block text-amber-300 text-sm mb-1">Game</label>
+        <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">Date (DD.MM.YYYY)</label>
+          <input
+            type="text"
+            placeholder="dd.mm.yyyy"
+            value={tournamentDate}
+            onChange={e=>setTournamentDate(e.target.value)}
+            className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100"
+            pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
+            title="Enter date as DD.MM.YYYY"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">Max Members</label>
+          <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
+          <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
+          <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
+          <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        </div>
+      </div>
+      <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">
+        {creating ? 'Creating...' : 'Create Tournament'}
+      </button>
+    </form>
+  );
+}
 
   // Fetch my tournaments when userPlayer is loaded and user is GM
   useEffect(() => {
