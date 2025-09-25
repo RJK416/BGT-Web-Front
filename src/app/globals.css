@@ -25,6 +25,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Mobile defaults */
+@media (max-width: 640px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
 /* Hide number input spinners for a cleaner look */
 input.no-spinner::-webkit-outer-spin-button,
 input.no-spinner::-webkit-inner-spin-button {

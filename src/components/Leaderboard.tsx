@@ -136,7 +136,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
   }
 
   return (
-    <div className={`bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 ${className}`}>
+    <div className={`bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 ${className}`}>
       {showTitle && (
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-amber-400">Top Players</h2>
@@ -187,8 +187,8 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
 
           return (
-            <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
-              <div className="flex items-center space-x-4">
+            <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 {/* Rank */}
                 <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold text-purple-900">{index + 1}</span>
@@ -209,12 +209,12 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                 </div>
 
                 {/* Player Info */}
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-bold text-amber-300">
+                <div className="flex-1 min-w-[220px]">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-amber-300 truncate">
                       {player.nickname}
                     </h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${
                       player.guild 
                         ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30'
                         : 'bg-red-500/20 text-red-300 border border-red-400/30'
@@ -224,38 +224,38 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                   </div>
 
                   {/* Level and XP Bar */}
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-bold text-amber-400">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-xs sm:text-sm font-bold text-amber-400">
                       LVL {player.level}
                     </span>
-                    <div className="flex-1 bg-purple-900/60 rounded-full h-3 overflow-hidden border-2 border-amber-400/60">
+                    <div className="flex-1 bg-purple-900/60 rounded-full h-2 sm:h-3 overflow-hidden border-2 border-amber-400/60">
                       <div 
                         className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
                         style={{ width: `${xpPercentage}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs font-medium text-amber-300">
+                    <span className="text-[10px] sm:text-xs font-medium text-amber-300">
                       {xpPercentage}%
                     </span>
                   </div>
                 </div>
 
                 {/* Achievements and Score */}
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   {/* Achievement Icons */}
-                  <div className="flex space-x-1">
+                  <div className="flex gap-1">
                     {player.mvps > 0 && (
-                      <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center" title={`${player.mvps} MVP${player.mvps > 1 ? 's' : ''}`}>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-500 rounded-full flex items-center justify-center" title={`${player.mvps} MVP${player.mvps > 1 ? 's' : ''}`}>
                         <span className="text-yellow-900 text-sm">⭐</span>
                       </div>
                     )}
                     {player.tournamentsWon > 0 && (
-                      <div className="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center" title={`${player.tournamentsWon} Tournament Win${player.tournamentsWon > 1 ? 's' : ''}`}>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-600 rounded-full flex items-center justify-center" title={`${player.tournamentsWon} Tournament Win${player.tournamentsWon > 1 ? 's' : ''}`}>
                         <span className="text-yellow-100 text-sm">👑</span>
                       </div>
                     )}
                     {player.wins > 0 && (
-                      <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center" title={`${player.wins} Win${player.wins > 1 ? 's' : ''}`}>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-800 rounded-full flex items-center justify-center" title={`${player.wins} Win${player.wins > 1 ? 's' : ''}`}>
                         <span className="text-white text-sm">🏆</span>
                       </div>
                     )}
@@ -263,10 +263,10 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
 
                   {/* Score */}
                   <div className="text-right">
-                    <div className="text-lg font-bold text-amber-400">
+                    <div className="text-base sm:text-lg font-bold text-amber-400">
                       +{player.totalScore}
                     </div>
-                    <div className="text-xs text-purple-300">
+                    <div className="text-[10px] sm:text-xs text-purple-300">
                       points
                     </div>
                   </div>

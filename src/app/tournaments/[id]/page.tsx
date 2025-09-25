@@ -60,9 +60,9 @@ export default function TournamentDetailPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400" /></div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-4 sm:p-6 relative overflow-hidden">
       {/* Background decorative shapes */}
-      <div className="absolute inset-0 opacity-20">
+      <div className="absolute inset-0 opacity-20 hidden sm:block">
         {/* Geometric shapes */}
         <div className="absolute top-20 left-20 w-20 h-20 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
         <div className="absolute top-40 right-20 w-16 h-16 border-2 border-amber-300 transform -rotate-12 rounded-full"></div>
@@ -110,13 +110,13 @@ export default function TournamentDetailPage() {
       </div>
       
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
           <div>
-            <h1 className="text-2xl font-bold text-amber-400">
+            <h1 className="text-xl sm:text-2xl font-bold text-amber-400">
               {tournament ? `${tournament.name}` : `Tournament #${id}`} Members
             </h1>
             {tournament && (
-              <div className="text-purple-300 text-sm mt-1">
+              <div className="text-purple-300 text-xs sm:text-sm mt-1">
                 {tournament.game} • {new Date(tournament.tournamentDate).toLocaleDateString()} • {tournament.memberCount}/{tournament.maxMembers} • {tournament.phase}
               </div>
             )}
@@ -125,12 +125,12 @@ export default function TournamentDetailPage() {
             {tournament && (
               <button 
                 onClick={() => setShowUpdateModal(true)} 
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-colors"
+                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-colors text-sm sm:text-base"
               >
                 Edit Tournament
               </button>
             )}
-            <button onClick={() => router.push('/tournaments')} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 rounded-lg">Back</button>
+            <button onClick={() => router.push('/tournaments')} className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 rounded-lg text-sm sm:text-base">Back</button>
           </div>
         </div>
 
@@ -139,12 +139,12 @@ export default function TournamentDetailPage() {
         ) : (
           <div className="space-y-2">
             {members.map(m => (
-              <div key={m.id} className="bg-purple-900/50 rounded-lg p-4 border border-amber-400/20 flex items-center justify-between">
+              <div key={m.id} className="bg-purple-900/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 flex items-center justify-between gap-2">
                 <div> 
                   <div className="text-amber-300 font-semibold">{m.nickname}</div>
-                  <div className="text-purple-300 text-sm">Joined: {new Date(m.joinedAt).toLocaleString()}</div>
+                  <div className="text-purple-300 text-xs sm:text-sm">Joined: {new Date(m.joinedAt).toLocaleString()}</div>
                 </div>
-                <div className="text-purple-200 text-sm">{m.placement ? `#${m.placement}` : '—'} {typeof m.score === 'number' ? `• ${m.score} pts` : ''}</div>
+                <div className="text-purple-200 text-xs sm:text-sm whitespace-nowrap">{m.placement ? `#${m.placement}` : '—'} {typeof m.score === 'number' ? `• ${m.score} pts` : ''}</div>
               </div>
             ))}
           </div>

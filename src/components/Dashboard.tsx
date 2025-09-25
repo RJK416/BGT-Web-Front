@@ -442,7 +442,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
       {/* Cosmic Background */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 hidden sm:block">
         {/* Stars */}
         <div className="absolute inset-0">
           {[...Array(50)].map((_, i) => (
@@ -486,8 +486,8 @@ export default function Dashboard() {
       {/* Header */}
       <header className="relative z-10 bg-gradient-to-r from-purple-950/90 to-purple-900/90 backdrop-blur-sm border-b border-amber-400/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 text-purple-900" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2L4 6v8c0 4 3 6 8 8 5-2 8-4 8-8V6l-8-4z"/>
@@ -499,17 +499,17 @@ export default function Dashboard() {
                 <p className="text-purple-200 text-sm">Chronicle Your Adventures</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-purple-200">Welcome, {user?.username}</span>
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
+              <span className="text-purple-200 text-sm sm:text-base">Welcome, {user?.username}</span>
               <button
                 onClick={() => router.push('/settings')}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm"
               >
                 Settings
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300"
+                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300 text-sm"
               >
                 Logout
               </button>
@@ -519,8 +519,8 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content with Right Sidebar */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Left Content Area */}
           <div className="flex-1">
 
@@ -796,7 +796,7 @@ export default function Dashboard() {
           </div>
 
           {/* Right Sidebar - Tournaments List */}
-          <div className="w-96 flex-shrink-0 relative">
+          <div className="w-full lg:w-96 flex-shrink-0 relative">
             {/* Stardust around Board Games */}
             <div className="absolute -top-4 -left-4 w-6 h-6 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
             <div className="absolute -top-2 -right-2 w-3 h-3 bg-blue-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.5s' }} />
@@ -814,7 +814,7 @@ export default function Dashboard() {
             <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-radial from-cyan-500/5 via-blue-500/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
             <div className="absolute -top-4 -right-8 w-24 h-24 bg-gradient-radial from-purple-500/6 via-cyan-500/2 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '2.5s' }} />
             
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 sticky top-8">
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 lg:sticky lg:top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-amber-400">Tournaments</h2>
                 <div className="flex items-center gap-2">

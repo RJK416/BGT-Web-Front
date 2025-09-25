@@ -57,9 +57,9 @@ export default function TournamentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-4 sm:p-6 relative overflow-hidden">
       {/* Background decorative shapes */}
-      <div className="absolute inset-0 opacity-20">
+      <div className="absolute inset-0 opacity-20 hidden sm:block">
         {/* Geometric shapes */}
         <div className="absolute top-20 left-20 w-24 h-24 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
         <div className="absolute top-40 right-20 w-20 h-20 border-2 border-amber-300 transform -rotate-12 rounded-full"></div>
@@ -133,9 +133,9 @@ export default function TournamentsPage() {
       </div>
       
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-amber-400">Your Tournaments</h1>
-          <button onClick={() => router.push('/dashboard')} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 rounded-lg">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-amber-400">Your Tournaments</h1>
+          <button onClick={() => router.push('/dashboard')} className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 rounded-lg text-sm sm:text-base">
             Back to Dashboard
           </button>
         </div>
@@ -145,10 +145,10 @@ export default function TournamentsPage() {
         ) : (
           <div className="space-y-3">
             {tournaments.map(t => (
-              <div key={t.id} className="bg-purple-900/50 rounded-lg p-4 border border-amber-400/20 flex items-center justify-between">
-                <div>
-                  <div className="text-amber-300 font-semibold">{t.name}</div>
-                  <div className="text-purple-300 text-sm">{t.game} • {new Date(t.tournamentDate).toLocaleDateString()} • {t.memberCount}/{t.maxMembers}</div>
+              <div key={t.id} className="bg-purple-900/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-amber-300 font-semibold truncate">{t.name}</div>
+                  <div className="text-purple-300 text-xs sm:text-sm truncate">{t.game} • {new Date(t.tournamentDate).toLocaleDateString()} • {t.memberCount}/{t.maxMembers}</div>
                   <div className="mt-1">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       t.phase === 0 
@@ -165,19 +165,9 @@ export default function TournamentsPage() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button 
-                    className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded border border-blue-400/30 text-xs hover:bg-blue-500/30 transition-colors" 
-                    onClick={() => handleUpdateTournament(t)}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    className="px-3 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-400/30 text-xs hover:bg-amber-500/30 transition-colors" 
-                    onClick={() => router.push(`/tournaments/${t.id}`)}
-                  >
-                    Open
-                  </button>
+                <div className="flex items-center gap-2 sm:self-end sm:self-auto">
+                  <button className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded border border-blue-400/30 text-xs hover:bg-blue-500/30 transition-colors" onClick={() => handleUpdateTournament(t)}>Edit</button>
+                  <button className="px-3 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-400/30 text-xs hover:bg-amber-500/30 transition-colors" onClick={() => router.push(`/tournaments/${t.id}`)}>Open</button>
                 </div>
               </div>
             ))}

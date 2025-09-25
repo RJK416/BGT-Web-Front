@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-25">
+      <div className="absolute inset-0 opacity-25 hidden sm:block">
         {/* Geometric shapes */}
         <div className="absolute top-10 left-10 w-32 h-32 border-2 border-amber-400 rounded-full"></div>
         <div className="absolute top-20 right-20 w-24 h-24 border-2 border-amber-400 transform rotate-45"></div>
@@ -22,13 +22,13 @@ export default function HomePage() {
         <div className="absolute bottom-10 right-10 w-28 h-28 border-2 border-amber-400 transform rotate-45"></div>
         
         {/* Additional geometric shapes */}
-        <div className="absolute top-1/3 left-1/3 w-16 h-16 border-2 border-amber-300 transform rotate-12 rounded-lg"></div>
+        <div className="absolute top-1/3 left-1/3 w-12 h-12 sm:w-16 sm:h-16 border-2 border-amber-300 transform rotate-12 rounded-lg"></div>
         <div className="absolute top-2/3 right-1/3 w-12 h-12 border-2 border-amber-500 transform -rotate-12 rounded-full"></div>
         <div className="absolute bottom-1/4 left-1/4 w-20 h-20 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
-        <div className="absolute top-1/2 right-1/4 w-14 h-14 border-2 border-amber-300 transform -rotate-45 rounded-full"></div>
+        <div className="absolute top-1/2 right-1/4 w-10 h-10 sm:w-14 sm:h-14 border-2 border-amber-300 transform -rotate-45 rounded-full"></div>
         
         {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-amber-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 sm:w-4 sm:h-4 bg-amber-400 rounded-full animate-pulse"></div>
         <div className="absolute top-3/4 right-1/4 w-3 h-3 bg-amber-300 rounded-full animate-pulse delay-1000"></div>
         <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-amber-500 rounded-full animate-pulse delay-500"></div>
         <div className="absolute top-1/2 right-1/2 w-3 h-3 bg-amber-400 rounded-full animate-pulse delay-700"></div>
@@ -98,7 +98,7 @@ export default function HomePage() {
         {/* Cosmic Dust/Nebula */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-purple-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-radial from-blue-400/8 via-cyan-400/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-40 h-40 sm:w-64 sm:h-64 bg-gradient-radial from-blue-400/8 via-cyan-400/4 to-transparent rounded-full blur-xl sm:blur-2xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
         
         {/* Additional cosmic dust clouds */}
         <div className="absolute top-1/6 right-1/6 w-72 h-72 bg-gradient-radial from-purple-400/6 via-cyan-400/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '7s', animationDelay: '3s' }} />
@@ -184,12 +184,12 @@ export default function HomePage() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 p-6">
-        <div className="flex justify-between items-center mb-8">
+      <div className="relative z-10 p-4 sm:p-6">
+        <div className="flex justify-between items-center mb-6 sm:mb-8">
           {/* Login/Registration Button */}
           <button
             onClick={() => setShowLogin(true)}
-            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
           >
             Login / Register
           </button>
@@ -199,16 +199,16 @@ export default function HomePage() {
         </div>
 
         {/* Main Title */}
-        <div className="text-center mb-8 relative">
-          <h1 className="text-6xl font-bold text-amber-600 mb-4 tracking-wider">
+        <div className="text-center mb-6 sm:mb-8 relative px-2">
+          <h1 className="text-3xl sm:text-6xl font-bold text-amber-600 mb-2 sm:mb-4 tracking-wide sm:tracking-wider">
             LEADERBOARD
           </h1>
-          <p className="text-purple-200 text-xl">
+          <p className="text-purple-200 text-sm sm:text-xl">
             Top Players & Guilds
           </p>
           
           {/* Cat Constellation - positioned to the right middle of the title area */}
-          <div className="absolute top-1/2 -right-32 transform -translate-y-1/2 opacity-60">
+          <div className="absolute top-1/2 -right-32 transform -translate-y-1/2 opacity-60 hidden md:block">
             {/* Cat's head */}
             <div className="absolute w-2 h-2 bg-amber-300 rounded-full top-0 left-8"></div>
             <div className="absolute w-1.5 h-1.5 bg-amber-300 rounded-full top-2 left-4"></div>
@@ -244,30 +244,30 @@ export default function HomePage() {
         </div>
 
         {/* Leaderboard */}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-full sm:max-w-4xl mx-auto px-2 sm:px-0">
           <Leaderboard 
             limit={5} 
             showTitle={true} 
             showPagination={false}
             showSearch={true}
-            className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-amber-400/30"
+            className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-2xl border border-amber-400/30"
           />
         </div>
       </div>
 
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="relative w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="relative w-full max-w-sm sm:max-w-md">
             {/* Close button */}
             <button
               onClick={() => setShowLogin(false)}
-              className="absolute -top-4 -right-4 z-10 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
             >
               ✕
             </button>
             {/* Login form frame only */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-amber-400/30 relative">
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-2xl border border-amber-400/30 relative">
               {/* Decorative columns */}
               <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full"></div>
               <div className="absolute -right-2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full"></div>
