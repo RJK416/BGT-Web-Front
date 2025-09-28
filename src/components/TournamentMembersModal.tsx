@@ -3,23 +3,27 @@
 import { useState, useEffect } from 'react';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import { TournamentMember } from '@/types/tournament';
+import { getAuthToken } from '@/utils/auth';
 
 interface TournamentMembersModalProps {
   tournamentId: number;
   tournamentName: string;
   isOpen: boolean;
   onClose: () => void;
+  onMemberRemoved?: () => void;
 }
 
 export default function TournamentMembersModal({ 
   tournamentId,
   tournamentName,
   isOpen, 
-  onClose
+  onClose,
+  onMemberRemoved
 }: TournamentMembersModalProps) {
   const [members, setMembers] = useState<TournamentMember[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [removingMember, setRemovingMember] = useState<number | null>(null);
 
   // Fetch members when modal opens
   useEffect(() => {
@@ -47,6 +51,42 @@ export default function TournamentMembersModal({
       console.error('Load members error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const removeMember = async (member: TournamentMember) => {
+    if (!confirm(`Are you sure you want to remove ${member.nickname} from this tournament?`)) {
+      return;
+    }
+
+    setRemovingMember(member.id);
+    
+    try {
+      const token = getAuthToken();
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.REMOVE_TOURNAMENT_MEMBER}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          TournamentId: tournamentId,
+          Username: member.nickname
+        })
+      });
+
+      if (res.ok) {
+        // Remove member from local state
+        setMembers(prev => prev.filter(m => m.id !== member.id));
+        onMemberRemoved?.();
+      } else {
+        setError(res.error || res.message || 'Failed to remove member');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to remove member');
+      console.error('Remove member error:', err);
+    } finally {
+      setRemovingMember(null);
     }
   };
 
@@ -112,23 +152,39 @@ export default function TournamentMembersModal({
                     </div>
                   </div>
                   
-                  {/* Member Stats */}
-                  <div className="text-right">
-                    {member.placement && (
-                      <div className="text-amber-400 font-bold text-lg">
-                        #{member.placement}
-                      </div>
-                    )}
-                    {typeof member.score === 'number' && (
-                      <div className="text-purple-300 text-sm">
-                        {member.score} pts
-                      </div>
-                    )}
-                    {!member.placement && !member.score && (
-                      <div className="text-purple-400 text-sm">
-                        Participant
-                      </div>
-                    )}
+                  {/* Member Stats and Remove Button */}
+                  <div className="flex items-center space-x-3">
+                    <div className="text-right">
+                      {member.placement && (
+                        <div className="text-amber-400 font-bold text-lg">
+                          #{member.placement}
+                        </div>
+                      )}
+                      {typeof member.score === 'number' && (
+                        <div className="text-purple-300 text-sm">
+                          {member.score} pts
+                        </div>
+                      )}
+                      {!member.placement && !member.score && (
+                        <div className="text-purple-400 text-sm">
+                          Participant
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Remove Button */}
+                    <button
+                      onClick={() => removeMember(member)}
+                      disabled={removingMember === member.id}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Remove member from tournament"
+                    >
+                      {removingMember === member.id ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400" />
+                      ) : (
+                        <span className="text-lg">✕</span>
+                      )}
+                    </button>
                   </div>
                 </div>
               ))}

@@ -28,6 +28,7 @@ export const API_CONFIG = {
       GET_USER_PLAYER: '/Boardgame/Get-User-Player',
       CREATE_TOURNAMENT: '/Boardgame/Create-Boardgame-Tournament',
       ADD_TOURNAMENT_MEMBER: '/Boardgame/Add-Tournament-Member',
+      REMOVE_TOURNAMENT_MEMBER: '/Boardgame/Remove-Tournament-Member',
       UPDATE_TOURNAMENT: '/Boardgame/Update-Tournament',
     },
     // Legacy endpoints

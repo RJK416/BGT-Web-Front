@@ -1207,6 +1207,11 @@ export default function Dashboard() {
             setIsMembersModalOpen(false);
             setMembersModalTournament(null);
           }}
+          onMemberRemoved={() => {
+            // Refresh tournaments list when member is removed
+            fetchMyTournaments();
+            fetchTournaments();
+          }}
         />
       )}
 
