@@ -46,7 +46,7 @@ export default function EndTournamentModal({
       const requestBody = {
         TournamentId: formData.tournamentId,
         WinnerId: formData.winnerId,
-        MvpId: formData.mvpId,
+        MvpId: formData.mvpId ?? null,
         Phase: formData.phase,
       };
       
@@ -142,8 +142,12 @@ export default function EndTournamentModal({
               MVP (Most Valuable Player)
             </label>
             <select
-              value={formData.mvpId || ''}
-              onChange={(e) => handleInputChange('mvpId', parseInt(e.target.value))}
+              value={formData.mvpId ?? ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const parsed = val ? parseInt(val) : undefined;
+                handleInputChange('mvpId', parsed);
+              }}
               className="w-full px-3 py-2 bg-purple-900/50 border border-amber-400/30 rounded text-white focus:border-amber-400 focus:outline-none"
             >
               <option value="">Select MVP (Optional)</option>
