@@ -34,6 +34,8 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
   const fetchProfile = async () => {
     if (!username) return;
@@ -65,6 +67,16 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
       fetchProfile();
     }
   }, [isOpen, username]);
+
+  const handleAvatarClick = (avatarUrl: string, nickname: string) => {
+    setSelectedAvatar({ url: avatarUrl, nickname });
+    setIsAvatarModalOpen(true);
+  };
+
+  const handleAvatarModalClose = () => {
+    setIsAvatarModalOpen(false);
+    setSelectedAvatar(null);
+  };
 
   if (!isOpen) return null;
 
@@ -118,7 +130,8 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                     <img
                       src={profile.avatarUrl}
                       alt={profile.userName}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-amber-400"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-amber-400 cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => handleAvatarClick(profile.avatarUrl!, profile.userName)}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -245,6 +258,56 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
           ) : null}
         </div>
       </div>
+
+      {/* Avatar Modal */}
+      {isAvatarModalOpen && selectedAvatar && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-400/30">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-amber-300">
+                {selectedAvatar.nickname}'s Avatar
+              </h3>
+              <button
+                onClick={handleAvatarModalClose}
+                className="text-purple-300 hover:text-amber-400 transition-colors p-2 hover:bg-purple-800/50 rounded-full"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Avatar Image */}
+            <div className="flex justify-center mb-4">
+              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl">
+                <img
+                  src={selectedAvatar.url}
+                  alt={`${selectedAvatar.nickname}'s avatar`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    target.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <div className="w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center hidden">
+                  <span className="text-6xl font-bold text-purple-900">
+                    {selectedAvatar.nickname.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="text-center">
+              <p className="text-purple-200 text-sm">
+                Click outside or press ESC to close
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

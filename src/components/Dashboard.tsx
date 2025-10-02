@@ -60,6 +60,8 @@ export default function Dashboard() {
   const [infoSuccess, setInfoSuccess] = useState(true);
   const [infoMessage, setInfoMessage] = useState<string | undefined>(undefined);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -210,6 +212,16 @@ export default function Dashboard() {
     } finally {
       setIsUploadingAvatar(false);
     }
+  };
+
+  const handleAvatarClick = (avatarUrl: string, nickname: string) => {
+    setSelectedAvatar({ url: avatarUrl, nickname });
+    setIsAvatarModalOpen(true);
+  };
+
+  const handleAvatarModalClose = () => {
+    setIsAvatarModalOpen(false);
+    setSelectedAvatar(null);
   };
 
   // Remove player confirm flow
@@ -687,105 +699,83 @@ export default function Dashboard() {
             {/* Leaderboard */}
             <Leaderboard limit={10} showPagination={true} showSearch={true} className="mb-8 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
 
-            {/* GM: Manage Tournaments Panel */}
-            {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-amber-400">My Tournaments</h2>
-                    <button
-                      onClick={fetchMyTournaments}
-                      className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm"
-                    >
-                      Refresh
-                    </button>
-                  </div>
-                  
-                  {/* My Tournaments List */}
-                  <div className="space-y-3 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden">
-                    {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
-                      <div
-                        key={tournament.id}
-                        onClick={() => openTournamentModal(tournament, true)}
-                        className="bg-gradient-to-r from-purple-800/40 to-purple-700/40 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-4 border border-sky-200/30 hover:border-sky-200/50 transition-all duration-300 cursor-pointer"
-                      >
-                        <div className="flex items-start justify-between min-w-0">
-                          <div className="flex-1 min-w-0 pr-2">
-                            <h3 className="text-amber-300 font-semibold text-sm truncate">{tournament.name}</h3>
-                            <p className="text-purple-300 text-xs truncate">{tournament.game}</p>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-purple-400">
-                              <span className="whitespace-nowrap">{tournament.memberCount}/{tournament.maxMembers} members</span>
-                              <span className="whitespace-nowrap">{new Date(tournament.tournamentDate).toLocaleDateString()}</span>
-                              <span className="whitespace-nowrap">{tournament.xpReward || 100} XP</span>
-                              <span className="whitespace-nowrap">{tournament.mvpXpReward || 50} MVP XP</span>
-                  </div>
-                            <div className="mt-1">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                tournament.phase === 0 ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
-                                tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
-                                tournament.phase === 2 ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30' :
-                                tournament.phase === 3 ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30' :
-                                'bg-red-500/20 text-red-300 border border-red-400/30'
-                              }`}>
-                                {tournament.phase === 0 ? 'Registration' :
-                                 tournament.phase === 1 ? 'Started' :
-                                 tournament.phase === 2 ? 'Finished' :
-                                 tournament.phase === 3 ? 'Postponed' : 'Cancelled'}
-                              </span>
-                </div>
-              </div>
-                          <div className="flex flex-col items-end space-y-1 flex-shrink-0">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                              tournament.memberCount < tournament.maxMembers 
-                                ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
-                                : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-                            }`}>
-                              {tournament.memberCount < tournament.maxMembers ? 'Open' : 'Full'}
-                            </span>
-                            <div className="flex flex-col items-end space-y-1">
-                              <span className="text-xs text-purple-400 whitespace-nowrap">Click to manage</span>
-                            </div>
-                  </div>
-                </div>
-              </div>
-                    )) : (
-                      <div className="text-center py-8">
-                        <div className="text-purple-300 text-lg">No tournaments created yet</div>
-                        <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
-                  </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* GM: Create Tournament Panel */}
-            {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
-                {/* Expandable Button */}
+            {/* My Tournaments */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-amber-400">My Tournaments</h2>
                 <button
-                  onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                  onClick={fetchMyTournaments}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
                 >
-                  <span className="text-lg font-bold">Create Tournament</span>
-                  <svg 
-                    className={`w-5 h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                  Refresh
                 </button>
-                
-                {/* Expandable Form */}
-                {isCreateTournamentExpanded && (
-                  <div className="p-6 border-t border-sky-200/20">
-                    <CreateTournamentForm />
+              </div>
+              
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
+                  <div
+                    key={tournament.id}
+                    onClick={() => openTournamentModal(tournament, true)}
+                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-amber-300 font-semibold">{tournament.name}</h3>
+                        <p className="text-purple-300 text-sm">{tournament.game}</p>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-purple-400">
+                          <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
+                          <span>{new Date(tournament.tournamentDate).toLocaleDateString()}</span>
+                          <span>{tournament.xpReward || 100} XP</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
+                          tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
+                          tournament.phase === 2 ? 'bg-purple-500/20 text-purple-300' :
+                          'bg-red-500/20 text-red-300'
+                        }`}>
+                          {tournament.phase === 0 ? 'Registration' :
+                           tournament.phase === 1 ? 'Started' :
+                           tournament.phase === 2 ? 'Finished' : 'Cancelled'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="text-center py-8">
+                    <div className="text-purple-300">No tournaments created yet</div>
+                    <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
                   </div>
                 )}
-                  </div>
-            )}
+              </div>
+            </div>
+
+            {/* Create Tournament */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-8">
+              {/* Expandable Button */}
+              <button
+                onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+              >
+                <span className="text-lg font-bold">Create Tournament</span>
+                <svg 
+                  className={`w-5 h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {/* Expandable Form */}
+              {isCreateTournamentExpanded && (
+                <div className="p-6 border-t border-amber-400/20">
+                  <CreateTournamentForm />
+                </div>
+              )}
+            </div>
 
 
             {/* Your Player Card */}
@@ -798,15 +788,16 @@ export default function Dashboard() {
               </div>
               
               <div className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-6 border border-amber-400/20">
-                <div className="flex items-center space-x-6">
-                  {/* Profile Picture */}
+                <div className="flex items-center space-x-4 sm:space-x-6">
+                  {/* Profile Picture - Mobile Friendly */}
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-amber-400">
+                    <div className="w-24 h-24 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400">
                       {userProfile?.avatarUrl ? (
                         <img
                           src={userProfile.avatarUrl}
                           alt={userProfile.userName || 'User'}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => handleAvatarClick(userProfile.avatarUrl!, userProfile.userName || 'User')}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -815,18 +806,19 @@ export default function Dashboard() {
                         />
                       ) : null}
                       <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
-                        <span className="text-2xl font-bold text-purple-900">
+                        <span className="text-3xl sm:text-2xl font-bold text-purple-900">
                           {userProfile?.userName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                     </div>
                     
-                    {/* Upload Button */}
+                    {/* Upload Button - Mobile Friendly */}
                     <div className="absolute -bottom-1 -right-1">
-                      <label className="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-purple-900 cursor-pointer hover:from-green-500 hover:to-green-700 transition-colors">
+                      <label className="w-8 h-8 sm:w-6 sm:h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-purple-900 cursor-pointer hover:from-green-500 hover:to-green-700 active:scale-95 transition-all duration-200 touch-manipulation">
                         <input
                           type="file"
-                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/heic"
+                          capture="environment"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
@@ -837,32 +829,35 @@ export default function Dashboard() {
                           disabled={isUploadingAvatar}
                         />
                         {isUploadingAvatar ? (
-                          <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                          <div className="animate-spin w-4 h-4 sm:w-3 sm:h-3 border border-white border-t-transparent rounded-full"></div>
                         ) : (
-                          <span className="text-xs font-bold text-white">📷</span>
+                          <svg className="w-4 h-4 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
                         )}
                       </label>
                     </div>
                   </div>
 
 
-                  {/* Player Info Added by me */}
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4 mb-3">
-                      <h3 className="text-2xl font-bold text-amber-300">
+                  {/* Player Info - Mobile Friendly */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-3">
+                      <h3 className="text-xl sm:text-2xl font-bold text-amber-300 truncate">
                         {userProfile?.stats?.nickname || userProfile?.userName || user?.username || 'User'}
                       </h3>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30 self-start">
                         {userPlayer?.guild || 'Elite Guild'}
                       </span>
                     </div>
 
-                    {/* Level and XP Bar */}
-                    <div className="flex items-center space-x-4 mb-4">
-                      <span className="text-xl font-bold text-amber-400">
+                    {/* Level and XP Bar - Mobile Friendly */}
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
+                      <span className="text-lg sm:text-xl font-bold text-amber-400">
                         LVL {userProfile?.stats?.level || userPlayer?.level || 1}
                       </span>
-                      <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden border-2 border-amber-400/60">
+                      <div className="flex-1 bg-purple-900/50 rounded-full h-3 sm:h-4 overflow-hidden border-2 border-amber-400/60">
                         {(userProfile?.stats || userPlayer) ? (() => {
                           // Derive from actual XP to avoid mismatch with level calc
                           const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
@@ -893,18 +888,18 @@ export default function Dashboard() {
                       </span>
                     </div>
 
-                    {/* Stats Row */}
-                    <div className="grid grid-cols-3 gap-4">
+                    {/* Stats Row - Mobile Friendly */}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || 0}</div>
+                        <div className="text-xl sm:text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || 0}</div>
                         <div className="text-xs text-purple-300">Games Played</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400">{userPlayer?.wins || 0}</div>
+                        <div className="text-xl sm:text-2xl font-bold text-green-400">{userPlayer?.wins || 0}</div>
                         <div className="text-xs text-purple-300">Games Won</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
+                        <div className="text-xl sm:text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
                         <div className="text-xs text-purple-300">Win Rate</div>
                       </div>
                     </div>
@@ -913,18 +908,18 @@ export default function Dashboard() {
                   {/* Achievements */}
                   <div className="flex flex-col space-y-2">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-amber-400">+{userPlayer?.totalScore || 0}</div>
+                      <div className="text-xl sm:text-2xl font-bold text-amber-400">+{userPlayer?.totalScore || 0}</div>
                       <div className="text-xs text-purple-300">Total Points</div>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1 sm:space-x-2 justify-center">
                       {userPlayer?.mvps > 0 && (
-                        <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center" title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}>
-                          <span className="text-yellow-900 text-sm">⭐</span>
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-500 rounded-full flex items-center justify-center" title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}>
+                          <span className="text-yellow-900 text-xs sm:text-sm">⭐</span>
                         </div>
                       )}
                       {userPlayer?.tournamentsWon > 0 && (
-                        <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center" title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}>
-                          <span className="text-yellow-100 text-sm">👑</span>
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-600 rounded-full flex items-center justify-center" title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}>
+                          <span className="text-yellow-100 text-xs sm:text-sm">👑</span>
                         </div>
                       )}
                       {userPlayer?.wins > 0 && (
@@ -1457,6 +1452,56 @@ export default function Dashboard() {
         success={infoSuccess}
         onClose={() => setInfoOpen(false)}
       />
+
+      {/* Avatar Modal */}
+      {isAvatarModalOpen && selectedAvatar && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-400/30">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-amber-300">
+                {selectedAvatar.nickname}'s Avatar
+              </h3>
+              <button
+                onClick={handleAvatarModalClose}
+                className="text-purple-300 hover:text-amber-400 transition-colors p-2 hover:bg-purple-800/50 rounded-full"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Avatar Image */}
+            <div className="flex justify-center mb-4">
+              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl">
+                <img
+                  src={selectedAvatar.url}
+                  alt={`${selectedAvatar.nickname}'s avatar`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    target.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <div className="w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center hidden">
+                  <span className="text-6xl font-bold text-purple-900">
+                    {selectedAvatar.nickname.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="text-center">
+              <p className="text-purple-200 text-sm">
+                Click outside or press ESC to close
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
