@@ -18,7 +18,6 @@ interface BoardgameStats {
 interface UserProfile {
   id: number;
   userName: string;
-  userEmail: string;
   isActive: boolean;
   avatarUrl?: string;
   stats: BoardgameStats;
@@ -148,7 +147,6 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                 
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-amber-300">{profile.userName}</h3>
-                  <p className="text-purple-300 text-sm">{profile.userEmail}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       profile.isActive 
