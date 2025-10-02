@@ -10,7 +10,6 @@ import EndTournamentModal from '@/components/EndTournamentModal';
 import TournamentMembersModal from '@/components/TournamentMembersModal';
 import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
-// import { useRef } from 'react'; // ← not used, remove
 import ConfirmModal from '@/components/ConfirmModal';
 import InfoModal from '@/components/InfoModal';
 
@@ -318,32 +317,18 @@ export default function Dashboard() {
     
     try {
       const token = getAuthToken();
-      console.log('🔍 Fetching my tournaments for GM user...');
-      console.log('🔍 Token exists:', !!token);
-      console.log('🔍 API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`);
-      console.log('🔍 User player role:', userPlayer.role);
-      console.log('🔍 Is GM:', isGM);
       
       const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      console.log('🔍 My tournaments response:', res);
-      console.log('🔍 Response ok:', res.ok);
-      console.log('🔍 Response status:', res.status);
-      console.log('🔍 Response data:', res.data);
-      console.log('🔍 Response result:', res.result);
-      
       if (res.ok) {
         const tournaments = res.data || res.result || [];
-        console.log('🔍 Setting my tournaments:', tournaments);
         setMyTournaments(tournaments);
-      } else {
-        console.error('🔍 Failed to fetch my tournaments:', res);
       }
     } catch (error) {
-      console.error('🔍 Error fetching my tournaments:', error);
+      // Error handling for tournament fetching
     }
   };
 

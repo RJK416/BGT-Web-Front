@@ -239,12 +239,10 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                           handleAvatarClick(player.avatarUrl!, player.nickname);
                         }}
                         onError={(e) => {
-                          console.log(`🔍 Avatar load error for ${player.nickname}:`, e);
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                           target.nextElementSibling?.classList.remove('hidden');
                         }}
-                        onLoad={() => console.log(`🔍 Avatar loaded successfully for ${player.nickname}`)}
                       />
                     ) : null}
                     <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${player.avatarUrl ? 'hidden' : ''}`}>

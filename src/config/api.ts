@@ -63,9 +63,6 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
   
   try {
-    console.log('Making API request to:', url);
-    console.log('Request options:', options);
-    
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -77,11 +74,7 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     
     clearTimeout(timeoutId);
     
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
-    
     const data = await response.json();
-    console.log('Response data:', data);
     
     // Return data with status for error handling in components
     return {
@@ -91,7 +84,6 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     };
   } catch (error) {
     clearTimeout(timeoutId);
-    console.error('API request error:', error);
     throw error;
   }
 }; 

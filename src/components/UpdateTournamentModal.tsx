@@ -62,8 +62,6 @@ export default function UpdateTournamentModal({
         MvpId: formData.mvpId,
       };
       
-      console.log('Sending update request:', requestBody);
-      
       const response = await apiRequest(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.UPDATE_TOURNAMENT}`,
         {

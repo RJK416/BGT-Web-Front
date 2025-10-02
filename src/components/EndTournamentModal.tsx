@@ -50,8 +50,6 @@ export default function EndTournamentModal({
         Phase: formData.phase,
       };
       
-      console.log('Sending end tournament request:', requestBody);
-      
       const response = await apiRequest(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.UPDATE_TOURNAMENT}`,
         {
