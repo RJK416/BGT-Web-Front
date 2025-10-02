@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Board Games Tracker - Chronicle Your Adventures Bober",
+  title: "Guild - Chronicle Your Adventures",
   description: "A medieval fantasy-themed board games tracker to manage and chronicle your board game collection and adventures Bober.",
 };
 

@@ -421,7 +421,7 @@ export default function PasswordResetPage() {
           {/* Footer */}
           <div className="text-center mt-8">
             <p className="text-purple-600 text-sm">
-              © 2024 Board Games Tracker • All rights reserved Biber
+              © 2024 Guild • All rights reserved
             </p>
           </div>
         </div>

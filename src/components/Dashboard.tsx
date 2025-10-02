@@ -652,7 +652,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-amber-400">Board Games Tracker</h1>
+                <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
                 <p className="text-purple-200 text-sm">Chronicle Your Adventures</p>
               </div>
             </div>
