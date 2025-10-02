@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import { TournamentMember } from '@/types/tournament';
 import { getAuthToken } from '@/utils/auth';
+import ConfirmModal from '@/components/ConfirmModal';
 
 interface TournamentMembersModalProps {
   tournamentId: number;
@@ -24,6 +25,8 @@ export default function TournamentMembersModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [removingMember, setRemovingMember] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState<TournamentMember | null>(null);
 
   // Fetch members when modal opens
   useEffect(() => {
@@ -54,13 +57,15 @@ export default function TournamentMembersModal({
     }
   };
 
-  const removeMember = async (member: TournamentMember) => {
-    if (!confirm(`Are you sure you want to remove ${member.nickname} from this tournament?`)) {
-      return;
-    }
+  const removeMember = (member: TournamentMember) => {
+    setPendingRemoval(member);
+    setConfirmOpen(true);
+  };
 
+  const confirmRemoval = async () => {
+    const member = pendingRemoval;
+    if (!member) return;
     setRemovingMember(member.id);
-    
     try {
       const token = getAuthToken();
       const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.REMOVE_TOURNAMENT_MEMBER}`, {
@@ -76,9 +81,10 @@ export default function TournamentMembersModal({
       });
 
       if (res.ok) {
-        // Remove member from local state
         setMembers(prev => prev.filter(m => m.id !== member.id));
         onMemberRemoved?.();
+        setConfirmOpen(false);
+        setPendingRemoval(null);
       } else {
         setError(res.error || res.message || 'Failed to remove member');
       }
@@ -207,6 +213,17 @@ export default function TournamentMembersModal({
           </div>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Remove Member"
+        description={pendingRemoval ? `Are you sure you want to remove ${pendingRemoval.nickname} from this tournament?` : ''}
+        confirmText="Remove"
+        cancelText="Cancel"
+        danger
+        loading={removingMember != null}
+        onConfirm={confirmRemoval}
+        onCancel={() => { setConfirmOpen(false); setPendingRemoval(null); }}
+      />
     </div>
   );
 }

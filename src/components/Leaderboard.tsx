@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { API_CONFIG, apiRequest } from '@/config/api';
+import UserProfileCard from './UserProfileCard';
 
 interface LeaderboardPlayer {
   id: number;
@@ -30,6 +31,8 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
+  const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: limit,
@@ -96,6 +99,18 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       player.nickname.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [leaderboard, searchTerm]);
+
+  // Handle player click to show profile
+  const handlePlayerClick = (nickname: string) => {
+    setSelectedUsername(nickname);
+    setIsProfileCardOpen(true);
+  };
+
+  // Handle profile card close
+  const handleProfileCardClose = () => {
+    setIsProfileCardOpen(false);
+    setSelectedUsername(null);
+  };
 
   if (isLoading) {
     return (
@@ -187,7 +202,11 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
 
           return (
-            <div key={player.id} className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300">
+            <div 
+              key={player.id} 
+              className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+              onClick={() => handlePlayerClick(player.nickname)}
+            >
               <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 {/* Rank */}
                 <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
@@ -196,10 +215,24 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                 
                 {/* Profile Picture */}
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-purple-900">
-                      {player.nickname.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400">
+                    {player.avatarUrl ? (
+                      <img
+                        src={player.avatarUrl}
+                        alt={player.nickname}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${player.avatarUrl ? 'hidden' : ''}`}>
+                      <span className="text-lg font-bold text-purple-900">
+                        {player.nickname.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
                   {player.guild && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
@@ -343,6 +376,15 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
             </button>
           </div>
         </div>
+      )}
+
+      {/* User Profile Card */}
+      {selectedUsername && (
+        <UserProfileCard
+          username={selectedUsername}
+          isOpen={isProfileCardOpen}
+          onClose={handleProfileCardClose}
+        />
       )}
     </div>
   );

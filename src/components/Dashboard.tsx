@@ -11,6 +11,8 @@ import TournamentMembersModal from '@/components/TournamentMembersModal';
 import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
 // import { useRef } from 'react'; // ← not used, remove
+import ConfirmModal from '@/components/ConfirmModal';
+import InfoModal from '@/components/InfoModal';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -26,6 +28,7 @@ export default function Dashboard() {
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
 
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [userPlayer, setUserPlayer] = useState<any>(null);
   const isGM = (() => {
     const r = userPlayer?.role;
@@ -34,6 +37,7 @@ export default function Dashboard() {
     return r === 1; // numeric enum fallback
   })();
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [isCreateTournamentExpanded, setIsCreateTournamentExpanded] = useState(false);
 
   const [selectedTournament, setSelectedTournament] = useState<any>(null);
@@ -49,6 +53,13 @@ export default function Dashboard() {
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [membersModalTournament, setMembersModalTournament] = useState<{ id: number; name: string } | null>(null);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState<any | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [infoSuccess, setInfoSuccess] = useState(true);
+  const [infoMessage, setInfoMessage] = useState<string | undefined>(undefined);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const router = useRouter();
 
@@ -72,6 +83,43 @@ export default function Dashboard() {
       setTournaments([]);
     } finally {
       setTournamentsLoading(false);
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      setProfileLoading(true);
+      const token = getAuthToken();
+      if (!token) {
+        console.error('No auth token found');
+        setUserProfile(null);
+        return;
+      }
+      const response = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.GET_PROFILE}`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok && response.status === 200) {
+        setUserProfile(response.data);
+        // Also set userPlayer from the profile stats for backward compatibility
+        if (response.data?.stats) {
+          setUserPlayer({
+            ...response.data.stats,
+            totalScore: response.data.stats.xp || 0, // Use XP as total score for now
+          });
+        }
+      } else {
+        console.error('Failed to fetch user profile:', response);
+        setUserProfile(null);
+        setUserPlayer(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      setUserProfile(null);
+      setUserPlayer(null);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -100,6 +148,112 @@ export default function Dashboard() {
       setUserPlayer(null);
     } finally {
       setUserPlayerLoading(false);
+    }
+  };
+
+  // Avatar upload function
+  const handleAvatarUpload = async (file: File) => {
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setInfoSuccess(false);
+      setInfoMessage('Please select a valid image file (JPG, PNG, or WebP)');
+      setInfoOpen(true);
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setInfoSuccess(false);
+      setInfoMessage('File size must be less than 5MB');
+      setInfoOpen(true);
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.UPLOAD_AVATAR}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.status === 200) {
+        setInfoSuccess(true);
+        setInfoMessage('Avatar uploaded successfully!');
+        setInfoOpen(true);
+        // Refresh profile to show new avatar
+        await fetchUserProfile();
+      } else {
+        throw new Error(result.error || result.message || 'Failed to upload avatar');
+      }
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      setInfoSuccess(false);
+      setInfoMessage(error.message || 'Failed to upload avatar');
+      setInfoOpen(true);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  // Remove player confirm flow
+  const promptRemoveMember = (member: any) => {
+    setPendingRemoval(member);
+    setConfirmOpen(true);
+  };
+
+  const removeMemberFromTournament = async () => {
+    const member = pendingRemoval;
+    if (!selectedTournament || !member) return;
+
+    setRemovingMemberId(member.id);
+    try {
+      const token = getAuthToken();
+      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.REMOVE_TOURNAMENT_MEMBER}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          TournamentId: selectedTournament.id,
+          Username: member.nickname
+        })
+      });
+
+      if (res.ok) {
+        setTournamentMembers(prev => prev.filter((m: any) => m.id !== member.id));
+        fetchMyTournaments();
+        fetchTournaments();
+        setConfirmOpen(false);
+        setPendingRemoval(null);
+      } else {
+        setInfoSuccess(false);
+        setInfoMessage(res.error || res.message || 'Failed to remove member');
+        setInfoOpen(true);
+      }
+    } catch (error: any) {
+      setInfoSuccess(false);
+      setInfoMessage(error.message || 'Failed to remove member');
+      setInfoOpen(true);
+    } finally {
+      setRemovingMemberId(null);
     }
   };
 
@@ -136,7 +290,7 @@ export default function Dashboard() {
           joinDate: '2024-01-15',
         });
 
-        await Promise.all([fetchUserPlayer(), fetchTournaments()]);
+        await Promise.all([fetchUserPlayer(), fetchUserProfile(), fetchTournaments()]);
       } finally {
         setIsLoading(false);
       }
@@ -228,11 +382,17 @@ export default function Dashboard() {
       });
       if (!res.ok) throw new Error(res.error || res.message || 'Failed');
       setMessage(res.message || 'Tournament created');
+      setInfoSuccess(true);
+      setInfoMessage(res.message || 'Tournament created successfully!');
+      setInfoOpen(true);
       setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
       // refresh list if available
       if (typeof fetchMyTournaments === 'function') fetchMyTournaments();
     } catch (err: any) {
       setMessage(err.message || 'Failed to create tournament');
+      setInfoSuccess(false);
+      setInfoMessage(err.message || 'Failed to create tournament');
+      setInfoOpen(true);
     } finally {
       setCreating(false);
     }
@@ -641,22 +801,56 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-6">
                   {/* Profile Picture */}
                   <div className="relative">
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                      <span className="text-2xl font-bold text-purple-900">
-                        {user?.username?.charAt(0).toUpperCase() || 'U'}
-                      </span>
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
-                      <span className="text-xs font-bold text-white">G</span>
-                    </div>
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-amber-400">
+                      {userProfile?.avatarUrl ? (
+                        <img
+                          src={userProfile.avatarUrl}
+                          alt={userProfile.userName || 'User'}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
+                        <span className="text-2xl font-bold text-purple-900">
+                          {userProfile?.userName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
+                        </span>
                       </div>
+                    </div>
+                    
+                    {/* Upload Button */}
+                    <div className="absolute -bottom-1 -right-1">
+                      <label className="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-purple-900 cursor-pointer hover:from-green-500 hover:to-green-700 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleAvatarUpload(file);
+                            }
+                          }}
+                          className="hidden"
+                          disabled={isUploadingAvatar}
+                        />
+                        {isUploadingAvatar ? (
+                          <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                        ) : (
+                          <span className="text-xs font-bold text-white">📷</span>
+                        )}
+                      </label>
+                    </div>
+                  </div>
 
 
                   {/* Player Info Added by me */}
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-3">
                       <h3 className="text-2xl font-bold text-amber-300">
-                        {userPlayer?.nickname || user?.username || 'User'}
+                        {userProfile?.stats?.nickname || userProfile?.userName || user?.username || 'User'}
                       </h3>
                       <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30">
                         {userPlayer?.guild || 'Elite Guild'}
@@ -666,12 +860,12 @@ export default function Dashboard() {
                     {/* Level and XP Bar */}
                     <div className="flex items-center space-x-4 mb-4">
                       <span className="text-xl font-bold text-amber-400">
-                        LVL {userPlayer?.level || 1}
+                        LVL {userProfile?.stats?.level || userPlayer?.level || 1}
                       </span>
                       <div className="flex-1 bg-purple-900/50 rounded-full h-4 overflow-hidden border-2 border-amber-400/60">
-                        {userPlayer ? (() => {
+                        {(userProfile?.stats || userPlayer) ? (() => {
                           // Derive from actual XP to avoid mismatch with level calc
-                          const xp = Math.max(0, userPlayer.xp || 0);
+                          const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
                           const levelBase = Math.floor(xp / 1000) * 1000;
                           const xpInCurrentLevel = xp - levelBase;
                           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
@@ -689,8 +883,8 @@ export default function Dashboard() {
                         )}
                       </div>
                       <span className="text-sm font-medium text-amber-300">
-                        {userPlayer ? (() => {
-                          const xp = Math.max(0, userPlayer.xp || 0);
+                        {(userProfile?.stats || userPlayer) ? (() => {
+                          const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
                           const levelBase = Math.floor(xp / 1000) * 1000;
                           const xpInCurrentLevel = xp - levelBase;
                           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
@@ -1102,10 +1296,19 @@ export default function Dashboard() {
                                   {member.score} pts
                                 </span>
                               )}
-                              <button className="p-1 text-red-400 hover:text-red-300 transition-colors flex-shrink-0">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                              <button
+                                onClick={() => promptRemoveMember(member)}
+                                disabled={removingMemberId === member.id}
+                                className="p-1 text-red-400 hover:text-red-300 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Remove member from tournament"
+                              >
+                                {removingMemberId === member.id ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400" />
+                                ) : (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                )}
                               </button>
                             </div>
                           </div>
@@ -1232,6 +1435,28 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Confirm remove member */}
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Remove Member"
+        description={pendingRemoval ? `Are you sure you want to remove ${pendingRemoval.nickname} from this tournament?` : ''}
+        confirmText="Remove"
+        cancelText="Cancel"
+        danger
+        loading={removingMemberId != null}
+        onConfirm={removeMemberFromTournament}
+        onCancel={() => { setConfirmOpen(false); setPendingRemoval(null); }}
+      />
+
+      {/* Info modal for creation and errors */}
+      <InfoModal
+        isOpen={infoOpen}
+        title={infoSuccess ? 'Tournament Created' : 'Action Failed'}
+        message={infoMessage}
+        success={infoSuccess}
+        onClose={() => setInfoOpen(false)}
+      />
 
     </div>
   );

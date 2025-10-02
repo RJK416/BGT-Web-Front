@@ -13,6 +13,9 @@ export const API_CONFIG = {
       COMPLETE_REGISTRATION: '/Account/Account-Creation/Complete',
       CHANGE_PASSWORD: '/Account/PasswordChange',
       RESET_PASSWORD: '/Account/Passwrod-Reset/Complete',
+      GET_PROFILE: '/Account/Profile',
+      GET_PROFILE_BY_USERNAME: '/Account/Profile/:username',
+      UPLOAD_AVATAR: '/Account/Avatar/Upload',
     },
     // Board Game Service Endpoints
     BOARDGAME: {

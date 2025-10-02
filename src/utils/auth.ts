@@ -3,15 +3,20 @@ import { jwtDecode } from 'jwt-decode';
 
 // JWT Token Management
 export const setAuthToken = (token: string, rememberMe: boolean = false) => {
-  // Set token in cookies with secure options
-  // If rememberMe is true, set longer expiration (30 days), otherwise 7 days
-  const expires = rememberMe ? 30 : 7;
-  
-  Cookies.set('auth-token', token, {
-    expires: expires,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  });
+  // Persist across sessions only if rememberMe is true; otherwise use a session cookie
+  if (rememberMe) {
+    Cookies.set('auth-token', token, {
+      expires: 30, // 30 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+  } else {
+    // Session cookie (no expires) — cleared when the browser is closed
+    Cookies.set('auth-token', token, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+  }
 };
 
 export const getAuthToken = (): string | undefined => {
