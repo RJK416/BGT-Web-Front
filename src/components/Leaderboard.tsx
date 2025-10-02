@@ -215,10 +215,26 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                 
                 {/* Profile Picture */}
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-purple-900">
-                      {player.nickname.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400">
+                    {player.avatarUrl ? (
+                      <img
+                        src={player.avatarUrl}
+                        alt={player.nickname}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.log(`🔍 Avatar load error for ${player.nickname}:`, e);
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                        onLoad={() => console.log(`🔍 Avatar loaded successfully for ${player.nickname}`)}
+                      />
+                    ) : null}
+                    <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${player.avatarUrl ? 'hidden' : ''}`}>
+                      <span className="text-lg font-bold text-purple-900">
+                        {player.nickname.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
                   {player.guild && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
