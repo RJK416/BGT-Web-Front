@@ -7,6 +7,7 @@ import UserProfileCard from './UserProfileCard';
 interface LeaderboardPlayer {
   id: number;
   nickname: string;
+  avatarUrl?: string;
   level: number;
   xp: number;
   matchesPlayed: number;
