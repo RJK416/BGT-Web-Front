@@ -690,22 +690,22 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Main Content with Right Sidebar */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      {/* Main Content - Mobile Optimized */}
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Content Area */}
           <div className="flex-1">
 
-            {/* Leaderboard */}
-            <Leaderboard limit={10} showPagination={true} showSearch={true} className="mb-8 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
+            {/* Leaderboard - Mobile Optimized */}
+            <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
 
-            {/* My Tournaments */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-amber-400">My Tournaments</h2>
+            {/* My Tournaments - Mobile Optimized */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+                <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
                 <button
                   onClick={fetchMyTournaments}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
                 >
                   Refresh
                 </button>
@@ -716,19 +716,19 @@ export default function Dashboard() {
                   <div
                     key={tournament.id}
                     onClick={() => openTournamentModal(tournament, true)}
-                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-amber-300 font-semibold">{tournament.name}</h3>
-                        <p className="text-purple-300 text-sm">{tournament.game}</p>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-purple-400">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="text-amber-300 font-semibold text-sm sm:text-base">{tournament.name}</h3>
+                        <p className="text-purple-300 text-xs sm:text-sm">{tournament.game}</p>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-purple-400">
                           <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
                           <span>{new Date(tournament.tournamentDate).toLocaleDateString()}</span>
                           <span>{tournament.xpReward || 100} XP</span>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="flex justify-end sm:text-right">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
                           tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
@@ -751,16 +751,16 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Create Tournament */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-8">
+            {/* Create Tournament - Mobile Optimized */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
               {/* Expandable Button */}
               <button
                 onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
               >
-                <span className="text-lg font-bold">Create Tournament</span>
+                <span className="text-base sm:text-lg font-bold">Create Tournament</span>
                 <svg 
-                  className={`w-5 h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
+                  className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -771,24 +771,24 @@ export default function Dashboard() {
               
               {/* Expandable Form */}
               {isCreateTournamentExpanded && (
-                <div className="p-6 border-t border-amber-400/20">
+                <div className="p-4 sm:p-6 border-t border-amber-400/20">
                   <CreateTournamentForm />
                 </div>
               )}
             </div>
 
 
-            {/* Your Player Card */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-amber-400">Your Profile</h2>
-                <button className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300">
+            {/* Your Player Card - Mobile Optimized */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
+                <h2 className="text-lg sm:text-xl font-bold text-amber-400">Your Profile</h2>
+                <button className="px-3 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto">
                   Edit Profile
                 </button>
               </div>
               
-              <div className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-6 border border-amber-400/20">
-                <div className="flex items-center space-x-4 sm:space-x-6">
+              <div className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 sm:p-6 border border-amber-400/20">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-6">
                   {/* Profile Picture - Mobile Friendly */}
                   <div className="relative">
                     <div className="w-24 h-24 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400">
