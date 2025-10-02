@@ -86,21 +86,9 @@ export default function LoginPage() {
       }
 
       const jwtToken = data.data || data.token || data.jwt;
-      console.log('🔍 Login response data:', data);
-      console.log('🔍 Extracted JWT token:', jwtToken);
-      
       
       if (jwtToken) {
         setAuthToken(jwtToken, rememberMe);
-        
-        // Debug: Decode the token to see what's inside
-        try {
-          const decodedToken = decodeToken(jwtToken) as MyJwtPayload | null;
-          console.log('🔍 Available claims:', Object.keys(decodedToken ?? {}));
-          console.log('🔍 Decoded JWT token:', decodedToken);
-        } catch (error) {
-          console.error('🔍 Error decoding token:', error);
-        }
       }
 
       // Display the message from the server
@@ -203,9 +191,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     
-    console.log('Starting OTP verification...');
-    console.log('Current sessionId:', sessionId);
-    console.log('Current OTP:', otp);
     
     try {
       // Step 2: Verify OTP using the session ID from step 1
@@ -226,31 +211,22 @@ export default function LoginPage() {
         otp: otp,
         purpose: 1 // Registration
       };
-      
-      console.log('Sending OTP verification request:', requestBody);
 
       const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.VERIFY_OTP}`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
       });
 
-      console.log('OTP verification response:', data);
-
       if (!data.ok || data.status !== 200) {
-        console.error('OTP verification failed:', data);
         throw new Error(data.error || data.message || 'OTP verification failed');
       }
 
       // Store the JWT token from the response as the reset token
       if (data.data) {
         setSessionId(data.data); // Store JWT token as sessionId for use as ResetToken
-        console.log('JWT token stored for account creation:', data.data);
-      } else {
-        console.error('No JWT token found in OTP verification response:', data);
       }
 
       // Display the message from the server
-      console.log('OTP verification successful, transitioning to password step');
       setSuccess(data.message || 'OTP verified! Now please set your password.');
       setShowOtpInput(false);
       setShowPasswordInput(true);
@@ -266,11 +242,6 @@ export default function LoginPage() {
   const handlePasswordCompletion = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Starting password completion...');
-    console.log('Current sessionId:', sessionId);
-    console.log('Password length:', password.length);
-    console.log('Confirm password length:', confirmPassword.length);
-    
     // Validate passwords
     if (!validatePassword(password)) {
       return;
@@ -281,7 +252,6 @@ export default function LoginPage() {
     }
     
     if (!sessionId) {
-      console.error('No session ID available for account creation');
       setError('Session expired. Please start registration again.');
       return;
     }
@@ -297,17 +267,10 @@ export default function LoginPage() {
         ConfirmNewPassword: confirmPassword
       };
       
-      console.log('Sending account creation request:', requestBody);
-      console.log('ResetToken length:', requestBody.ResetToken?.length);
-      console.log('ResetToken starts with:', requestBody.ResetToken?.substring(0, 20) + '...');
-      console.log('Full URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`);
-      
       const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
       });
-      
-      console.log('Account creation response:', data);
 
       if (!data.ok || data.status !== 200) {
         const errorMessage = data.error || data.message || 'Account creation failed';
@@ -317,7 +280,6 @@ export default function LoginPage() {
       }
 
       // Display the message from the server
-      console.log('Account creation successful, resetting form state');
       setSuccess(data.message || 'Account created successfully! You can now login.');
       setShowPasswordInput(false);
       setIsRegistering(false);
