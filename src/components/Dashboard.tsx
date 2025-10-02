@@ -923,13 +923,13 @@ export default function Dashboard() {
                         </div>
                       )}
                       {userPlayer?.wins > 0 && (
-                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center" title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}>
-                          <span className="text-white text-sm">🏆</span>
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-800 rounded-full flex items-center justify-center" title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}>
+                          <span className="text-white text-xs sm:text-sm">🏆</span>
                         </div>
                       )}
                       {(!userPlayer || (userPlayer.mvps === 0 && userPlayer.tournamentsWon === 0 && userPlayer.wins === 0)) && (
-                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center" title="No achievements yet">
-                          <span className="text-gray-300 text-sm">🎯</span>
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-600 rounded-full flex items-center justify-center" title="No achievements yet">
+                          <span className="text-gray-300 text-xs sm:text-sm">🎯</span>
                         </div>
                       )}
                     </div>
