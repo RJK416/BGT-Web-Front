@@ -374,7 +374,6 @@ export default function SettingsPage() {
                       type="file"
                       id="avatar-upload"
                       accept="image/jpeg,image/jpg,image/png,image/webp,image/heic"
-                      capture="environment"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -400,7 +399,7 @@ export default function SettingsPage() {
                         )}
                       </div>
                       <p className="text-amber-300 font-medium mb-2 text-sm sm:text-base">
-                        {isUploadingAvatar ? 'Uploading...' : 'Tap to upload or take photo'}
+                        {isUploadingAvatar ? 'Uploading...' : 'Tap to choose from gallery or camera'}
                       </p>
                       <p className="text-purple-300 text-xs sm:text-sm">
                         JPG, PNG, WebP up to 5MB
