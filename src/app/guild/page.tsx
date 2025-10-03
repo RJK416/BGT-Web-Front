@@ -28,9 +28,8 @@ export default function GuildPage() {
       }
 
       try {
-        const token = getAuthToken();
-        if (token) {
-          const userData = getUserFromToken(token);
+        const userData = getUserFromToken();
+        if (userData) {
           setUser(userData);
         }
       } catch (error) {
