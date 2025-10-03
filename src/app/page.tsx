@@ -1,15 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginModal from '@/components/LoginModal';
 import Leaderboard from '@/components/Leaderboard';
+import { isAuthenticated } from '@/utils/auth';
 
 
 export default function HomePage() {
   const [showLogin, setShowLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  useEffect(() => {
+    // Check if user is already authenticated
+    if (isAuthenticated()) {
+      // Redirect to dashboard if authenticated
+      router.push('/dashboard');
+    } else {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto mb-4"></div>
+          <p className="text-amber-400 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
