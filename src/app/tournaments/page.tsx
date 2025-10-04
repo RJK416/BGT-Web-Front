@@ -148,7 +148,7 @@ export default function TournamentsPage() {
               <div key={t.id} className="bg-purple-900/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-amber-300 font-semibold truncate">{t.name}</div>
-                  <div className="text-purple-300 text-xs sm:text-sm truncate">{t.game} • {new Date(t.tournamentDate).toLocaleDateString()} • {t.memberCount}/{t.maxMembers}</div>
+                  <div className="text-purple-300 text-xs sm:text-sm truncate">{t.game} • {new Date(t.tournamentDate).toLocaleDateString('de-DE')} • {t.memberCount}/{t.maxMembers}</div>
                   <div className="mt-1">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       t.phase === 0 

@@ -709,7 +709,7 @@ export default function Dashboard() {
                         <p className="text-purple-300 text-xs sm:text-sm">{tournament.game}</p>
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-purple-400">
                           <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
-                          <span>{new Date(tournament.tournamentDate).toLocaleDateString()}</span>
+                          <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
                           <span>{tournament.xpReward || 100} XP</span>
                         </div>
                       </div>
@@ -1070,7 +1070,7 @@ export default function Dashboard() {
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                              {new Date(t.tournamentDate).toLocaleDateString()}
+                              {new Date(t.tournamentDate).toLocaleDateString('de-DE')}
                             </span>
                             <span className="flex items-center whitespace-nowrap">
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1209,7 +1209,7 @@ export default function Dashboard() {
                   <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
                     <div className="text-sm text-purple-300 mb-2">Tournament Date</div>
                     <div className="text-amber-400 font-semibold">
-                      {new Date(selectedTournament.tournamentDate).toLocaleDateString('en-US', {
+                      {new Date(selectedTournament.tournamentDate).toLocaleDateString('de-DE', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -1279,7 +1279,7 @@ export default function Dashboard() {
                               <div className="min-w-0 flex-1">
                                 <div className="text-amber-300 font-medium text-sm truncate">{member.nickname}</div>
                                 <div className="text-purple-400 text-xs truncate">
-                                  Joined: {new Date(member.joinedAt).toLocaleDateString()}
+                                  Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
                                 </div>
                               </div>
                             </div>

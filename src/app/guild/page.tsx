@@ -208,7 +208,7 @@ export default function GuildPage() {
                           <div className="flex items-center gap-4 mt-2 text-xs text-purple-300">
                             <span>Level: {guild.level}</span>
                             <span>Members: {guild.memberCount}/{guild.maxMember}</span>
-                            <span>Created: {new Date(guild.created).toLocaleDateString()}</span>
+                            <span>Created: {new Date(guild.created).toLocaleDateString('de-DE')}</span>
                           </div>
                         </div>
                         <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition-all duration-300 text-sm">

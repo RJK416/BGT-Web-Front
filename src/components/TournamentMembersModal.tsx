@@ -153,7 +153,7 @@ export default function TournamentMembersModal({
                     <div>
                       <div className="text-amber-300 font-semibold">{member.nickname}</div>
                       <div className="text-purple-300 text-sm">
-                        Joined: {new Date(member.joinedAt).toLocaleDateString()}
+                        Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
                       </div>
                     </div>
                   </div>
