@@ -383,8 +383,10 @@ export default function Dashboard() {
       setInfoMessage(res.message || 'Tournament created successfully!');
       setInfoOpen(true);
       setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
-      // refresh list if available
-      if (typeof fetchMyTournaments === 'function') fetchMyTournaments();
+      // refresh list after a short delay to ensure backend has processed the creation
+      setTimeout(() => {
+        if (typeof fetchMyTournaments === 'function') fetchMyTournaments();
+      }, 500);
     } catch (err: any) {
       setMessage(err.message || 'Failed to create tournament');
       setInfoSuccess(false);
@@ -689,7 +691,10 @@ export default function Dashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
                 <button
-                  onClick={fetchMyTournaments}
+                  onClick={() => {
+                    console.log('Refresh button clicked');
+                    fetchMyTournaments();
+                  }}
                   className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
                 >
                   Refresh
