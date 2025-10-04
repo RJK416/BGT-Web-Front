@@ -691,9 +691,21 @@ export default function Dashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
                 <button
-                  onClick={() => {
-                    console.log('Refresh button clicked');
-                    fetchMyTournaments();
+                  onClick={async () => {
+                    try {
+                      const token = getAuthToken();
+                      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                      });
+                      
+                      if (res.ok) {
+                        const tournaments = res.data || res.result || [];
+                        setMyTournaments(tournaments);
+                      }
+                    } catch (error) {
+                      console.error('Error refreshing tournaments:', error);
+                    }
                   }}
                   className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
                 >
