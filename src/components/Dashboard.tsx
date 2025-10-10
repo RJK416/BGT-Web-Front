@@ -643,26 +643,37 @@ export default function Dashboard() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 bg-gradient-to-r from-purple-950/90 to-purple-900/90 backdrop-blur-sm border-b border-amber-400/30">
+      <header className="relative z-10 backdrop-blur-sm border-b border-amber-400/30" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.9), rgba(15, 66, 52, 0.9))'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3 relative">
+            {/* Left side - Logo and Title */}
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-purple-900" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L4 6v8c0 4 3 6 8 8 5-2 8-4 8-8V6l-8-4z"/>
-                  <circle cx="12" cy="10" r="2" fill="amber-300"/>
-                </svg>
-              </div>
+              <img 
+                src="/4447.png" 
+                alt="Castle Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
-                <p className="text-purple-200 text-sm">Chronicle Your Adventures</p>
+                <p className="text-emerald-200 text-sm">Chronicle Your Adventures</p>
               </div>
             </div>
+            
+            {/* Center - Dragon Logo */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img 
+                src="/6669.png" 
+                alt="Dragon Logo" 
+                className="w-12 h-12 object-contain"
+              />
+            </div>
+            
+            {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
               <span className="text-purple-200 text-sm sm:text-base">Welcome, {user?.username}</span>
               <button
                 onClick={() => router.push('/settings')}
-                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm"
+                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm"
               >
                 Settings
               </button>
@@ -734,7 +745,7 @@ export default function Dashboard() {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
                           tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
-                          tournament.phase === 2 ? 'bg-purple-500/20 text-purple-300' :
+                          tournament.phase === 2 ? 'bg-emerald-500/20 text-purple-300' :
                           'bg-red-500/20 text-red-300'
                         }`}>
                           {tournament.phase === 0 ? 'Registration' :

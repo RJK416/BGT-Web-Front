@@ -742,7 +742,7 @@ x                     {/* Form */}
                  >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-900 mr-2"></div>
                       {isRegistering ? 'Creating...' : 'Entering...'}
                     </div>
                   ) : (
@@ -785,7 +785,7 @@ x                     {/* Form */}
                  >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-900 mr-2"></div>
                       Verifying...
                     </div>
                   ) : (
@@ -869,7 +869,7 @@ x                     {/* Form */}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-900 mr-2"></div>
                       Creating Account...
                     </div>
                   ) : (

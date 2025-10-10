@@ -272,6 +272,11 @@ input.no-spinner[type=number] {
   left: 70%;
 }
 
+/* Logo Blend Mode */
+.logo {
+  mix-blend-mode: multiply;
+}
+
 /* Chain Link Structure */
 .chain-link {
   position: relative;
