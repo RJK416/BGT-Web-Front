@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { guildService } from '@/services/guildService';
-import type { Guild, GuildMember, GuildInvitation, GuildRole, InviteStatus } from '@/types/guild';
+import type { Guild, GuildMember, GuildInvitation, InviteStatus } from '@/types/guild';
+import { GuildRole } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
 
 // ✅ Keep this type if you want typed access to extended claims

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
+import GuildChat from './GuildChat';
 
 // Simple types based on your actual API response
 interface GuildMember {
@@ -124,6 +125,7 @@ export default function GuildPageSimple() {
   const [inviteMessage, setInviteMessage] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
+  const [showChat, setShowChat] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -287,15 +289,26 @@ export default function GuildPageSimple() {
                 Created by {guild.creatorName} on {new Date(guild.created).toLocaleDateString()}
               </div>
               
-              {/* Invite Player Button */}
-              {(guild.userRole === 'Leader' || guild.userRole === 'Officer') && (
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                {/* Chat Button */}
                 <button
-                  onClick={openInviteModal}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                  onClick={() => setShowChat(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
-                  ✨ Invite Player
+                  💬 Guild Chat
                 </button>
-              )}
+                
+                {/* Invite Player Button */}
+                {(guild.userRole === 'Leader' || guild.userRole === 'Officer') && (
+                  <button
+                    onClick={openInviteModal}
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    ✨ Invite Player
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Guild Members */}
@@ -410,6 +423,15 @@ export default function GuildPageSimple() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Guild Chat Modal */}
+      {showChat && guild && (
+        <GuildChat
+          guildId={guild.id}
+          guildName={guild.name}
+          onClose={() => setShowChat(false)}
+        />
       )}
     </div>
   );
