@@ -12,6 +12,7 @@ import AddTournamentMemberModal from '@/components/AddTournamentMemberModal';
 import { getPhaseDisplayName } from '@/types/tournament';
 import ConfirmModal from '@/components/ConfirmModal';
 import InfoModal from '@/components/InfoModal';
+import NotificationBar from '@/components/NotificationBar';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -671,6 +672,10 @@ export default function Dashboard() {
             {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
               <span className="text-purple-200 text-sm sm:text-base">Welcome, {user?.username}</span>
+              
+              {/* Notification Bar */}
+              <NotificationBar className="flex-shrink-0" />
+              
               <button
                 onClick={() => router.push('/settings')}
                 className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm"

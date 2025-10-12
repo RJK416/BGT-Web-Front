@@ -34,6 +34,14 @@ export const API_CONFIG = {
       REMOVE_TOURNAMENT_MEMBER: '/Boardgame/Remove-Tournament-Member',
       UPDATE_TOURNAMENT: '/Boardgame/Update-Tournament',
     },
+    // Notification Service Endpoints
+    NOTIFICATION: {
+      GET_ALL: '/Notification/Get-User-Notifications',
+      GET_UNREAD: '/Notification/Get-Unread-Notifications',
+      GET_UNREAD_COUNT: '/Notification/Get-Unread-Count',
+      MARK_AS_READ: '/Notification/Mark-As-Read',
+      MARK_ALL_AS_READ: '/Notification/Mark-All-As-Read',
+    },
     // Legacy endpoints
     PRODUCTS: '/api/products',
     CATEGORIES: '/api/categories',
