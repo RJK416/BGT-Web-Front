@@ -70,7 +70,7 @@ export default function GuildChat({ guildId, guildName, onClose }: GuildChatProp
               username: data.username,
               message: data.message,
               timestamp: new Date(data.timestamp),
-              isOwn: data.username === (user?.name || 'Anonymous')
+              isOwn: data.username === ((user as any)?.name || (user as any)?.unique_name || 'Anonymous')
             };
             
             setMessages(prev => [...prev, chatMessage]);
