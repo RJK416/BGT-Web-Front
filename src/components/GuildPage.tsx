@@ -425,8 +425,7 @@ export default function GuildPage() {
                           <h4 className="text-amber-300 font-semibold text-lg">{invitation.guild.name}</h4>
                           <p className="text-purple-400 text-sm mb-2">{invitation.guild.description || 'No description provided.'}</p>
                           <div className="flex flex-wrap gap-4 text-sm text-purple-400 mb-2">
-                            <span>{invitation.guild.memberCount}/{invitation.guild.maxMember} members</span>
-                            <span>Level {invitation.guild.level}</span>
+                            <span>{invitation.guild.memberCount}/{invitation.guild.maxMembers} members</span>
                           </div>
                           <p className="text-amber-300 text-sm">
                             Invited by <span className="font-semibold">{invitation.inviter.nickname}</span>
