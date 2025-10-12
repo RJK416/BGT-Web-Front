@@ -5,9 +5,10 @@ export enum GuildRole {
 }
 
 export enum InviteStatus {
-  Pending = 0,
-  Accepted = 1,
-  Declined = 2
+  Pending = 1,
+  Accepted = 2,
+  Declined = 3,
+  Expired = 4
 }
 
 export interface GuildMember {
@@ -62,15 +63,16 @@ export interface CreateGuildRequest {
 }
 
 export interface GuildInvitationRequest {
-  guildId: number;
-  username: string;
-  message?: string;
-  expiresInDays?: number;
+  GuildId: number;
+  Username: string;
+  Message?: string;
+  ExpiresInDays?: number;
 }
 
 export interface GuildInvitationResponse {
   inviteId: number;
   status: InviteStatus;
+  dateTime: string;
 }
 
 export interface GuildListResponse {

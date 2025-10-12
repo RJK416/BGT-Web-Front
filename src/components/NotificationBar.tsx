@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNotifications } from '../hooks/useNotifications';
+import { guildService } from '../services/guildService';
 import type { NotificationType } from '../types/notification';
+import type { InviteStatus } from '../types/guild';
 
 interface NotificationBarProps {
   className?: string;
@@ -17,6 +19,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
   const [touchStartX, setTouchStartX] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | null>(null);
+  const [respondingToInvite, setRespondingToInvite] = useState<number | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -146,6 +149,50 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     await markAllAsRead();
   };
 
+  const handleGuildInviteResponse = async (notificationId: number, inviteId: number, status: InviteStatus) => {
+    try {
+      setRespondingToInvite(inviteId);
+      
+      // Haptic feedback for mobile
+      if (isMobile && 'vibrate' in navigator) {
+        navigator.vibrate([50, 50, 50]);
+      }
+
+      const response = await guildService.respondToInvitation({
+        inviteId,
+        status,
+        dateTime: new Date().toISOString()
+      });
+
+      if (response.isSuccess) {
+        // Mark notification as read
+        await markAsRead(notificationId);
+        
+        // Refresh notifications to show updated state
+        await refreshNotifications();
+        
+        // Success feedback
+        if (isMobile && 'vibrate' in navigator) {
+          navigator.vibrate([100, 50, 100]);
+        }
+      } else {
+        // Error feedback
+        if (isMobile && 'vibrate' in navigator) {
+          navigator.vibrate([200, 100, 200, 100, 200]);
+        }
+        console.error('Failed to respond to guild invite:', response.message);
+      }
+    } catch (error) {
+      console.error('Error responding to guild invite:', error);
+      // Error feedback
+      if (isMobile && 'vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200, 100, 200]);
+      }
+    } finally {
+      setRespondingToInvite(null);
+    }
+  };
+
 
   const handleToggleDropdown = () => {
     if (!isOpen) {
@@ -183,6 +230,91 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     }
   };
 
+  const getNotificationTypeInfo = (type: NotificationType) => {
+    switch (type) {
+      case 0: // GuildInvite
+        return {
+          title: 'Guild Invitation',
+          color: 'from-blue-500 to-purple-600',
+          bgColor: 'from-blue-500/10 to-purple-600/10',
+          borderColor: 'border-blue-400/30',
+          iconBg: 'bg-gradient-to-br from-blue-500 to-purple-600'
+        };
+      case 1: // GuildInviteApproved
+        return {
+          title: 'Invite Accepted',
+          color: 'from-green-500 to-emerald-600',
+          bgColor: 'from-green-500/10 to-emerald-600/10',
+          borderColor: 'border-green-400/30',
+          iconBg: 'bg-gradient-to-br from-green-500 to-emerald-600'
+        };
+      case 2: // GuildInviteRejected
+        return {
+          title: 'Invite Declined',
+          color: 'from-red-500 to-rose-600',
+          bgColor: 'from-red-500/10 to-rose-600/10',
+          borderColor: 'border-red-400/30',
+          iconBg: 'bg-gradient-to-br from-red-500 to-rose-600'
+        };
+      case 3: // TournamentInvite
+        return {
+          title: 'Tournament Invite',
+          color: 'from-amber-500 to-orange-600',
+          bgColor: 'from-amber-500/10 to-orange-600/10',
+          borderColor: 'border-amber-400/30',
+          iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600'
+        };
+      case 4: // TournamentUpdate
+        return {
+          title: 'Tournament Update',
+          color: 'from-indigo-500 to-blue-600',
+          bgColor: 'from-indigo-500/10 to-blue-600/10',
+          borderColor: 'border-indigo-400/30',
+          iconBg: 'bg-gradient-to-br from-indigo-500 to-blue-600'
+        };
+      case 5: // MatchResult
+        return {
+          title: 'Match Result',
+          color: 'from-emerald-500 to-teal-600',
+          bgColor: 'from-emerald-500/10 to-teal-600/10',
+          borderColor: 'border-emerald-400/30',
+          iconBg: 'bg-gradient-to-br from-emerald-500 to-teal-600'
+        };
+      case 6: // SystemMessage
+        return {
+          title: 'System Message',
+          color: 'from-gray-500 to-slate-600',
+          bgColor: 'from-gray-500/10 to-slate-600/10',
+          borderColor: 'border-gray-400/30',
+          iconBg: 'bg-gradient-to-br from-gray-500 to-slate-600'
+        };
+      case 7: // FriendRequest
+        return {
+          title: 'Friend Request',
+          color: 'from-pink-500 to-rose-600',
+          bgColor: 'from-pink-500/10 to-rose-600/10',
+          borderColor: 'border-pink-400/30',
+          iconBg: 'bg-gradient-to-br from-pink-500 to-rose-600'
+        };
+      case 8: // AchievementUnlocked
+        return {
+          title: 'Achievement Unlocked',
+          color: 'from-yellow-500 to-amber-600',
+          bgColor: 'from-yellow-500/10 to-amber-600/10',
+          borderColor: 'border-yellow-400/30',
+          iconBg: 'bg-gradient-to-br from-yellow-500 to-amber-600'
+        };
+      default:
+        return {
+          title: 'Notification',
+          color: 'from-purple-500 to-indigo-600',
+          bgColor: 'from-purple-500/10 to-indigo-600/10',
+          borderColor: 'border-purple-400/30',
+          iconBg: 'bg-gradient-to-br from-purple-500 to-indigo-600'
+        };
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -194,6 +326,15 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
     
     return date.toLocaleDateString();
+  };
+
+  const isGuildInviteNotification = (notification: any) => {
+    return notification.type === 0; // NotificationType.GuildInvite
+  };
+
+  const getInviteIdFromNotification = (notification: any) => {
+    // The invite ID should be in contentId field for guild invite notifications
+    return notification.contentId;
   };
 
   return (
@@ -261,8 +402,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                   zIndex: 999999
                 }
               : {
-                  top: buttonRect.bottom + 8,
-                  right: window.innerWidth - buttonRect.right,
+            top: buttonRect.bottom + 8,
+            right: window.innerWidth - buttonRect.right,
                   transform: 'translateZ(0)',
                   zIndex: 999999
                 }
@@ -288,9 +429,9 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                   {unreadCount} unread
                 </span>
               )}
-              {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllAsRead}
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
                   className={`${isMobile ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'} bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg touch-manipulation`}
                 >
                   {isMobile ? 'Mark All' : 'Mark all read'}
@@ -304,8 +445,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </button>
-              )}
+              </button>
+            )}
             </div>
           </div>
 
@@ -324,69 +465,200 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
             onTouchStart={handlePullToRefresh}
           >
             {isLoading ? (
-              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-amber-300`}>
-                <div className={`animate-spin rounded-full border-b-2 border-amber-400 mx-auto ${isMobile ? 'h-8 w-8' : 'h-6 w-6'}`}></div>
-                <p className={`${isMobile ? 'mt-3 text-base' : 'mt-2 text-sm'}`}>Loading notifications...</p>
+              <div className={`${isMobile ? 'p-8' : 'p-6'} text-center`}>
+                <div className="relative">
+                  <div className={`animate-spin rounded-full border-4 border-amber-400/30 mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'}`}></div>
+                  <div className={`animate-spin rounded-full border-4 border-transparent border-t-amber-400 mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'} absolute top-0`}></div>
+                </div>
+                <div className={`${isMobile ? 'mt-4' : 'mt-3'}`}>
+                  <p className={`${isMobile ? 'text-base font-semibold' : 'text-sm font-medium'} text-amber-300`}>Loading notifications...</p>
+                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-amber-400/80 mt-1`}>Fetching your latest updates</p>
+                </div>
               </div>
             ) : error ? (
-              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-red-400`}>
-                <p className={`${isMobile ? 'text-base' : 'text-sm'}`}>{error}</p>
+              <div className={`${isMobile ? 'p-8' : 'p-6'} text-center`}>
+                <div className={`${isMobile ? 'text-5xl mb-4' : 'text-4xl mb-3'} animate-bounce`}>⚠️</div>
+                <div className="bg-gradient-to-br from-red-500/10 to-rose-600/10 rounded-xl p-4 border border-red-400/20">
+                  <p className={`${isMobile ? 'text-base font-semibold' : 'text-sm font-medium'} text-red-300 mb-2`}>Oops! Something went wrong</p>
+                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-red-400/80 mb-4`}>{error}</p>
                 <button
                   onClick={refreshNotifications}
-                  className={`mt-3 ${isMobile ? 'text-base px-4 py-2 bg-amber-500/20 rounded-lg' : 'text-sm'} text-amber-400 hover:text-amber-300 touch-manipulation transition-colors`}
+                    className={`${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl mx-auto`}
                 >
-                  Try again
+                    <span>🔄</span>
+                    <span>Try Again</span>
                 </button>
+                </div>
               </div>
             ) : notifications.length === 0 ? (
-              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-amber-300`}>
-                <div className={`${isMobile ? 'text-4xl mb-3' : 'text-2xl mb-2'}`}>📭</div>
-                <p className={`${isMobile ? 'text-base' : 'text-sm'}`}>No notifications</p>
-                {isMobile && (
-                  <p className="text-xs text-amber-400 mt-1">Pull down to refresh</p>
-                )}
+              <div className={`${isMobile ? 'p-8' : 'p-6'} text-center`}>
+                <div className="relative">
+                  <div className={`${isMobile ? 'text-6xl mb-4' : 'text-5xl mb-3'} animate-float-slow`}>📭</div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className={`${isMobile ? 'w-16 h-16' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-amber-400/20 to-orange-500/20 animate-ping`}></div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-xl p-6 border border-amber-400/20">
+                  <h3 className={`${isMobile ? 'text-lg font-bold' : 'text-base font-semibold'} text-amber-300 mb-2`}>All caught up! 🎉</h3>
+                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-amber-400/80 mb-3`}>You have no new notifications at the moment.</p>
+                  {isMobile && (
+                    <div className="flex items-center justify-center space-x-2 text-xs text-amber-400/60">
+                      <span>💡</span>
+                      <span>Pull down to refresh</span>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
-              <div className="divide-y divide-purple-600/30">
-                {notifications.map((notification) => (
+              <div className="space-y-3">
+                {notifications.map((notification) => {
+                  const typeInfo = getNotificationTypeInfo(notification.type);
+                  const isUnread = notification.status === 0;
+                  
+                  return (
                   <div
                     key={notification.id}
-                    className={`notification-item ${isMobile ? 'p-4' : 'p-4'} hover:bg-purple-700/30 active:bg-purple-700/50 cursor-pointer transition-all duration-150 touch-manipulation ${
-                      notification.status === 0 ? 'bg-blue-500/10 border-l-4 border-l-blue-400' : ''
-                    }`}
-                    onClick={() => {
-                      handleMarkAsRead(notification.id);
-                      // Haptic feedback for mobile
-                      if (isMobile && 'vibrate' in navigator) {
-                        navigator.vibrate(25);
-                      }
-                    }}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className={`flex-shrink-0 ${isMobile ? 'text-xl' : 'text-lg'}`}>
+                      className={`notification-item group relative overflow-hidden rounded-xl border-2 transition-all duration-300 touch-manipulation hover:scale-[1.02] active:scale-[0.98] ${
+                        isUnread 
+                          ? `bg-gradient-to-br ${typeInfo.bgColor} ${typeInfo.borderColor} shadow-lg` 
+                          : 'bg-gradient-to-br from-purple-800/30 to-purple-700/30 border-purple-600/20 hover:from-purple-700/40 hover:to-purple-600/40'
+                      }`}
+                    >
+                      {/* Animated Background Glow */}
+                      {isUnread && (
+                        <div className={`absolute inset-0 bg-gradient-to-r ${typeInfo.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      )}
+                      
+                      {/* Content */}
+                      <div className={`relative ${isMobile ? 'p-4' : 'p-4'}`}>
+                        <div className="flex items-start space-x-4">
+                          {/* Icon Container */}
+                          <div className={`relative flex-shrink-0 ${isMobile ? 'w-12 h-12' : 'w-10 h-10'} rounded-full ${typeInfo.iconBg} flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300`}>
+                            <span className={`${isMobile ? 'text-xl' : 'text-lg'} filter drop-shadow-sm`}>
                         {getNotificationIcon(notification.type)}
+                            </span>
+                            
+                            {/* Pulsing Ring for Unread */}
+                            {isUnread && (
+                              <div className={`absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-30`}></div>
+                            )}
                       </div>
+
+                          {/* Content Area */}
+                          <div className="flex-1 min-w-0">
+                            {/* Header */}
+                            <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
-                        <p className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} text-purple-100`}>
+                                <h4 className={`${isMobile ? 'text-sm' : 'text-xs'} font-bold ${isUnread ? 'text-blue-300' : 'text-purple-300'} truncate`}>
+                                  {typeInfo.title}
+                                </h4>
+                                <div className={`${isMobile ? 'mt-1' : 'mt-0.5'} flex items-center space-x-2`}>
+                                  <span className={`text-xs ${isUnread ? 'text-blue-400' : 'text-purple-400'}`}>
+                                    {formatDate(notification.create)}
+                                  </span>
+                                  {isUnread && (
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30`}>
+                                      New
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Status Indicator */}
+                              <div className="flex items-center space-x-2">
+                         {isUnread && !isGuildInviteNotification(notification) && (
+                           <div className={`w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-lg`}></div>
+                         )}
+                              </div>
+                            </div>
+
+                            {/* Message */}
+                            <p className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} text-purple-100 mb-3 group-hover:text-white transition-colors duration-200`}>
                           {notification.message}
                         </p>
-                        <div className={`${isMobile ? 'mt-2' : 'mt-1'} flex items-center justify-between`}>
-                          <p className={`text-xs text-purple-400`}>
-                            {formatDate(notification.create)}
-                          </p>
-                          <div className="flex items-center space-x-2">
-                            {notification.status === 0 && (
-                              <div className={`${isMobile ? 'w-3 h-3' : 'w-2 h-2'} bg-blue-400 rounded-full animate-pulse`}></div>
+                            
+                            {/* Guild Invite Action Buttons */}
+                            {isGuildInviteNotification(notification) && notification.status === 0 && (
+                              <div className={`${isMobile ? 'mt-4' : 'mt-3'} flex flex-col sm:flex-row gap-3`}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const inviteId = getInviteIdFromNotification(notification);
+                                    if (inviteId) {
+                                      handleGuildInviteResponse(notification.id, inviteId, 2); // InviteStatus.Accepted
+                                    }
+                                  }}
+                                  disabled={respondingToInvite === getInviteIdFromNotification(notification)}
+                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-green-500/25 transform hover:scale-105 active:scale-95 border border-green-400/30`}
+                                >
+                                  {respondingToInvite === getInviteIdFromNotification(notification) ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                      <span>{isMobile ? 'Accepting...' : 'Accepting...'}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-lg">✅</span>
+                                      <span>{isMobile ? 'Accept Invite' : 'Accept'}</span>
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const inviteId = getInviteIdFromNotification(notification);
+                                    if (inviteId) {
+                                      handleGuildInviteResponse(notification.id, inviteId, 3); // InviteStatus.Declined
+                                    }
+                                  }}
+                                  disabled={respondingToInvite === getInviteIdFromNotification(notification)}
+                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-red-500/25 transform hover:scale-105 active:scale-95 border border-red-400/30`}
+                                >
+                                  {respondingToInvite === getInviteIdFromNotification(notification) ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                      <span>{isMobile ? 'Declining...' : 'Declining...'}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-lg">❌</span>
+                                      <span>{isMobile ? 'Decline Invite' : 'Decline'}</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             )}
-                            {isMobile && notification.status === 0 && (
-                              <span className="text-xs text-blue-400 font-medium">Tap to read</span>
+
+                            {/* Read Button for Non-Guild Invites */}
+                            {!isGuildInviteNotification(notification) && isUnread && (
+                              <div className={`${isMobile ? 'mt-3' : 'mt-2'} flex justify-end`}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMarkAsRead(notification.id);
+                                    // Haptic feedback for mobile
+                                    if (isMobile && 'vibrate' in navigator) {
+                                      navigator.vibrate(25);
+                                    }
+                                  }}
+                                  className={`notification-button ${isMobile ? 'px-4 py-2 text-sm' : 'px-3 py-1.5 text-xs'} bg-gradient-to-r ${typeInfo.color} hover:opacity-90 text-white font-medium rounded-lg transition-all duration-200 touch-manipulation flex items-center space-x-1 shadow-md hover:shadow-lg`}
+                                >
+                                  <span>👁️</span>
+                                  <span>{isMobile ? 'Mark as Read' : 'Read'}</span>
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
+
+                 {/* Bottom Border Accent */}
+                 {isUnread && (
+                   <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600 opacity-60 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                 )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

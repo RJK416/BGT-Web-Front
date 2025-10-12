@@ -88,10 +88,10 @@ const sendGuildInvite = async (guildId: number, username: string, message?: stri
     }
 
     const inviteData = {
-      guildId: guildId,
-      username: username,
-      message: message || undefined,
-      expiresInDays: expiresInDays
+      GuildId: guildId,
+      Username: username,
+      Message: message || undefined,
+      ExpiresInDays: expiresInDays
     };
 
     console.log('Sending invite with data:', inviteData);
@@ -168,6 +168,12 @@ export default function GuildPageSimple() {
   const handleInvitePlayer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteUsername.trim() || !guild) return;
+
+    // Validate username length (backend requirement: 3-10 characters)
+    if (inviteUsername.trim().length < 3 || inviteUsername.trim().length > 10) {
+      setInviteSuccess('Username must be between 3 and 10 characters');
+      return;
+    }
 
     setInviteLoading(true);
     setInviteSuccess(null);
