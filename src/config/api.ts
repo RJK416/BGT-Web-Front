@@ -36,11 +36,25 @@ export const API_CONFIG = {
     },
     // Notification Service Endpoints
     NOTIFICATION: {
-      GET_ALL: '/Notification/Get-User-Notifications',
-      GET_UNREAD: '/Notification/Get-Unread-Notifications',
-      GET_UNREAD_COUNT: '/Notification/Get-Unread-Count',
-      MARK_AS_READ: '/Notification/Mark-As-Read',
-      MARK_ALL_AS_READ: '/Notification/Mark-All-As-Read',
+      GET_ALL: '/api/Notification/Get-My-Notifications',
+      GET_UNREAD: '/api/Notification/Get-Unread-Notifications',
+      GET_UNREAD_COUNT: '/api/Notification/Get-Unread-Count',
+      MARK_AS_READ: '/api/Notification/Mark-As-Read',
+      MARK_ALL_AS_READ: '/api/Notification/Mark-All-As-Read',
+    },
+    // Guild Service Endpoints
+    GUILD: {
+      ADD: '/Guild/Add-Guild',
+      GET_MY_GUILD: '/Guild/Get-My-Guild',
+      GET_ALL: '/Guild/Get-All-Guilds',
+      GET_BY_ID: '/Guild/Get-Guild-By-Id',
+      GET_BY_NAME: '/Guild/Get-Guild-By-Name',
+      SEND_INVITATION: '/Guild/Send-Guild-Invitation',
+      RESPOND_INVITATION: '/Guild/Recieve-Guild-Invitation-Respond',
+      GET_MEMBER_BY_USERNAME: '/Guild/Get-Guild-Member-By-Username',
+      GET_MY_INVITATIONS: '/Guild/Get-My-Received-Invitations',
+      GET_ALL_MEMBERS: '/Guild/Get-All-Guild-Members',
+      GET_MY_MEMBERS: '/Guild/Get-My-Guild-Members',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',

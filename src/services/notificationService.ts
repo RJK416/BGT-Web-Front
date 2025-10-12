@@ -9,7 +9,12 @@ import type {
 
 class NotificationService {
   private getAuthHeaders() {
-    const token = localStorage.getItem('authToken');
+    // Get token from cookies (not localStorage)
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('auth-token='))
+      ?.split('=')[1];
+    
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -25,7 +30,7 @@ class NotificationService {
   }
 
   async getUnreadNotifications(): Promise<NotificationResponse> {
-    const url = buildApiUrl(API_CONFIG.ENDPOINTS.NOTIFICATION.GET_UNREAD);
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.NOTIFICATION.GET_ALL);
     return await apiRequest(url, {
       method: 'GET',
       headers: this.getAuthHeaders(),

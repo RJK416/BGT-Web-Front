@@ -63,6 +63,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     await markAllAsRead();
   };
 
+
   const handleToggleDropdown = () => {
     if (!isOpen) {
       updateButtonPosition();
@@ -184,6 +185,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
               </button>
             )}
           </div>
+
 
           {/* Content */}
           <div className="max-h-80 overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50">

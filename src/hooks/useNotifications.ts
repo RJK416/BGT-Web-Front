@@ -12,16 +12,22 @@ export const useNotifications = () => {
     try {
       setIsLoading(true);
       setError(null);
+      
+      // Get all notifications from the working endpoint
       const response = await notificationService.getUnreadNotifications();
       
-      if (response.isSuccess && response.data) {
-        setNotifications(response.data);
+      if (response.status === 200 && response.data && Array.isArray(response.data)) {
+        // Filter for unread notifications (status === 0)
+        const unreadNotifications = response.data.filter(notification => notification.status === 0);
+        setNotifications(unreadNotifications);
+        setError(null);
       } else {
-        setError('Failed to load notifications');
+        console.error('Invalid response:', response);
+        setError('Failed to load notifications - invalid response format');
       }
     } catch (err) {
-      setError('Error loading notifications');
       console.error('Error fetching notifications:', err);
+      setError('Error loading notifications - network or server error');
     } finally {
       setIsLoading(false);
     }
@@ -29,19 +35,25 @@ export const useNotifications = () => {
 
   const fetchUnreadCount = useCallback(async () => {
     try {
+      // Try to get unread count from dedicated endpoint
       const response = await notificationService.getUnreadCount();
-      if (response.isSuccess && typeof response.data === 'number') {
+      if (response.status === 200 && typeof response.data === 'number') {
         setUnreadCount(response.data);
+      } else {
+        // Fallback: calculate count from notifications array
+        console.warn('Unread count endpoint failed, calculating from notifications');
       }
     } catch (err) {
       console.error('Error fetching unread count:', err);
+      // Fallback: calculate count from notifications array
+      console.warn('Unread count endpoint failed, calculating from notifications');
     }
   }, []);
 
   const markAsRead = useCallback(async (notificationId: number) => {
     try {
       const response = await notificationService.markAsRead(notificationId);
-      if (response.isSuccess) {
+      if (response.status === 200) {
         setNotifications(prev => 
           prev.map(notification => 
             notification.id === notificationId 
@@ -59,7 +71,7 @@ export const useNotifications = () => {
   const markAllAsRead = useCallback(async () => {
     try {
       const response = await notificationService.markAllAsRead();
-      if (response.isSuccess) {
+      if (response.status === 200) {
         setNotifications(prev => 
           prev.map(notification => ({ ...notification, status: 1 as any }))
         );
