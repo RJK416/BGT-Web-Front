@@ -389,7 +389,6 @@ export default function GuildPage() {
                         <div className="flex flex-wrap gap-4 text-sm text-purple-400">
                           <span>{guild.memberCount}/{guild.maxMember} members</span>
                           <span>Level {guild.level}</span>
-                          <span>{guild.xp} XP</span>
                           <span>Created by {guild.creatorName}</span>
                         </div>
                       </div>
