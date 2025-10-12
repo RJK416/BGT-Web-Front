@@ -125,7 +125,11 @@ export default function GuildPage() {
 
   const handleInvitationResponse = async (inviteId: number, status: InviteStatus) => {
     try {
-      const response = await guildService.respondToInvitation({ inviteId, status });
+      const response = await guildService.respondToInvitation({ 
+        inviteId, 
+        status, 
+        dateTime: new Date().toISOString() 
+      });
       if (response.isSuccess) {
         // Refresh invitations and guild data
         await fetchGuildData();
