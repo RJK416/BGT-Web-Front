@@ -99,11 +99,11 @@ export default function GuildPage() {
 
   const getRoleDisplayName = (role: GuildRole): string => {
     switch (role) {
-      case GuildRole.Leader:
+      case 0: // GuildRole.Leader
         return '👑 Leader';
-      case GuildRole.Officer:
+      case 1: // GuildRole.Officer
         return '⚔️ Officer';
-      case GuildRole.Member:
+      case 2: // GuildRole.Member
         return '🛡️ Member';
       default:
         return '❓ Unknown';
@@ -112,11 +112,11 @@ export default function GuildPage() {
 
   const getRoleColor = (role: GuildRole): string => {
     switch (role) {
-      case GuildRole.Leader:
+      case 0: // GuildRole.Leader
         return 'text-yellow-400';
-      case GuildRole.Officer:
+      case 1: // GuildRole.Officer
         return 'text-blue-400';
-      case GuildRole.Member:
+      case 2: // GuildRole.Member
         return 'text-green-400';
       default:
         return 'text-gray-400';

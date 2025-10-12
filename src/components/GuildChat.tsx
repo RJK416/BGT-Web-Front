@@ -53,7 +53,7 @@ export default function GuildChat({ guildId, guildName, onClose }: GuildChatProp
         const joinMessage = {
           type: 'join',
           guildId: guildId,
-          username: user?.name || 'Anonymous',
+          username: (user as any)?.name || (user as any)?.unique_name || 'Anonymous',
           timestamp: new Date().toISOString()
         };
         
@@ -120,7 +120,7 @@ export default function GuildChat({ guildId, guildName, onClose }: GuildChatProp
     const messageData = {
       type: 'message',
       guildId: guildId,
-      username: user?.name || 'Anonymous',
+      username: (user as any)?.name || (user as any)?.unique_name || 'Anonymous',
       message: newMessage.trim(),
       timestamp: new Date().toISOString()
     };
