@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNotifications } from '../hooks/useNotifications';
 import type { NotificationType } from '../types/notification';
@@ -12,8 +12,14 @@ interface NotificationBarProps {
 const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [buttonRect, setButtonRect] = useState<DOMRect | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [touchStartY, setTouchStartY] = useState<number>(0);
+  const [touchStartX, setTouchStartX] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   const {
     notifications,
@@ -25,6 +31,17 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     refreshNotifications,
     fetchUnreadCount
   } = useNotifications();
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Set up polling for real-time updates (every 30 seconds)
   useEffect(() => {
@@ -55,6 +72,72 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Mobile touch handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isOpen) return;
+    
+    const touch = e.touches[0];
+    setTouchStartY(touch.clientY);
+    setTouchStartX(touch.clientX);
+    setIsDragging(true);
+    setSwipeDirection(null);
+  }, [isMobile, isOpen]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isOpen || !isDragging) return;
+    
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - touchStartY;
+    const deltaX = Math.abs(touch.clientX - touchStartX);
+    
+    // Only consider vertical swipes
+    if (deltaX < 50) {
+      if (deltaY > 50) {
+        setSwipeDirection('down');
+      } else if (deltaY < -50) {
+        setSwipeDirection('up');
+      }
+    }
+  }, [isMobile, isOpen, isDragging, touchStartY, touchStartX]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isOpen || !isDragging) return;
+    
+    setIsDragging(false);
+    
+    if (swipeDirection === 'down') {
+      // Swipe down to close
+      setIsOpen(false);
+      // Haptic feedback if available
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+    } else if (swipeDirection === 'up' && contentRef.current) {
+      // Swipe up to refresh
+      refreshNotifications();
+      if ('vibrate' in navigator) {
+        navigator.vibrate([50, 50, 50]);
+      }
+    }
+    
+    setSwipeDirection(null);
+  }, [isMobile, isOpen, isDragging, swipeDirection, refreshNotifications]);
+
+  // Pull to refresh functionality
+  const handlePullToRefresh = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !isOpen) return;
+    
+    const touch = e.touches[0];
+    const contentElement = contentRef.current;
+    
+    if (contentElement && contentElement.scrollTop === 0 && touch.clientY > touchStartY + 50) {
+      refreshNotifications();
+      if ('vibrate' in navigator) {
+        navigator.vibrate([50, 50, 50]);
+      }
+    }
+  }, [isMobile, isOpen, touchStartY, refreshNotifications]);
+
   const handleMarkAsRead = async (notificationId: number) => {
     await markAsRead(notificationId);
   };
@@ -67,6 +150,10 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
   const handleToggleDropdown = () => {
     if (!isOpen) {
       updateButtonPosition();
+      // Haptic feedback for opening on mobile
+      if (isMobile && 'vibrate' in navigator) {
+        navigator.vibrate(30);
+      }
     }
     setIsOpen(!isOpen);
   };
@@ -160,79 +247,141 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
       {isOpen && buttonRect && createPortal(
         <div 
           ref={dropdownRef}
-          className="fixed w-80 bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl shadow-2xl border-2 border-amber-400/30 max-h-96 overflow-hidden"
+          className={`fixed bg-gradient-to-br from-purple-950/90 to-purple-900/90 shadow-2xl border-2 border-amber-400/30 overflow-hidden transition-all duration-300 ${
+            isMobile 
+              ? 'w-full max-w-sm mx-auto rounded-t-xl max-h-[80vh] notification-mobile' 
+              : 'w-80 rounded-xl max-h-96'
+          }`}
           style={{ 
-            top: buttonRect.bottom + 8,
-            right: window.innerWidth - buttonRect.right,
-            zIndex: 999999,
-            transform: 'translateZ(0)'
+            ...(isMobile 
+              ? {
+                  bottom: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%) translateZ(0)',
+                  zIndex: 999999
+                }
+              : {
+                  top: buttonRect.bottom + 8,
+                  right: window.innerWidth - buttonRect.right,
+                  transform: 'translateZ(0)',
+                  zIndex: 999999
+                }
+            )
           }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Header */}
-          <div className="px-4 py-4 bg-gradient-to-br from-purple-950/90 to-purple-900/90 border-b-2 border-purple-400 flex items-center justify-between rounded-t-lg">
+          <div className={`px-4 bg-gradient-to-br from-purple-950/90 to-purple-900/90 border-b-2 border-purple-400 flex items-center justify-between ${
+            isMobile ? 'py-3' : 'py-4'
+          } ${isMobile ? 'rounded-t-xl' : 'rounded-t-lg'}`}>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center shadow-lg border border-emerald-400">
-                <span className="text-emerald-100 text-lg">🔔</span>
+              <div className={`${isMobile ? 'w-7 h-7' : 'w-8 h-8'} bg-emerald-600 rounded-full flex items-center justify-center shadow-lg border border-emerald-400`}>
+                <span className={`text-emerald-100 ${isMobile ? 'text-base' : 'text-lg'}`}>🔔</span>
               </div>
-              <h3 className="text-lg font-bold text-amber-300 drop-shadow-sm">Notifications</h3>
+              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-amber-300 drop-shadow-sm`}>Notifications</h3>
             </div>
-            {unreadCount > 0 && (
-              <button
-                onClick={handleMarkAllAsRead}
-                className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 text-sm font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                Mark all read
-              </button>
-            )}
+            <div className="flex items-center space-x-2">
+              {isMobile && unreadCount > 0 && (
+                <span className="text-xs text-amber-300 font-medium">
+                  {unreadCount} unread
+                </span>
+              )}
+              {unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  className={`${isMobile ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'} bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg touch-manipulation`}
+                >
+                  {isMobile ? 'Mark All' : 'Mark all read'}
+                </button>
+              )}
+              {isMobile && (
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-1 text-purple-300 hover:text-amber-400 transition-colors touch-manipulation"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Mobile swipe indicator */}
+          {isMobile && (
+            <div className="flex justify-center py-2 bg-purple-800/30">
+              <div className="w-8 h-1 bg-amber-400/50 rounded-full"></div>
+            </div>
+          )}
 
 
           {/* Content */}
-          <div className="max-h-80 overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50">
+          <div 
+            ref={contentRef}
+            className={`${isMobile ? 'max-h-[60vh]' : 'max-h-80'} overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50 custom-scrollbar`}
+            onTouchStart={handlePullToRefresh}
+          >
             {isLoading ? (
-              <div className="p-4 text-center text-amber-300">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400 mx-auto"></div>
-                <p className="mt-2">Loading notifications...</p>
+              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-amber-300`}>
+                <div className={`animate-spin rounded-full border-b-2 border-amber-400 mx-auto ${isMobile ? 'h-8 w-8' : 'h-6 w-6'}`}></div>
+                <p className={`${isMobile ? 'mt-3 text-base' : 'mt-2 text-sm'}`}>Loading notifications...</p>
               </div>
             ) : error ? (
-              <div className="p-4 text-center text-red-400">
-                <p>{error}</p>
+              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-red-400`}>
+                <p className={`${isMobile ? 'text-base' : 'text-sm'}`}>{error}</p>
                 <button
                   onClick={refreshNotifications}
-                  className="mt-2 text-sm text-amber-400 hover:text-amber-300"
+                  className={`mt-3 ${isMobile ? 'text-base px-4 py-2 bg-amber-500/20 rounded-lg' : 'text-sm'} text-amber-400 hover:text-amber-300 touch-manipulation transition-colors`}
                 >
                   Try again
                 </button>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-amber-300">
-                <p>No notifications</p>
+              <div className={`${isMobile ? 'p-6' : 'p-4'} text-center text-amber-300`}>
+                <div className={`${isMobile ? 'text-4xl mb-3' : 'text-2xl mb-2'}`}>📭</div>
+                <p className={`${isMobile ? 'text-base' : 'text-sm'}`}>No notifications</p>
+                {isMobile && (
+                  <p className="text-xs text-amber-400 mt-1">Pull down to refresh</p>
+                )}
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-purple-600/30">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
-                      notification.status === 0 ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    className={`notification-item ${isMobile ? 'p-4' : 'p-4'} hover:bg-purple-700/30 active:bg-purple-700/50 cursor-pointer transition-all duration-150 touch-manipulation ${
+                      notification.status === 0 ? 'bg-blue-500/10 border-l-4 border-l-blue-400' : ''
                     }`}
-                    onClick={() => handleMarkAsRead(notification.id)}
+                    onClick={() => {
+                      handleMarkAsRead(notification.id);
+                      // Haptic feedback for mobile
+                      if (isMobile && 'vibrate' in navigator) {
+                        navigator.vibrate(25);
+                      }
+                    }}
                   >
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 text-lg">
+                      <div className={`flex-shrink-0 ${isMobile ? 'text-xl' : 'text-lg'}`}>
                         {getNotificationIcon(notification.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 leading-relaxed">
+                        <p className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} text-purple-100`}>
                           {notification.message}
                         </p>
-                        <div className="mt-1 flex items-center justify-between">
-                          <p className="text-xs text-gray-500">
+                        <div className={`${isMobile ? 'mt-2' : 'mt-1'} flex items-center justify-between`}>
+                          <p className={`text-xs text-purple-400`}>
                             {formatDate(notification.create)}
                           </p>
-                          {notification.status === 0 && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          )}
+                          <div className="flex items-center space-x-2">
+                            {notification.status === 0 && (
+                              <div className={`${isMobile ? 'w-3 h-3' : 'w-2 h-2'} bg-blue-400 rounded-full animate-pulse`}></div>
+                            )}
+                            {isMobile && notification.status === 0 && (
+                              <span className="text-xs text-blue-400 font-medium">Tap to read</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -244,13 +393,26 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+            <div className={`${isMobile ? 'px-4 py-3' : 'px-4 py-3'} border-t border-purple-600/30 bg-purple-800/30`}>
               <button
-                onClick={refreshNotifications}
-                className="w-full text-sm text-gray-600 hover:text-gray-800 font-medium"
+                onClick={() => {
+                  refreshNotifications();
+                  // Haptic feedback for mobile
+                  if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate([30, 30, 30]);
+                  }
+                }}
+                className={`w-full ${isMobile ? 'text-sm px-4 py-3' : 'text-sm'} text-amber-400 hover:text-amber-300 font-medium touch-manipulation transition-colors bg-amber-500/10 hover:bg-amber-500/20 rounded-lg`}
               >
-                Refresh notifications
+                {isMobile ? '🔄 Pull to refresh notifications' : 'Refresh notifications'}
               </button>
+              {isMobile && (
+                <div className="text-center mt-2">
+                  <p className="text-xs text-purple-400">
+                    Swipe down to close • Swipe up to refresh
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>,

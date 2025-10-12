@@ -337,3 +337,158 @@ input.no-spinner[type=number] {
   align-items: center;
   gap: 2px;
 }
+
+/* Mobile Notification Enhancements */
+@media (max-width: 768px) {
+  /* Better touch targets */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile notification animations */
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%) translateX(-50%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) translateX(-50%);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideDownMobile {
+    from {
+      transform: translateY(0) translateX(-50%);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%) translateX(-50%);
+      opacity: 0;
+    }
+  }
+  
+  /* Mobile notification positioning */
+  .notification-mobile {
+    animation: slideUpMobile 0.3s ease-out;
+  }
+  
+  .notification-mobile.closing {
+    animation: slideDownMobile 0.3s ease-in;
+  }
+  
+  /* Mobile swipe indicators */
+  .swipe-indicator {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .swipe-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .swipe-indicator.swiping::before {
+    left: 100%;
+  }
+  
+  /* Mobile pull-to-refresh */
+  .pull-to-refresh {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pull-to-refresh::after {
+    content: 'Pull to refresh';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f59e0b;
+    font-size: 12px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .pull-to-refresh.pulling::after {
+    top: 10px;
+    opacity: 1;
+  }
+}
+
+/* Enhanced mobile scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(147, 51, 234, 0.1);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f59e0b, #d97706);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+  transform: scaleX(1.1);
+}
+
+/* Mobile-specific notification styles */
+@media (max-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .notification-item {
+    transition: all 0.2s ease;
+    transform-origin: center;
+  }
+  
+  .notification-item:active {
+    transform: scale(0.98);
+    background-color: rgba(139, 92, 246, 0.2);
+  }
+  
+  /* Mobile haptic feedback simulation */
+  .haptic-light {
+    animation: hapticLight 0.1s ease;
+  }
+  
+  .haptic-medium {
+    animation: hapticMedium 0.15s ease;
+  }
+  
+  .haptic-heavy {
+    animation: hapticHeavy 0.2s ease;
+  }
+}
+
+@keyframes hapticLight {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes hapticMedium {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(0.98); }
+  75% { transform: scale(1.02); }
+}
+
+@keyframes hapticHeavy {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(0.95); }
+  40% { transform: scale(1.05); }
+  60% { transform: scale(0.98); }
+  80% { transform: scale(1.02); }
+}
