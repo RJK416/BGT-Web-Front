@@ -671,7 +671,7 @@ export default function Dashboard() {
             
             {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
-              <span className="text-purple-200 text-sm sm:text-base">Welcome, {user?.username}</span>
+              <span className="text-purple-200 text-sm sm:text-base">Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
@@ -825,7 +825,7 @@ export default function Dashboard() {
                       ) : null}
                       <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
                         <span className="text-3xl sm:text-2xl font-bold text-purple-900">
-                          {userProfile?.userName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
+                          {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                     </div>
@@ -862,7 +862,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-3">
                       <h3 className="text-xl sm:text-2xl font-bold text-amber-300 truncate">
-                        {userProfile?.stats?.nickname || userProfile?.userName || user?.username || 'User'}
+                        {userProfile?.stats?.nickname || userProfile?.userName || (user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}
                       </h3>
                       <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30 self-start">
                         {userPlayer?.guild || 'Elite Guild'}

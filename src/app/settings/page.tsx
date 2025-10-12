@@ -349,7 +349,7 @@ export default function SettingsPage() {
                       ) : null}
                       <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
                         <span className="text-2xl sm:text-3xl font-bold text-purple-900">
-                          {userProfile?.userName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
+                          {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                     </div>

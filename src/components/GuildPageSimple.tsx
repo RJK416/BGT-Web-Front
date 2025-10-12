@@ -235,7 +235,7 @@ export default function GuildPageSimple() {
             </div>
             
             <div className="flex items-center gap-4">
-              <span className="text-purple-200">Welcome, {user?.name || 'User'}</span>
+              <span className="text-purple-200">Welcome, {(user as any)?.name || (user as any)?.unique_name || (user as any)?.username || 'User'}</span>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300"

@@ -201,7 +201,7 @@ export default function GuildPage() {
             
             {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
-              <span className="text-purple-200 text-sm sm:text-base">Welcome, {user?.username}</span>
+              <span className="text-purple-200 text-sm sm:text-base">Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
@@ -387,7 +387,7 @@ export default function GuildPage() {
                         <h4 className="text-amber-300 font-semibold text-lg">{guild.name}</h4>
                         <p className="text-purple-400 text-sm mb-2">{guild.description || 'No description provided.'}</p>
                         <div className="flex flex-wrap gap-4 text-sm text-purple-400">
-                          <span>{guild.memberCount}/{guild.maxMembers} members</span>
+                          <span>{guild.memberCount}/{guild.maxMember} members</span>
                           <span>Level {guild.level}</span>
                           <span>{guild.xp} XP</span>
                           <span>Created by {guild.creatorName}</span>
@@ -426,7 +426,7 @@ export default function GuildPage() {
                           <h4 className="text-amber-300 font-semibold text-lg">{invitation.guild.name}</h4>
                           <p className="text-purple-400 text-sm mb-2">{invitation.guild.description || 'No description provided.'}</p>
                           <div className="flex flex-wrap gap-4 text-sm text-purple-400 mb-2">
-                            <span>{invitation.guild.memberCount}/{invitation.guild.maxMembers} members</span>
+                            <span>{invitation.guild.memberCount}/{invitation.guild.maxMember} members</span>
                             <span>Level {invitation.guild.level}</span>
                           </div>
                           <p className="text-amber-300 text-sm">
