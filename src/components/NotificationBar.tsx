@@ -230,11 +230,30 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     }
   };
 
+  const getNotificationMessage = (type: NotificationType, notification?: any) => {
+    switch (type) {
+      case 0: 
+        if (notification && (notification as any).guild && (notification as any).guild.name) {
+          return `You have been invited to the "${(notification as any).guild.name}" Guild!`;
+        }
+        return 'You have received a guild invitation!';
+      case 1: return 'Your guild invitation has been accepted!';
+      case 2: return 'Your guild invitation was declined.';
+      case 3: return 'You have been invited to a tournament!';
+      case 4: return 'There\'s an update about a tournament you\'re in.';
+      case 5: return 'Your match results are ready!';
+      case 6: return 'You have a new system message.';
+      case 7: return 'You have received a friend request!';
+      case 8: return 'Congratulations! You\'ve unlocked an achievement!';
+      default: return 'You have a new notification.';
+    }
+  };
+
   const getNotificationTypeInfo = (type: NotificationType) => {
     switch (type) {
       case 0: // GuildInvite
         return {
-          title: 'Guild Invitation',
+          title: 'Message from guild',
           color: 'from-blue-500 to-purple-600',
           bgColor: 'from-blue-500/10 to-purple-600/10',
           borderColor: 'border-blue-400/30',
@@ -461,7 +480,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
           {/* Content */}
           <div 
             ref={contentRef}
-            className={`${isMobile ? 'max-h-[60vh]' : 'max-h-80'} overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50 custom-scrollbar`}
+            className={`${isMobile ? 'max-h-[60vh]' : 'max-h-80'} overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50 custom-scrollbar hide-scrollbar`}
             onTouchStart={handlePullToRefresh}
           >
             {isLoading ? (
@@ -518,29 +537,25 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                   return (
                   <div
                     key={notification.id}
-                      className={`notification-item group relative overflow-hidden rounded-xl border-2 transition-all duration-300 touch-manipulation hover:scale-[1.02] active:scale-[0.98] ${
+                      className={`notification-item group relative overflow-hidden rounded-xl border-2 touch-manipulation hover:shadow-yellow-400/50 hover:shadow-lg ${
                         isUnread 
-                          ? `bg-gradient-to-br ${typeInfo.bgColor} ${typeInfo.borderColor} shadow-lg` 
-                          : 'bg-gradient-to-br from-purple-800/30 to-purple-700/30 border-purple-600/20 hover:from-purple-700/40 hover:to-purple-600/40'
+                          ? `bg-gradient-to-br ${typeInfo.bgColor} ${typeInfo.borderColor} shadow-lg border-yellow-400` 
+                          : 'bg-gradient-to-br from-purple-800/30 to-purple-700/30 border-purple-600/20'
                       }`}
                     >
-                      {/* Animated Background Glow */}
-                      {isUnread && (
-                        <div className={`absolute inset-0 bg-gradient-to-r ${typeInfo.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                      )}
                       
                       {/* Content */}
-                      <div className={`relative ${isMobile ? 'p-4' : 'p-4'}`}>
-                        <div className="flex items-start space-x-4">
+                      <div className={`relative ${isMobile ? 'p-3' : 'p-3'}`}>
+                        <div className="flex items-start space-x-3">
                           {/* Icon Container */}
-                          <div className={`relative flex-shrink-0 ${isMobile ? 'w-12 h-12' : 'w-10 h-10'} rounded-full ${typeInfo.iconBg} flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300`}>
+                          <div className={`relative flex-shrink-0 ${isMobile ? 'w-12 h-12' : 'w-10 h-10'} rounded-full ${typeInfo.iconBg} flex items-center justify-center shadow-lg border-2 border-white/20`}>
                             <span className={`${isMobile ? 'text-xl' : 'text-lg'} filter drop-shadow-sm`}>
                         {getNotificationIcon(notification.type)}
                             </span>
                             
                             {/* Pulsing Ring for Unread */}
                             {isUnread && (
-                              <div className={`absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-30`}></div>
+                              <div className={`absolute inset-0 rounded-full border-2 border-yellow-400 animate-ping opacity-30`}></div>
                             )}
                       </div>
 
@@ -549,16 +564,21 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                             {/* Header */}
                             <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
-                                <h4 className={`${isMobile ? 'text-sm' : 'text-xs'} font-bold ${isUnread ? 'text-blue-300' : 'text-purple-300'} truncate`}>
+                                <h4 className={`${isMobile ? 'text-base' : 'text-sm'} font-bold ${isUnread ? 'text-yellow-300' : 'text-purple-300'} truncate mb-1`}>
                                   {typeInfo.title}
                                 </h4>
-                                <div className={`${isMobile ? 'mt-1' : 'mt-0.5'} flex items-center space-x-2`}>
-                                  <span className={`text-xs ${isUnread ? 'text-blue-400' : 'text-purple-400'}`}>
+                                <div className={`flex items-center space-x-2`}>
+                                  <span className={`text-xs ${isUnread ? 'text-yellow-400' : 'text-purple-400'} font-medium`}>
                                     {formatDate(notification.create)}
                                   </span>
                                   {isUnread && (
-                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30`}>
-                                      New
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-500/30 to-amber-500/30 text-yellow-200 border border-yellow-400/40 shadow-sm`}>
+                                      ✨ New
+                                    </span>
+                                  )}
+                                  {notification.type === 0 && (
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border border-blue-400/30`}>
+                                      🏰 Guild
                                     </span>
                                   )}
                                 </div>
@@ -567,19 +587,41 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                               {/* Status Indicator */}
                               <div className="flex items-center space-x-2">
                          {isUnread && !isGuildInviteNotification(notification) && (
-                           <div className={`w-3 h-3 bg-blue-400 rounded-full animate-pulse shadow-lg`}></div>
+                           <div className={`w-3 h-3 bg-yellow-400 rounded-full animate-pulse shadow-lg`}></div>
                          )}
                               </div>
                             </div>
 
                             {/* Message */}
-                            <p className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} text-purple-100 mb-3 group-hover:text-white transition-colors duration-200`}>
-                          {notification.message}
-                        </p>
+                            <div className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} ${isUnread ? 'text-yellow-100' : 'text-purple-100'} mb-2 group-hover:text-white transition-colors duration-200`}>
+                              {notification.message && notification.message !== 'string' ? (
+                                <p className="mb-2">{notification.message}</p>
+                              ) : (
+                                <div className="space-y-2">
+                                  <p className={`${isUnread ? 'text-yellow-200' : 'text-purple-200'} font-medium`}>
+                                    {getNotificationMessage(notification.type, notification)}
+                                  </p>
+                                  {notification.type === 0 && (
+                                    <div className="bg-gradient-to-r from-yellow-500/15 to-amber-500/15 border border-yellow-400/30 rounded-lg p-3 shadow-md">
+                                      <div className="flex items-center space-x-2 mb-1">
+                                        <span className="text-base">🎉</span>
+                                        <span className="text-yellow-200 font-semibold text-xs">Guild Invitation</span>
+                                      </div>
+                                      <p className="text-yellow-200 text-xs leading-relaxed">
+                                        {(notification as any).guild && (notification as any).guild.name
+                                          ? `You've been invited to join the "${(notification as any).guild.name}" guild! Tap below to accept or decline.`
+                                          : "You've been invited to join a guild! Tap below to accept or decline."
+                                        }
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                             
                             {/* Guild Invite Action Buttons */}
                             {isGuildInviteNotification(notification) && notification.status === 0 && (
-                              <div className={`${isMobile ? 'mt-4' : 'mt-3'} flex flex-col sm:flex-row gap-3`}>
+                              <div className={`${isMobile ? 'mt-3' : 'mt-3'} flex flex-col sm:flex-row gap-3`}>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -589,7 +631,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                                     }
                                   }}
                                   disabled={respondingToInvite === getInviteIdFromNotification(notification)}
-                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-green-500/25 transform hover:scale-105 active:scale-95 border border-green-400/30`}
+                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-5 py-2 text-xs'} bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-green-500/30 border-2 border-green-400/40`}
                                 >
                                   {respondingToInvite === getInviteIdFromNotification(notification) ? (
                                     <>
@@ -612,7 +654,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                                     }
                                   }}
                                   disabled={respondingToInvite === getInviteIdFromNotification(notification)}
-                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-red-500/25 transform hover:scale-105 active:scale-95 border border-red-400/30`}
+                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-5 py-2 text-xs'} bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-red-500/30 border-2 border-red-400/40`}
                                 >
                                   {respondingToInvite === getInviteIdFromNotification(notification) ? (
                                     <>
@@ -651,10 +693,6 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                           </div>
                         </div>
 
-                 {/* Bottom Border Accent */}
-                 {isUnread && (
-                   <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600 opacity-60 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                 )}
                       </div>
                     </div>
                   );

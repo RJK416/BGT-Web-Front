@@ -30,6 +30,10 @@ export interface Notification {
   type: NotificationType;
   contentId?: number;
   actionData?: string;
+  guild?: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface NotificationResponse {
