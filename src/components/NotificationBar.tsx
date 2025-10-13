@@ -46,14 +46,17 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Set up polling for real-time updates (every 30 seconds)
+  // Set up polling for real-time updates (every 60 seconds, only when not open)
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchUnreadCount();
-    }, 30000);
+      // Only poll when the notification bar is closed to avoid conflicts
+      if (!isOpen) {
+        fetchUnreadCount();
+      }
+    }, 60000); // Increased to 60 seconds for better performance
 
     return () => clearInterval(interval);
-  }, [fetchUnreadCount]);
+  }, [fetchUnreadCount, isOpen]);
 
   // Update button position when opening
   const updateButtonPosition = () => {
@@ -181,6 +184,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
           navigator.vibrate([200, 100, 200, 100, 200]);
         }
         console.error('Failed to respond to guild invite:', response.message);
+        // You could add a toast notification here for better user feedback
       }
     } catch (error) {
       console.error('Error responding to guild invite:', error);
@@ -188,6 +192,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
       if (isMobile && 'vibrate' in navigator) {
         navigator.vibrate([200, 100, 200, 100, 200]);
       }
+      // You could add a toast notification here for better user feedback
     } finally {
       setRespondingToInvite(null);
     }

@@ -30,7 +30,7 @@ class NotificationService {
   }
 
   async getUnreadNotifications(): Promise<NotificationResponse> {
-    const url = buildApiUrl(API_CONFIG.ENDPOINTS.NOTIFICATION.GET_ALL);
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.NOTIFICATION.GET_UNREAD);
     return await apiRequest(url, {
       method: 'GET',
       headers: this.getAuthHeaders(),

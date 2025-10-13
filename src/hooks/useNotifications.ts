@@ -13,13 +13,12 @@ export const useNotifications = () => {
       setIsLoading(true);
       setError(null);
       
-      // Get all notifications from the working endpoint
+      // Get unread notifications from the dedicated endpoint
       const response = await notificationService.getUnreadNotifications();
       
       if (response.status === 200 && response.data && Array.isArray(response.data)) {
-        // Filter for unread notifications (status === 0)
-        const unreadNotifications = response.data.filter(notification => notification.status === 0);
-        setNotifications(unreadNotifications);
+        // The endpoint already returns only unread notifications
+        setNotifications(response.data);
         setError(null);
       } else {
         console.error('Invalid response:', response);
@@ -42,25 +41,22 @@ export const useNotifications = () => {
       } else {
         // Fallback: calculate count from notifications array
         console.warn('Unread count endpoint failed, calculating from notifications');
+        setUnreadCount(notifications.length);
       }
     } catch (err) {
       console.error('Error fetching unread count:', err);
       // Fallback: calculate count from notifications array
       console.warn('Unread count endpoint failed, calculating from notifications');
+      setUnreadCount(notifications.length);
     }
-  }, []);
+  }, [notifications.length]);
 
   const markAsRead = useCallback(async (notificationId: number) => {
     try {
       const response = await notificationService.markAsRead(notificationId);
       if (response.status === 200) {
-        setNotifications(prev => 
-          prev.map(notification => 
-            notification.id === notificationId 
-              ? { ...notification, status: 1 as any } // NotificationStatus.Read
-              : notification
-          )
-        );
+        // Remove the notification from the list since we only show unread notifications
+        setNotifications(prev => prev.filter(notification => notification.id !== notificationId));
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
     } catch (err) {
@@ -72,9 +68,8 @@ export const useNotifications = () => {
     try {
       const response = await notificationService.markAllAsRead();
       if (response.status === 200) {
-        setNotifications(prev => 
-          prev.map(notification => ({ ...notification, status: 1 as any }))
-        );
+        // Clear all notifications since we only show unread ones
+        setNotifications([]);
         setUnreadCount(0);
       }
     } catch (err) {

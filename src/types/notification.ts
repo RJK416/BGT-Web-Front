@@ -20,11 +20,11 @@ export interface Notification {
   id: number;
   senderId: number;
   senderName: string;
-  recieverId: number;
-  recieverName: string;
+  receiverId: number;
+  receiverName: string;
   message: string;
   create: string;
-  recieved: string;
+  received: string;
   readAt?: string;
   status: NotificationStatus;
   type: NotificationType;
