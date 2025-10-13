@@ -168,16 +168,17 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
       });
 
       if (response.isSuccess) {
-        // Mark notification as read
+        // Mark notification as read (this will remove it from unread list)
         await markAsRead(notificationId);
-        
-        // Refresh notifications to show updated state
-        await refreshNotifications();
         
         // Success feedback
         if (isMobile && 'vibrate' in navigator) {
           navigator.vibrate([100, 50, 100]);
         }
+        
+        // Show success message briefly - the notification will be removed from unread list
+        // The backend will send a new notification to the inviter about the response
+        
       } else {
         // Error feedback
         if (isMobile && 'vibrate' in navigator) {
