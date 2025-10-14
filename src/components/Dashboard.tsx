@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import Leaderboard from '@/components/Leaderboard';
+import { guildService } from '@/services/guildService';
+import type { Guild } from '@/types/guild';
 import UpdateTournamentModal from '@/components/UpdateTournamentModal';
 import EndTournamentModal from '@/components/EndTournamentModal';
 import TournamentMembersModal from '@/components/TournamentMembersModal';
@@ -27,6 +29,8 @@ export default function Dashboard() {
   const [myTournaments, setMyTournaments] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
+  const [guilds, setGuilds] = useState<Guild[]>([]);
+  const [guildsLoading, setGuildsLoading] = useState(true);
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userPlayer, setUserPlayer] = useState<any>(null);
@@ -85,6 +89,28 @@ export default function Dashboard() {
       setTournaments([]);
     } finally {
       setTournamentsLoading(false);
+    }
+  };
+
+  const fetchGuilds = async () => {
+    try {
+      setGuildsLoading(true);
+      try { console.log('Fetching guilds...'); } catch {}
+      const res = await guildService.getAllGuilds(1, 5);
+      try { console.log('Guilds API response:', res); } catch {}
+      if ((res as any)?.status === 200) {
+        const dataBlock = (res as any)?.data || {};
+        const items = (dataBlock as any).guilds ?? (dataBlock as any).items;
+        try { console.log('Parsed guilds:', items); } catch {}
+        setGuilds(Array.isArray(items) ? items : []);
+      } else {
+        setGuilds([]);
+      }
+    } catch (error) {
+      console.error('Error fetching guilds:', error);
+      setGuilds([]);
+    } finally {
+      setGuildsLoading(false);
     }
   };
 
@@ -302,7 +328,7 @@ export default function Dashboard() {
           joinDate: '2024-01-15',
         });
 
-        await Promise.all([fetchUserPlayer(), fetchUserProfile(), fetchTournaments()]);
+        await Promise.all([fetchUserPlayer(), fetchUserProfile(), fetchTournaments(), fetchGuilds()]);
       } finally {
         setIsLoading(false);
       }
@@ -701,6 +727,57 @@ export default function Dashboard() {
 
             {/* Leaderboard - Mobile Optimized */}
             <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
+
+            {/* Guild Scoreboard */}
+            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-amber-400">Top Guilds</h2>
+                <button
+                  onClick={fetchGuilds}
+                  className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {guildsLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400 mr-2" />
+                  <span className="text-amber-400">Loading guilds...</span>
+                </div>
+              ) : guilds.length > 0 ? (
+                <div className="space-y-3">
+                  {guilds.map((g, idx) => (
+                    <div key={g.id} className="flex items-center justify-between bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 border border-amber-400/20">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-purple-900 font-bold flex items-center justify-center flex-shrink-0">
+                          {idx + 1}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-amber-300 font-semibold truncate">{g.name}</div>
+                          <div className="text-purple-400 text-xs truncate">Leader: {g.creatorName}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0 text-xs text-purple-300">
+                        <span className="whitespace-nowrap">Lv {g.level ?? 1}</span>
+                        <span className="whitespace-nowrap">{g.memberCount}/{(g as any).maxMember || (g as any).maxMembers || 0} members</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-purple-300">No guilds found</div>
+              )}
+
+              <div className="mt-4">
+                <button
+                  onClick={() => router.push('/guild')}
+                  className="w-full py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-lg transition-all duration-300"
+                >
+                  View All Guilds
+                </button>
+              </div>
+            </div>
 
             {/* My Tournaments - Mobile Optimized */}
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">

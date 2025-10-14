@@ -1,4 +1,5 @@
 import { buildApiUrl, apiRequest } from '../config/api';
+import { getAuthToken } from '@/utils/auth';
 import { API_CONFIG } from '../config/api';
 import type { 
   Guild, 
@@ -16,16 +17,10 @@ import type {
 
 class GuildService {
   private getAuthHeaders() {
-    // Get token from cookies (not localStorage)
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('auth-token='))
-      ?.split('=')[1];
-    
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    };
+    const token = getAuthToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
   }
 
   async createGuild(request: CreateGuildRequest): Promise<GuildActionResponse> {
@@ -47,10 +42,7 @@ class GuildService {
 
   async getAllGuilds(page: number = 1, pageSize: number = 10): Promise<GuildListResponse> {
     const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.GUILD.GET_ALL}?page=${page}&pageSize=${pageSize}`);
-    return await apiRequest(url, {
-      method: 'GET',
-      headers: this.getAuthHeaders(),
-    });
+    return await apiRequest(url, { method: 'GET', headers: this.getAuthHeaders() }) as unknown as GuildListResponse;
   }
 
   async getGuildById(guildId: number): Promise<GuildResponse> {

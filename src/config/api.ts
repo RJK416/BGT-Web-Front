@@ -46,7 +46,7 @@ export const API_CONFIG = {
     GUILD: {
       ADD: '/Guild/Add-Guild',
       GET_MY_GUILD: '/Guild/Get-My-Guild',
-      GET_ALL: '/Guild/Get-All-Guilds',
+      GET_ALL: '/Get-All-Guilds',
       GET_BY_ID: '/Guild/Get-Guild-By-Id',
       GET_BY_NAME: '/Guild/Get-Guild-By-Name',
       SEND_INVITATION: '/Guild/Send-Guild-Invitation',
