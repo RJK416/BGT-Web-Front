@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import GuildChat from './GuildChat';
+import { guildService } from '@/services/guildService';
 
 // Simple types based on your actual API response
 interface GuildMember {
@@ -126,6 +127,11 @@ export default function GuildPageSimple() {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false);
+  const [showCreateGuildModal, setShowCreateGuildModal] = useState(false);
+  const [guildName, setGuildName] = useState('');
+  const [guildDescription, setGuildDescription] = useState('');
+  const [createGuildLoading, setCreateGuildLoading] = useState(false);
+  const [createGuildMessage, setCreateGuildMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -216,6 +222,64 @@ export default function GuildPageSimple() {
     setInviteUsername('');
     setInviteMessage('');
     setInviteSuccess(null);
+  };
+
+  const handleCreateGuild = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!guildName.trim()) return;
+
+    // Validate guild name length (3-20 characters)
+    if (guildName.trim().length < 3 || guildName.trim().length > 20) {
+      setCreateGuildMessage('Guild name must be between 3 and 20 characters');
+      return;
+    }
+
+    setCreateGuildLoading(true);
+    setCreateGuildMessage(null);
+
+    try {
+      const response = await guildService.createGuild({
+        name: guildName.trim(),
+        description: guildDescription.trim() || undefined,
+      });
+
+      if (response.isSuccess && response.data) {
+        setCreateGuildMessage('Guild created successfully! Loading...');
+        // Refresh guild data
+        const guildData = await fetchMyGuild();
+        if (guildData) {
+          setGuild(guildData);
+          setError(null);
+        }
+        // Close modal after a short delay
+        setTimeout(() => {
+          setShowCreateGuildModal(false);
+          setGuildName('');
+          setGuildDescription('');
+          setCreateGuildMessage(null);
+        }, 1500);
+      } else {
+        setCreateGuildMessage(response.message || 'Failed to create guild. Please try again.');
+      }
+    } catch (error) {
+      setCreateGuildMessage('Error creating guild. Please try again.');
+    } finally {
+      setCreateGuildLoading(false);
+    }
+  };
+
+  const openCreateGuildModal = () => {
+    setShowCreateGuildModal(true);
+    setGuildName('');
+    setGuildDescription('');
+    setCreateGuildMessage(null);
+  };
+
+  const closeCreateGuildModal = () => {
+    setShowCreateGuildModal(false);
+    setGuildName('');
+    setGuildDescription('');
+    setCreateGuildMessage(null);
   };
 
   if (loading) {
@@ -353,7 +417,13 @@ export default function GuildPageSimple() {
         ) : (
           <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-8 border border-amber-400/30 text-center">
             <h3 className="text-2xl font-bold text-amber-400 mb-4">No Guild Found</h3>
-            <p className="text-purple-300 text-lg">You are not currently a member of any guild.</p>
+            <p className="text-purple-300 text-lg mb-6">You are not currently a member of any guild.</p>
+            <button
+              onClick={openCreateGuildModal}
+              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              🏰 Create New Guild
+            </button>
           </div>
         )}
       </div>
@@ -424,6 +494,80 @@ export default function GuildPageSimple() {
                   className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-lg transition-all duration-300"
                 >
                   {inviteLoading ? 'Sending...' : 'Send Invite'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Guild Modal */}
+      {showCreateGuildModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 rounded-xl p-6 border-2 border-amber-400/30 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-amber-400">Create New Guild</h3>
+              <button
+                onClick={closeCreateGuildModal}
+                className="text-purple-300 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateGuild} className="space-y-4">
+              <div>
+                <label className="block text-purple-300 text-sm font-medium mb-2">
+                  Guild Name *
+                </label>
+                <input
+                  type="text"
+                  value={guildName}
+                  onChange={(e) => setGuildName(e.target.value)}
+                  placeholder="Enter guild name (3-20 characters)"
+                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  required
+                  maxLength={20}
+                />
+              </div>
+
+              <div>
+                <label className="block text-purple-300 text-sm font-medium mb-2">
+                  Description (Optional)
+                </label>
+                <textarea
+                  value={guildDescription}
+                  onChange={(e) => setGuildDescription(e.target.value)}
+                  placeholder="Enter guild description"
+                  rows={3}
+                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                />
+              </div>
+
+              {createGuildMessage && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  createGuildMessage.includes('successfully') 
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                }`}>
+                  {createGuildMessage}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={closeCreateGuildModal}
+                  className="flex-1 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createGuildLoading || !guildName.trim()}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-lg transition-all duration-300"
+                >
+                  {createGuildLoading ? 'Creating...' : 'Create Guild'}
                 </button>
               </div>
             </form>
