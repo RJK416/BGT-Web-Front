@@ -169,9 +169,9 @@ export default function GuildPageSimple() {
     e.preventDefault();
     if (!inviteUsername.trim() || !guild) return;
 
-    // Validate username length (backend requirement: 3-10 characters)
-    if (inviteUsername.trim().length < 3 || inviteUsername.trim().length > 10) {
-      setInviteSuccess('Username must be between 3 and 10 characters');
+    // Validate username length (backend requirement: 3-20 characters)
+    if (inviteUsername.trim().length < 3 || inviteUsername.trim().length > 20) {
+      setInviteSuccess('Username must be between 3 and 20 characters');
       return;
     }
 
