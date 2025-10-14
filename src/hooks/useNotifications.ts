@@ -53,14 +53,20 @@ export const useNotifications = () => {
 
   const markAsRead = useCallback(async (notificationId: number) => {
     try {
+      console.log('useNotifications: Attempting to mark notification as read:', notificationId);
       const response = await notificationService.markAsRead(notificationId);
+      console.log('useNotifications: Mark as read response:', response);
+      
       if (response.status === 200) {
+        console.log('useNotifications: Successfully marked as read, updating UI');
         // Remove the notification from the list since we only show unread notifications
         setNotifications(prev => prev.filter(notification => notification.id !== notificationId));
         setUnreadCount(prev => Math.max(0, prev - 1));
+      } else {
+        console.error('useNotifications: Mark as read failed with status:', response.status);
       }
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      console.error('useNotifications: Error marking notification as read:', err);
     }
   }, []);
 

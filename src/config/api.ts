@@ -50,7 +50,7 @@ export const API_CONFIG = {
       GET_BY_ID: '/Guild/Get-Guild-By-Id',
       GET_BY_NAME: '/Guild/Get-Guild-By-Name',
       SEND_INVITATION: '/Guild/Send-Guild-Invitation',
-      RESPOND_INVITATION: '/Guild/Recieve-Guild-Invitation-Respond',
+      RESPOND_INVITATION: '/Recieve-Guild-Invitation-Respond',
       GET_MEMBER_BY_USERNAME: '/Guild/Get-Guild-Member-By-Username',
       GET_MY_INVITATIONS: '/Guild/Get-My-Received-Invitations',
       GET_ALL_MEMBERS: '/Guild/Get-All-Guild-Members',
@@ -96,7 +96,30 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     
     clearTimeout(timeoutId);
     
-    const data = await response.json();
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
+    
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response:', jsonError);
+        data = { error: 'Invalid JSON response from server' };
+      }
+    } else {
+      // Handle non-JSON responses (HTML error pages, etc.)
+      const textResponse = await response.text();
+      console.error('Non-JSON response received:', {
+        status: response.status,
+        contentType,
+        body: textResponse.substring(0, 200) // First 200 chars for debugging
+      });
+      data = { 
+        error: `Server returned ${response.status} ${response.statusText}`,
+        details: textResponse.substring(0, 200)
+      };
+    }
     
     // Return data with status for error handling in components
     return {

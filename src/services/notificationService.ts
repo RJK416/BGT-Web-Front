@@ -47,10 +47,19 @@ class NotificationService {
 
   async markAsRead(notificationId: number): Promise<NotificationActionResponse> {
     const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.NOTIFICATION.MARK_AS_READ}/${notificationId}`);
-    return await apiRequest(url, {
+    console.log('NotificationService: Marking notification as read:', {
+      notificationId,
+      url,
+      headers: this.getAuthHeaders()
+    });
+    
+    const response = await apiRequest(url, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
     });
+    
+    console.log('NotificationService: Mark as read API response:', response);
+    return response;
   }
 
   async markAllAsRead(): Promise<NotificationActionResponse> {

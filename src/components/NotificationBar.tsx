@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNotifications } from '../hooks/useNotifications';
 import { guildService } from '../services/guildService';
-import type { NotificationType } from '../types/notification';
+import GuildInviteModal from './GuildInviteModal';
+import type { NotificationType, Notification } from '../types/notification';
 import type { InviteStatus } from '../types/guild';
 
 interface NotificationBarProps {
@@ -19,7 +20,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
   const [touchStartX, setTouchStartX] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [swipeDirection, setSwipeDirection] = useState<'up' | 'down' | null>(null);
-  const [respondingToInvite, setRespondingToInvite] = useState<number | null>(null);
+  const [selectedGuildInvite, setSelectedGuildInvite] = useState<Notification | null>(null);
+  const [isGuildModalOpen, setIsGuildModalOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -152,52 +154,34 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     await markAllAsRead();
   };
 
-  const handleGuildInviteResponse = async (notificationId: number, inviteId: number, status: InviteStatus) => {
-    try {
-      setRespondingToInvite(inviteId);
-      
-      // Haptic feedback for mobile
-      if (isMobile && 'vibrate' in navigator) {
-        navigator.vibrate([50, 50, 50]);
-      }
-
-      const response = await guildService.respondToInvitation({
-        inviteId,
-        status,
-        dateTime: new Date().toISOString()
-      });
-
-      if (response.isSuccess) {
-        // Mark notification as read (this will remove it from unread list)
-        await markAsRead(notificationId);
-        
-        // Success feedback
-        if (isMobile && 'vibrate' in navigator) {
-          navigator.vibrate([100, 50, 100]);
-        }
-        
-        // Show success message briefly - the notification will be removed from unread list
-        // The backend will send a new notification to the inviter about the response
-        
-      } else {
-        // Error feedback
-        if (isMobile && 'vibrate' in navigator) {
-          navigator.vibrate([200, 100, 200, 100, 200]);
-        }
-        console.error('Failed to respond to guild invite:', response.message);
-        // You could add a toast notification here for better user feedback
-      }
-    } catch (error) {
-      console.error('Error responding to guild invite:', error);
-      // Error feedback
-      if (isMobile && 'vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200, 100, 200]);
-      }
-      // You could add a toast notification here for better user feedback
-    } finally {
-      setRespondingToInvite(null);
+  const handleGuildInviteClick = (notification: Notification) => {
+    if (notification.type === 0 && notification.status === 0) { // GuildInvite and Unread
+      setSelectedGuildInvite(notification);
+      setIsGuildModalOpen(true);
     }
   };
+
+  const handleGuildModalClose = () => {
+    setIsGuildModalOpen(false);
+    setSelectedGuildInvite(null);
+  };
+
+  const handleGuildResponse = async () => {
+    if (selectedGuildInvite) {
+      try {
+        console.log('Marking guild invite notification as read:', selectedGuildInvite.id);
+        await markAsRead(selectedGuildInvite.id);
+        
+        // Also refresh the notifications to ensure UI is updated
+        await refreshNotifications();
+        
+        console.log('Successfully marked guild invite as read and refreshed notifications');
+      } catch (error) {
+        console.error('Error handling guild invite response:', error);
+      }
+    }
+  };
+
 
 
   const handleToggleDropdown = () => {
@@ -255,11 +239,11 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
     }
   };
 
-  const getNotificationTypeInfo = (type: NotificationType) => {
+  const getNotificationTypeInfo = (type: NotificationType, notification?: any) => {
     switch (type) {
       case 0: // GuildInvite
         return {
-          title: 'Message from guild',
+          title: 'A Notification from Guild',
           color: 'from-blue-500 to-purple-600',
           bgColor: 'from-blue-500/10 to-purple-600/10',
           borderColor: 'border-blue-400/30',
@@ -537,7 +521,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
             ) : (
               <div className="space-y-3">
                 {notifications.map((notification) => {
-                  const typeInfo = getNotificationTypeInfo(notification.type);
+                  const typeInfo = getNotificationTypeInfo(notification.type, notification);
                   const isUnread = notification.status === 0;
                   
                   return (
@@ -547,7 +531,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                         isUnread 
                           ? `bg-gradient-to-br ${typeInfo.bgColor} ${typeInfo.borderColor} shadow-lg border-yellow-400` 
                           : 'bg-gradient-to-br from-purple-800/30 to-purple-700/30 border-purple-600/20'
-                      }`}
+                      } ${isGuildInviteNotification(notification) && notification.status === 0 ? 'cursor-pointer' : ''}`}
+                      onClick={() => handleGuildInviteClick(notification)}
                     >
                       
                       {/* Content */}
@@ -600,82 +585,25 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
 
                             {/* Message */}
                             <div className={`${isMobile ? 'text-sm leading-relaxed' : 'text-sm leading-relaxed'} ${isUnread ? 'text-yellow-100' : 'text-purple-100'} mb-2 group-hover:text-white transition-colors duration-200`}>
-                              {notification.message && notification.message !== 'string' ? (
-                                <p className="mb-2">{notification.message}</p>
-                              ) : (
-                                <div className="space-y-2">
-                                  <p className={`${isUnread ? 'text-yellow-200' : 'text-purple-200'} font-medium`}>
-                                    {getNotificationMessage(notification.type, notification)}
+                              {notification.type === 0 ? (
+                                <div className="bg-gradient-to-r from-yellow-500/15 to-amber-500/15 border border-yellow-400/30 rounded-lg p-4 shadow-md">
+                                  <p className="text-yellow-200 text-center font-medium">
+                                    Click to open
                                   </p>
-                                  {notification.type === 0 && (
-                                    <div className="bg-gradient-to-r from-yellow-500/15 to-amber-500/15 border border-yellow-400/30 rounded-lg p-3 shadow-md">
-                                      <div className="flex items-center space-x-2 mb-1">
-                                        <span className="text-base">🎉</span>
-                                        <span className="text-yellow-200 font-semibold text-xs">Guild Invitation</span>
-                                      </div>
-                                      <p className="text-yellow-200 text-xs leading-relaxed">
-                                        {(notification as any).guild && (notification as any).guild.name
-                                          ? `You've been invited to join the "${(notification as any).guild.name}" guild! Tap below to accept or decline.`
-                                          : "You've been invited to join a guild! Tap below to accept or decline."
-                                        }
-                                      </p>
-                                    </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  {notification.message && notification.message !== 'string' ? (
+                                    <p className="mb-2">{notification.message}</p>
+                                  ) : (
+                                    <p className={`${isUnread ? 'text-yellow-200' : 'text-purple-200'} font-medium`}>
+                                      {getNotificationMessage(notification.type, notification)}
+                                    </p>
                                   )}
                                 </div>
                               )}
                             </div>
                             
-                            {/* Guild Invite Action Buttons */}
-                            {isGuildInviteNotification(notification) && notification.status === 0 && (
-                              <div className={`${isMobile ? 'mt-3' : 'mt-3'} flex flex-col sm:flex-row gap-3`}>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const inviteId = getInviteIdFromNotification(notification);
-                                    if (inviteId) {
-                                      handleGuildInviteResponse(notification.id, inviteId, 2); // InviteStatus.Accepted
-                                    }
-                                  }}
-                                  disabled={respondingToInvite === getInviteIdFromNotification(notification)}
-                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-5 py-2 text-xs'} bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-green-500/30 border-2 border-green-400/40`}
-                                >
-                                  {respondingToInvite === getInviteIdFromNotification(notification) ? (
-                                    <>
-                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                      <span>{isMobile ? 'Accepting...' : 'Accepting...'}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="text-lg">✅</span>
-                                      <span>{isMobile ? 'Accept Invite' : 'Accept'}</span>
-                                    </>
-                                  )}
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const inviteId = getInviteIdFromNotification(notification);
-                                    if (inviteId) {
-                                      handleGuildInviteResponse(notification.id, inviteId, 3); // InviteStatus.Declined
-                                    }
-                                  }}
-                                  disabled={respondingToInvite === getInviteIdFromNotification(notification)}
-                                  className={`notification-button ${isMobile ? 'px-6 py-3 text-sm' : 'px-5 py-2 text-xs'} bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:shadow-red-500/30 border-2 border-red-400/40`}
-                                >
-                                  {respondingToInvite === getInviteIdFromNotification(notification) ? (
-                                    <>
-                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                      <span>{isMobile ? 'Declining...' : 'Declining...'}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="text-lg">❌</span>
-                                      <span>{isMobile ? 'Decline Invite' : 'Decline'}</span>
-                                    </>
-                                  )}
-                                </button>
-                              </div>
-                            )}
 
                             {/* Read Button for Non-Guild Invites */}
                             {!isGuildInviteNotification(notification) && isUnread && (
@@ -733,6 +661,17 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
           )}
         </div>,
         document.body
+      )}
+
+      {/* Guild Invite Modal */}
+      {selectedGuildInvite && (
+        <GuildInviteModal
+          notification={selectedGuildInvite}
+          isOpen={isGuildModalOpen}
+          onClose={handleGuildModalClose}
+          onResponse={handleGuildResponse}
+          isMobile={isMobile}
+        />
       )}
     </div>
   );
