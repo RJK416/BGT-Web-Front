@@ -251,11 +251,6 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                       </span>
                     </div>
                   </div>
-                  {player.guild && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center border-2 border-purple-900">
-                      <span className="text-xs font-bold text-white">G</span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Player Info */}
