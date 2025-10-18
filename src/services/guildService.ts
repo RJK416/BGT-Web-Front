@@ -12,7 +12,8 @@ import type {
   GuildResponse,
   GuildMembersResponse,
   GuildInvitationsResponse,
-  GuildActionResponse
+  GuildActionResponse,
+  AppointGMRequest
 } from '../types/guild';
 
 class GuildService {
@@ -108,6 +109,15 @@ class GuildService {
     return await apiRequest(url, {
       method: 'GET',
       headers: this.getAuthHeaders(),
+    });
+  }
+
+  async appointGM(request: AppointGMRequest): Promise<GuildActionResponse> {
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.GUILD.APPOINT_GM);
+    return await apiRequest(url, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(request),
     });
   }
 }

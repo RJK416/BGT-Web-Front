@@ -115,3 +115,7 @@ export interface GuildActionResponse {
   data: boolean;
   isSuccess: boolean;
 }
+
+export interface AppointGMRequest {
+  Username: string;
+}

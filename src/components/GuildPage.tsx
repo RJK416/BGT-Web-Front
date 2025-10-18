@@ -7,6 +7,7 @@ import { guildService } from '@/services/guildService';
 import { GuildRole, InviteStatus } from '@/types/guild';
 import type { Guild, GuildMember, GuildInvitation } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
+import AppointGMModal from '@/components/AppointGMModal';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -24,6 +25,7 @@ export default function GuildPage() {
   const [allGuilds, setAllGuilds] = useState<Guild[]>([]);
   const [activeTab, setActiveTab] = useState<'my-guild' | 'all-guilds' | 'invitations'>('my-guild');
   const [error, setError] = useState<string | null>(null);
+  const [isAppointGMModalOpen, setIsAppointGMModalOpen] = useState(false);
   
   const router = useRouter();
 
@@ -140,6 +142,11 @@ export default function GuildPage() {
       console.error('Error responding to invitation:', error);
       setError('Failed to respond to invitation');
     }
+  };
+
+  const handleAppointGMSuccess = async () => {
+    // Refresh guild data to show updated roles
+    await fetchGuildData();
   };
 
   if (isLoading) {
@@ -330,7 +337,18 @@ export default function GuildPage() {
 
                 {/* Guild Members */}
                 <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
-                  <h3 className="text-xl font-bold text-amber-400 mb-4">Guild Members</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-amber-400">Guild Members</h3>
+                    {/* Only show appoint GM button for guild leaders */}
+                    {myGuild.userRole === 'Leader' && (
+                      <button
+                        onClick={() => setIsAppointGMModalOpen(true)}
+                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+                      >
+                        Appoint GM
+                      </button>
+                    )}
+                  </div>
                   <div className="space-y-3">
                     {myGuild.members.map((member) => (
                       <div
@@ -468,6 +486,14 @@ export default function GuildPage() {
           </div>
         )}
       </div>
+
+      {/* Appoint GM Modal */}
+      <AppointGMModal
+        isOpen={isAppointGMModalOpen}
+        onClose={() => setIsAppointGMModalOpen(false)}
+        onSuccess={handleAppointGMSuccess}
+        currentGuildMembers={myGuild?.members || []}
+      />
     </div>
   );
 }

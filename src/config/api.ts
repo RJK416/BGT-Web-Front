@@ -55,6 +55,7 @@ export const API_CONFIG = {
       GET_MY_INVITATIONS: '/Guild/Get-My-Received-Invitations',
       GET_ALL_MEMBERS: '/Guild/Get-All-Guild-Members',
       GET_MY_MEMBERS: '/Guild/Get-My-Guild-Members',
+      APPOINT_GM: '/Guild/Appoint-GM',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',
