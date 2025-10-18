@@ -264,10 +264,10 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                     <h3 className="text-base sm:text-lg font-bold text-amber-300 truncate">
                       {player.nickname}
                     </h3>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold ${
                       player.guild 
-                        ? 'bg-orange-500/20 text-orange-300 border border-orange-400/30'
-                        : 'bg-red-500/20 text-red-300 border border-red-400/30'
+                        ? 'bg-yellow-500/40 text-yellow-200 border-2 border-yellow-400 shadow-lg shadow-yellow-500/20'
+                        : 'bg-purple-500/40 text-purple-200 border-2 border-purple-400 shadow-lg shadow-purple-500/20'
                     }`}>
                       {player.guild || "No guild"}
                     </span>
