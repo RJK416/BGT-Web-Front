@@ -31,16 +31,15 @@ export default function AppointGMModal({
     setError(null);
 
     try {
-      // We need to get the user ID from the member data
-      // For now, we'll assume the member object has a userId field
-      const response = await guildService.appointGM({ TargetUserId: selectedMember.userId || selectedMember.playerId });
+      // Use the new username-based appoint method
+      const response = await guildService.appointGMByUsername(selectedMember.playerName);
       
-      if (response.isSuccess) {
+      if (response.isSuccess && response.status === 200) {
         onSuccess();
         onClose();
         setSelectedMember(null);
       } else {
-        setError(response.message || 'Failed to appoint GM');
+        setError((response as any).error || response.message || 'Failed to appoint GM');
       }
     } catch (error: any) {
       console.error('Error appointing GM:', error);
