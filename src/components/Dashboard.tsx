@@ -779,98 +779,102 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* My Tournaments - Mobile Optimized */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
-                <button
-                  onClick={async () => {
-                    try {
-                      const token = getAuthToken();
-                      const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`, {
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                      });
-                      
-                      if (res.ok) {
-                        const tournaments = res.data || res.result || [];
-                        setMyTournaments(tournaments);
+            {/* My Tournaments - Mobile Optimized - Only show for GMs */}
+            {isGM && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+                  <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const token = getAuthToken();
+                        const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.GET_MY_TOURNAMENTS_WITH_GM}`, {
+                          method: 'GET',
+                          headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (res.ok) {
+                          const tournaments = res.data || res.result || [];
+                          setMyTournaments(tournaments);
+                        }
+                      } catch (error) {
+                        console.error('Error refreshing tournaments:', error);
                       }
-                    } catch (error) {
-                      console.error('Error refreshing tournaments:', error);
-                    }
-                  }}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
-                >
-                  Refresh
-                </button>
-              </div>
-              
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
-                  <div
-                    key={tournament.id}
-                    onClick={() => openTournamentModal(tournament, true)}
-                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div className="flex-1">
-                        <h3 className="text-amber-300 font-semibold text-sm sm:text-base">{tournament.name}</h3>
-                        <p className="text-purple-300 text-xs sm:text-sm">{tournament.game}</p>
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-purple-400">
-                          <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
-                          <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
-                          <span>{tournament.xpReward || 100} XP</span>
+                    Refresh
+                  </button>
+                </div>
+                
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
+                    <div
+                      key={tournament.id}
+                      onClick={() => openTournamentModal(tournament, true)}
+                      className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex-1">
+                          <h3 className="text-amber-300 font-semibold text-sm sm:text-base">{tournament.name}</h3>
+                          <p className="text-purple-300 text-xs sm:text-sm">{tournament.game}</p>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-purple-400">
+                            <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
+                            <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
+                            <span>{tournament.xpReward || 100} XP</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-end sm:text-right">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
+                            tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
+                            tournament.phase === 2 ? 'bg-emerald-500/20 text-purple-300' :
+                            'bg-red-500/20 text-red-300'
+                          }`}>
+                            {tournament.phase === 0 ? 'Registration' :
+                             tournament.phase === 1 ? 'Started' :
+                             tournament.phase === 2 ? 'Finished' : 'Cancelled'}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex justify-end sm:text-right">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
-                          tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
-                          tournament.phase === 2 ? 'bg-emerald-500/20 text-purple-300' :
-                          'bg-red-500/20 text-red-300'
-                        }`}>
-                          {tournament.phase === 0 ? 'Registration' :
-                           tournament.phase === 1 ? 'Started' :
-                           tournament.phase === 2 ? 'Finished' : 'Cancelled'}
-                        </span>
-                      </div>
                     </div>
-                  </div>
-                )) : (
-                  <div className="text-center py-8">
-                    <div className="text-purple-300">No tournaments created yet</div>
-                    <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <div className="text-purple-300">No tournaments created yet</div>
+                      <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Create Tournament - Mobile Optimized - Only show for GMs */}
+            {isGM && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
+                {/* Expandable Button */}
+                <button
+                  onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
+                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                >
+                  <span className="text-base sm:text-lg font-bold">Create Tournament</span>
+                  <svg 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Expandable Form */}
+                {isCreateTournamentExpanded && (
+                  <div className="p-4 sm:p-6 border-t border-amber-400/20">
+                    <CreateTournamentForm />
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Create Tournament - Mobile Optimized */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
-              {/* Expandable Button */}
-              <button
-                onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
-              >
-                <span className="text-base sm:text-lg font-bold">Create Tournament</span>
-                <svg 
-                  className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {/* Expandable Form */}
-              {isCreateTournamentExpanded && (
-                <div className="p-4 sm:p-6 border-t border-amber-400/20">
-                  <CreateTournamentForm />
-                </div>
-              )}
-            </div>
+            )}
 
 
             {/* Your Player Card - Mobile Optimized */}
