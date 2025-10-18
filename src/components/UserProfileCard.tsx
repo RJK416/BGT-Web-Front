@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { API_CONFIG, apiRequest, buildApiUrl } from '@/config/api';
 
 interface BoardgameStats {
@@ -86,8 +87,8 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
     return Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999999] flex items-center justify-center p-4">
       <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 backdrop-blur-sm rounded-2xl border border-amber-400/30 max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-amber-400/20">
@@ -259,7 +260,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
 
       {/* Avatar Modal */}
       {isAvatarModalOpen && selectedAvatar && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
           <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-400/30">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -306,6 +307,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
