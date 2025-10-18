@@ -16,14 +16,14 @@ export default function AppointGMModal({
   onSuccess, 
   currentGuildMembers 
 }: AppointGMModalProps) {
-  const [username, setUsername] = useState('');
+  const [selectedMember, setSelectedMember] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) {
-      setError('Please enter a username');
+    if (!selectedMember) {
+      setError('Please select a member to appoint as GM');
       return;
     }
 
@@ -31,12 +31,14 @@ export default function AppointGMModal({
     setError(null);
 
     try {
-      const response = await guildService.appointGM({ Username: username.trim() });
+      // We need to get the user ID from the member data
+      // For now, we'll assume the member object has a userId field
+      const response = await guildService.appointGM({ TargetUserId: selectedMember.userId || selectedMember.playerId });
       
       if (response.isSuccess) {
         onSuccess();
         onClose();
-        setUsername('');
+        setSelectedMember(null);
       } else {
         setError(response.message || 'Failed to appoint GM');
       }
@@ -49,7 +51,7 @@ export default function AppointGMModal({
   };
 
   const handleClose = () => {
-    setUsername('');
+    setSelectedMember(null);
     setError(null);
     onClose();
   };
@@ -83,43 +85,49 @@ export default function AppointGMModal({
               </div>
             )}
 
-            <div>
-              <label className="block text-amber-300 text-sm mb-2 font-medium">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username to appoint as GM"
-                className="w-full px-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
-                required
-              />
-            </div>
-
             {/* Available Members List */}
             {currentGuildMembers.length > 0 && (
               <div>
                 <label className="block text-amber-300 text-sm mb-2 font-medium">
-                  Available Members
+                  Select Member to Appoint as GM
                 </label>
-                <div className="max-h-32 overflow-y-auto bg-purple-900/50 rounded-lg p-3 space-y-1">
+                <div className="max-h-48 overflow-y-auto bg-purple-900/50 rounded-lg p-3 space-y-2">
                   {currentGuildMembers.map((member) => (
                     <div
                       key={member.playerId}
-                      className="flex items-center justify-between p-2 bg-purple-800/30 rounded hover:bg-purple-700/30 transition-colors"
+                      className={`flex items-center justify-between p-3 rounded transition-colors cursor-pointer ${
+                        selectedMember?.playerId === member.playerId
+                          ? 'bg-amber-500/30 border-2 border-amber-400'
+                          : 'bg-purple-800/30 hover:bg-purple-700/30 border-2 border-transparent'
+                      }`}
+                      onClick={() => setSelectedMember(member)}
                     >
-                      <span className="text-purple-200 text-sm">{member.playerName}</span>
-                      <button
-                        type="button"
-                        onClick={() => setUsername(member.playerName)}
-                        className="px-2 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded text-xs transition-colors"
-                      >
-                        Select
-                      </button>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-sm">
+                          {member.playerName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="text-purple-200 font-medium">{member.playerName}</span>
+                          <div className="text-purple-400 text-xs">Level {member.playerLevel || 'N/A'}</div>
+                        </div>
+                      </div>
+                      {selectedMember?.playerId === member.playerId && (
+                        <div className="text-amber-400">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
+                {selectedMember && (
+                  <div className="mt-3 p-3 bg-amber-500/20 border border-amber-400/50 rounded-lg">
+                    <p className="text-amber-300 text-sm">
+                      <strong>Selected:</strong> {selectedMember.playerName}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -134,7 +142,7 @@ export default function AppointGMModal({
               </button>
               <button
                 type="submit"
-                disabled={isLoading || !username.trim()}
+                disabled={isLoading || !selectedMember}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-purple-900 font-medium rounded-lg transition-all duration-300"
               >
                 {isLoading ? 'Appointing...' : 'Appoint GM'}

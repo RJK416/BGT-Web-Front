@@ -35,7 +35,8 @@ export default function Dashboard() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userPlayer, setUserPlayer] = useState<any>(null);
   const isGM = (() => {
-    const r = userPlayer?.role;
+    // Try both 'role' and 'Role' properties since the API returns 'Role' but JS might convert it
+    const r = userPlayer?.role || userPlayer?.Role;
     if (r == null) return false;
     if (typeof r === 'string') return r.toUpperCase() === 'GM';
     return r === 1; // numeric enum fallback
@@ -43,6 +44,9 @@ export default function Dashboard() {
   const [userPlayerLoading, setUserPlayerLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
   const [isCreateTournamentExpanded, setIsCreateTournamentExpanded] = useState(false);
+  const [isAppointGMExpanded, setIsAppointGMExpanded] = useState(false);
+  const [appointGMUsername, setAppointGMUsername] = useState('');
+  const [isAppointingGM, setIsAppointingGM] = useState(false);
 
   const [selectedTournament, setSelectedTournament] = useState<any>(null);
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
@@ -130,13 +134,7 @@ export default function Dashboard() {
 
       if (response.ok && response.status === 200) {
         setUserProfile(response.data);
-        // Also set userPlayer from the profile stats for backward compatibility
-        if (response.data?.stats) {
-          setUserPlayer({
-            ...response.data.stats,
-            totalScore: response.data.stats.xp || 0, // Use XP as total score for now
-          });
-        }
+        // Don't override userPlayer here - it should come from fetchUserPlayer() with role data
       } else {
         console.error('Failed to fetch user profile:', response);
         setUserProfile(null);
@@ -340,7 +338,7 @@ export default function Dashboard() {
 
   // Function to fetch my tournaments
   const fetchMyTournaments = async () => {
-    if (!userPlayer || !isGM) return;
+    if (!userPlayer) return;
     
     try {
       const token = getAuthToken();
@@ -359,6 +357,37 @@ export default function Dashboard() {
     }
   };
 
+  const handleAppointGM = async () => {
+    if (!appointGMUsername.trim()) {
+      setInfoSuccess(false);
+      setInfoMessage('Please enter a username');
+      setInfoOpen(true);
+      return;
+    }
+
+    try {
+      setIsAppointingGM(true);
+      const response = await guildService.appointGMByUsername(appointGMUsername.trim());
+      
+      if (response.isSuccess && response.status === 200) {
+        setInfoSuccess(true);
+        setInfoMessage(response.message || `Successfully appointed '${appointGMUsername}' as GM!`);
+        setInfoOpen(true);
+        setAppointGMUsername(''); // Clear the input
+        setIsAppointGMExpanded(false); // Collapse the section
+      } else {
+        setInfoSuccess(false);
+        setInfoMessage((response as any).error || response.message || 'Failed to appoint GM');
+        setInfoOpen(true);
+      }
+    } catch (error: any) {
+      setInfoSuccess(false);
+      setInfoMessage(error.message || 'Failed to appoint GM');
+      setInfoOpen(true);
+    } finally {
+      setIsAppointingGM(false);
+    }
+  };
 
   function CreateTournamentForm() {
   const [name, setName] = useState('');
@@ -475,10 +504,10 @@ export default function Dashboard() {
   );
 }
 
-  // Fetch my tournaments when userPlayer is loaded and user is GM
+  // Fetch my tournaments when userPlayer is loaded
   useEffect(() => {
     fetchMyTournaments();
-  }, [userPlayer, isGM]);
+  }, [userPlayer]);
 
   // Function to open tournament modal and fetch members
   const openTournamentModal = async (tournament: any, fromMyTournaments: boolean = false) => {
@@ -779,6 +808,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+
             {/* My Tournaments - Mobile Optimized - Only show for GMs */}
             {isGM && (
               <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
@@ -876,6 +906,66 @@ export default function Dashboard() {
               </div>
             )}
 
+            {/* Appoint GM - Mobile Optimized - Only show for GMs */}
+            {isGM && (
+              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
+                {/* Expandable Button */}
+                <button
+                  onClick={() => setIsAppointGMExpanded(!isAppointGMExpanded)}
+                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                >
+                  <span className="text-base sm:text-lg font-bold">Appoint GM</span>
+                  <svg 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isAppointGMExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Expandable Content */}
+                {isAppointGMExpanded && (
+                  <div className="p-4 sm:p-6 border-t border-amber-400/20">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-amber-300 text-sm font-medium mb-2">
+                          Username
+                        </label>
+                        <input
+                          type="text"
+                          value={appointGMUsername}
+                          onChange={(e) => setAppointGMUsername(e.target.value)}
+                          placeholder="Enter username to appoint as GM"
+                          className="w-full px-4 py-3 bg-purple-800/50 border border-amber-400/30 rounded-lg text-amber-300 placeholder-purple-400 focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all duration-300"
+                        />
+                      </div>
+                      
+                      <button
+                        onClick={handleAppointGM}
+                        disabled={!appointGMUsername.trim() || isAppointingGM}
+                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-purple-900 font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                      >
+                        {isAppointingGM ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-900"></div>
+                            Appointing...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                            </svg>
+                            Appoint GM
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Your Player Card - Mobile Optimized */}
             <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-6 sm:mb-8">
@@ -946,7 +1036,7 @@ export default function Dashboard() {
                         {userProfile?.stats?.nickname || userProfile?.userName || (user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}
                       </h3>
                       <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30 self-start">
-                        {userPlayer?.guild || 'Elite Guild'}
+                        {userPlayer?.guild || userPlayer?.Guild || 'No Guild'}
                       </span>
                     </div>
 
@@ -1001,6 +1091,21 @@ export default function Dashboard() {
                         <div className="text-xs text-purple-300">Win Rate</div>
                       </div>
                     </div>
+
+                    {/* Role Display */}
+                    {(userPlayer?.role || userPlayer?.Role) && (
+                      <div className="mt-4 text-center">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          (userPlayer?.role || userPlayer?.Role) === 'GM' 
+                            ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/50' 
+                            : 'bg-purple-500/20 text-purple-300 border border-purple-400/50'
+                        }`}>
+                          {(userPlayer?.role || userPlayer?.Role) === 'GM' ? '👑 Game Master' : `🎮 ${userPlayer?.role || userPlayer?.Role}`}
+                        </span>
+                      </div>
+                    )}
+
+
                   </div>
 
                   {/* Achievements */}
@@ -1111,14 +1216,16 @@ export default function Dashboard() {
                   >
                     Refresh
                   </button>
-                  <button 
-                    onClick={() => console.log('Add tournament clicked')}
-                    className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </button>
+                  {isGM && (
+                    <button 
+                      onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
+                      className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
 

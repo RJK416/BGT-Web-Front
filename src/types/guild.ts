@@ -117,5 +117,5 @@ export interface GuildActionResponse {
 }
 
 export interface AppointGMRequest {
-  Username: string;
+  TargetUserId: number;
 }

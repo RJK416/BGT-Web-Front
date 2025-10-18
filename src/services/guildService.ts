@@ -112,12 +112,21 @@ class GuildService {
     });
   }
 
-  async appointGM(request: AppointGMRequest): Promise<GuildActionResponse> {
-    const url = buildApiUrl(API_CONFIG.ENDPOINTS.GUILD.APPOINT_GM);
+
+  async getUserPlayer(): Promise<any> {
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.BOARDGAME.GET_USER_PLAYER);
+    return await apiRequest(url, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  async appointGMByUsername(username: string): Promise<GuildActionResponse> {
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.BOARDGAME.APPOINT_GM_BY_USERNAME);
     return await apiRequest(url, {
       method: 'POST',
       headers: this.getAuthHeaders(),
-      body: JSON.stringify(request),
+      body: JSON.stringify({ Username: username }),
     });
   }
 }

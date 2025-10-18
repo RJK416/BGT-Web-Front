@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { guildService } from '@/services/guildService';
-import { GuildRole, InviteStatus } from '@/types/guild';
+import { GuildRole, InviteStatus, AppointGMRequest } from '@/types/guild';
 import type { Guild, GuildMember, GuildInvitation } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
 import AppointGMModal from '@/components/AppointGMModal';
@@ -25,9 +25,18 @@ export default function GuildPage() {
   const [allGuilds, setAllGuilds] = useState<Guild[]>([]);
   const [activeTab, setActiveTab] = useState<'my-guild' | 'all-guilds' | 'invitations'>('my-guild');
   const [error, setError] = useState<string | null>(null);
+  const [userPlayer, setUserPlayer] = useState<any>(null);
   const [isAppointGMModalOpen, setIsAppointGMModalOpen] = useState(false);
   
   const router = useRouter();
+
+  // Check if user is GM
+  const isGM = (() => {
+    const r = userPlayer?.role;
+    if (r == null) return false;
+    if (typeof r === 'string') return r.toUpperCase() === 'GM';
+    return r === 1; // numeric enum fallback
+  })();
 
   // ✅ Fixed useEffect: single place to do auth, set user, then fetch data
   useEffect(() => {
@@ -69,6 +78,12 @@ export default function GuildPage() {
 
   const fetchGuildData = async () => {
     try {
+      // Fetch user player data to check GM status
+      const userPlayerResponse = await guildService.getUserPlayer();
+      if (userPlayerResponse.isSuccess && userPlayerResponse.data) {
+        setUserPlayer(userPlayerResponse.data);
+      }
+
       // Fetch my guild
       const guildResponse = await guildService.getMyGuild();
       if (guildResponse.isSuccess && guildResponse.data) {
@@ -339,8 +354,8 @@ export default function GuildPage() {
                 <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-amber-400">Guild Members</h3>
-                    {/* Only show appoint GM button for guild leaders */}
-                    {myGuild.userRole === 'Leader' && (
+                    {/* Only show appoint GM button for current GMs */}
+                    {isGM && (
                       <button
                         onClick={() => setIsAppointGMModalOpen(true)}
                         className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
@@ -491,7 +506,10 @@ export default function GuildPage() {
       <AppointGMModal
         isOpen={isAppointGMModalOpen}
         onClose={() => setIsAppointGMModalOpen(false)}
-        onSuccess={handleAppointGMSuccess}
+        onSuccess={() => {
+          // Refresh guild data after successful appointment
+          fetchGuildData();
+        }}
         currentGuildMembers={myGuild?.members || []}
       />
     </div>

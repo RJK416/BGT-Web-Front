@@ -33,6 +33,7 @@ export const API_CONFIG = {
       ADD_TOURNAMENT_MEMBER: '/Boardgame/Add-Tournament-Member',
       REMOVE_TOURNAMENT_MEMBER: '/Boardgame/Remove-Tournament-Member',
       UPDATE_TOURNAMENT: '/Boardgame/Update-Tournament',
+      APPOINT_GM_BY_USERNAME: '/Boardgame/Appoint-GM-By-Username',
     },
     // Notification Service Endpoints
     NOTIFICATION: {
