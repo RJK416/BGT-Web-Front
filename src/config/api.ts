@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Base URL for your API
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://a9mykszmmd.eu-central-1.awsapprunner.com',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://guild-api-1011546854121.europe-west3.run.app',
   
   // API Endpoints
   ENDPOINTS: {

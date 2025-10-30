@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import GuildChat from './GuildChat';
 import { guildService } from '@/services/guildService';
+import { API_CONFIG } from '@/config/api';
 
 // Simple types based on your actual API response
 interface GuildMember {
@@ -49,7 +50,7 @@ const fetchMyGuild = async (): Promise<Guild | null> => {
       return null;
     }
 
-    const response = await fetch('https://a9mykszmmd.eu-central-1.awsapprunner.com/Get-My-Guild', {
+    const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GUILD.GET_MY_GUILD}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -97,7 +98,7 @@ const sendGuildInvite = async (guildId: number, username: string, message?: stri
 
     console.log('Sending invite with data:', inviteData);
 
-    const response = await fetch('https://a9mykszmmd.eu-central-1.awsapprunner.com/Send-Guild-Invitation', {
+    const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GUILD.SEND_INVITATION}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
