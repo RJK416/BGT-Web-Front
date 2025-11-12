@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import GuildChat from './GuildChat';
@@ -283,21 +283,55 @@ export default function GuildPageSimple() {
     setCreateGuildMessage(null);
   };
 
+  const pageBackgroundStyle: CSSProperties = {
+    backgroundColor: 'rgba(8, 47, 35, 1)',
+    backgroundImage: `
+      linear-gradient(to bottom right, rgba(8, 47, 35, 0.98), rgba(4, 30, 24, 0.95)),
+      radial-gradient(circle at top left, rgba(21, 128, 61, 0.28), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(13, 84, 57, 0.24), transparent 60%)
+    `,
+    backgroundBlendMode: 'overlay'
+  };
+
+  const panelStyle: CSSProperties = {
+    backgroundColor: 'rgba(68, 36, 19, 0.95)',
+    backgroundImage: `
+      linear-gradient(to bottom right, rgba(68, 36, 19, 0.95), rgba(87, 44, 23, 0.96)),
+      linear-gradient(90deg, rgba(68, 36, 19, 0.75), rgba(87, 44, 23, 0.82), rgba(68, 36, 19, 0.75))
+    `,
+    border: '1px solid rgba(120, 53, 15, 0.55)',
+    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45)'
+  };
+
+  const subPanelClass =
+    'rounded-xl border border-amber-900/40 bg-amber-950/60';
+
+  const mutedTextClass = 'text-amber-200/80';
+
+  const toastStyle: CSSProperties = {
+    backgroundColor: 'rgba(68, 36, 19, 0.92)',
+    border: '1px solid rgba(217, 119, 6, 0.5)',
+    color: '#fcd34d'
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={pageBackgroundStyle}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto mb-4"></div>
-          <p className="text-amber-300">Loading guild...</p>
+          <p className="text-amber-200">Loading guild...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen" style={pageBackgroundStyle}>
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-sm border-b border-amber-400/30" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.9), rgba(15, 66, 52, 0.9))'}}>
+      <header
+        className="relative z-10 backdrop-blur-sm border-b border-amber-900/40"
+        style={{background: 'linear-gradient(to right, rgba(20, 83, 45, 0.92), rgba(12, 50, 35, 0.92))'}}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
@@ -306,16 +340,16 @@ export default function GuildPageSimple() {
             </div>
             
             <div className="flex items-center gap-4">
-              <span className="text-purple-200">Welcome, {(user as any)?.name || (user as any)?.unique_name || (user as any)?.username || 'User'}</span>
+              <span className="text-amber-200/90">Welcome, {(user as any)?.name || (user as any)?.unique_name || (user as any)?.username || 'User'}</span>
               <button
                 onClick={() => router.push('/dashboard')}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300"
+                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg"
               >
                 Dashboard
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300"
+                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300 shadow-lg"
               >
                 Logout
               </button>
@@ -327,36 +361,36 @@ export default function GuildPageSimple() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {error ? (
-          <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 text-center">
-            <p className="text-red-300 text-lg">{error}</p>
+          <div className="rounded-lg p-6 text-center" style={toastStyle}>
+            <p className="text-lg">{error}</p>
           </div>
         ) : guild ? (
           <div className="space-y-6">
             {/* Guild Info */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
-              <h2 className="text-3xl font-bold text-amber-400 mb-4">{guild.name}</h2>
-              <p className="text-purple-300 mb-6">{guild.description || 'No description provided.'}</p>
+            <div className="rounded-xl p-6" style={panelStyle}>
+              <h2 className="text-3xl font-bold text-orange-300 mb-4">{guild.name}</h2>
+              <p className={`${mutedTextClass} mb-6`}>{guild.description || 'No description provided.'}</p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-300">{guild.memberCount}</div>
-                  <div className="text-sm text-purple-400">Members</div>
+                  <div className={`text-sm ${mutedTextClass}`}>Members</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-300">{guild.maxMember}</div>
-                  <div className="text-sm text-purple-400">Max Members</div>
+                  <div className={`text-sm ${mutedTextClass}`}>Max Members</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-300">{guild.level}</div>
-                  <div className="text-sm text-purple-400">Guild Level</div>
+                  <div className={`text-sm ${mutedTextClass}`}>Guild Level</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-300">{guild.userRole}</div>
-                  <div className="text-sm text-purple-400">Your Role</div>
+                  <div className={`text-sm ${mutedTextClass}`}>Your Role</div>
                 </div>
               </div>
               
-              <div className="text-sm text-purple-400 mb-4">
+              <div className={`text-sm ${mutedTextClass} mb-4`}>
                 Created by {guild.creatorName} on {new Date(guild.created).toLocaleDateString()}
               </div>
               
@@ -365,7 +399,7 @@ export default function GuildPageSimple() {
                 {/* Chat Button */}
                 <button
                   onClick={() => setShowChat(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   💬 Guild Chat
                 </button>
@@ -383,29 +417,29 @@ export default function GuildPageSimple() {
             </div>
 
             {/* Guild Members */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
-              <h3 className="text-2xl font-bold text-amber-400 mb-6">Guild Members</h3>
+            <div className={`${subPanelClass} p-6`}>
+              <h3 className="text-2xl font-bold text-orange-300 mb-6">Guild Members</h3>
               <div className="space-y-4">
                 {guild.members.map((member) => (
                   <div
                     key={member.playerId}
-                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20"
+                    className="rounded-lg p-4 border border-amber-900/40 bg-gradient-to-r from-amber-950/70 via-amber-900/60 to-amber-950/70"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-lg">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-amber-950 font-bold text-lg">
                           {member.playerName.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <h4 className="text-amber-300 font-semibold text-lg">{member.playerName}</h4>
-                          <p className="text-purple-400">Level {member.playerLevel || 'N/A'}</p>
+                          <p className={mutedTextClass}>Level {member.playerLevel || 'N/A'}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="font-medium text-amber-300 text-lg">
                           {member.role}
                         </div>
-                        <div className="text-purple-400 text-sm">
+                        <div className={`${mutedTextClass} text-sm`}>
                           Joined {new Date(member.joinedAt).toLocaleDateString()}
                         </div>
                       </div>
@@ -416,9 +450,9 @@ export default function GuildPageSimple() {
             </div>
           </div>
         ) : (
-          <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-8 border border-amber-400/30 text-center">
-            <h3 className="text-2xl font-bold text-amber-400 mb-4">No Guild Found</h3>
-            <p className="text-purple-300 text-lg mb-6">You are not currently a member of any guild.</p>
+          <div className="rounded-xl p-8 text-center" style={panelStyle}>
+            <h3 className="text-2xl font-bold text-orange-300 mb-4">No Guild Found</h3>
+            <p className={`${mutedTextClass} text-lg mb-6`}>You are not currently a member of any guild.</p>
             <button
               onClick={openCreateGuildModal}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -432,12 +466,12 @@ export default function GuildPageSimple() {
       {/* Invite Player Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 rounded-xl p-6 border-2 border-amber-400/30 w-full max-w-md mx-4">
+          <div className="rounded-xl p-6 border-2 border-amber-900/50 w-full max-w-md mx-4 bg-amber-950/80 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-amber-400">Invite Player</h3>
+              <h3 className="text-xl font-bold text-orange-300">Invite Player</h3>
               <button
                 onClick={closeInviteModal}
-                className="text-purple-300 hover:text-white text-2xl"
+                className="text-amber-200 hover:text-orange-300 text-2xl"
               >
                 ×
               </button>
@@ -445,7 +479,7 @@ export default function GuildPageSimple() {
 
             <form onSubmit={handleInvitePlayer} className="space-y-4">
               <div>
-                <label className="block text-purple-300 text-sm font-medium mb-2">
+                <label className="block text-amber-200 text-sm font-medium mb-2">
                   Username
                 </label>
                 <input
@@ -453,13 +487,13 @@ export default function GuildPageSimple() {
                   value={inviteUsername}
                   onChange={(e) => setInviteUsername(e.target.value)}
                   placeholder="Enter player username"
-                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-purple-300 text-sm font-medium mb-2">
+                <label className="block text-amber-200 text-sm font-medium mb-2">
                   Message (Optional)
                 </label>
                 <textarea
@@ -467,16 +501,18 @@ export default function GuildPageSimple() {
                   onChange={(e) => setInviteMessage(e.target.value)}
                   placeholder="Optional invitation message"
                   rows={3}
-                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40 resize-none"
                 />
               </div>
 
               {inviteSuccess && (
-                <div className={`p-3 rounded-lg text-sm ${
-                  inviteSuccess.includes('sent') 
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                }`}>
+                <div
+                  className={`p-3 rounded-lg text-sm border ${
+                    inviteSuccess.includes('sent')
+                      ? 'bg-emerald-900/40 text-emerald-200 border-emerald-500/40'
+                      : 'bg-red-900/40 text-red-200 border-red-500/40'
+                  }`}
+                >
                   {inviteSuccess}
                 </div>
               )}
@@ -485,7 +521,7 @@ export default function GuildPageSimple() {
                 <button
                   type="button"
                   onClick={closeInviteModal}
-                  className="flex-1 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-all duration-300"
+                  className="flex-1 px-4 py-2 bg-amber-950/70 hover:bg-amber-900/60 border border-amber-900/40 text-amber-200 rounded-lg transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -505,12 +541,12 @@ export default function GuildPageSimple() {
       {/* Create Guild Modal */}
       {showCreateGuildModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 rounded-xl p-6 border-2 border-amber-400/30 w-full max-w-md mx-4">
+          <div className="rounded-xl p-6 border-2 border-amber-900/50 w-full max-w-md mx-4 bg-amber-950/80 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-amber-400">Create New Guild</h3>
+              <h3 className="text-xl font-bold text-orange-300">Create New Guild</h3>
               <button
                 onClick={closeCreateGuildModal}
-                className="text-purple-300 hover:text-white text-2xl"
+                className="text-amber-200 hover:text-orange-300 text-2xl"
               >
                 ×
               </button>
@@ -518,7 +554,7 @@ export default function GuildPageSimple() {
 
             <form onSubmit={handleCreateGuild} className="space-y-4">
               <div>
-                <label className="block text-purple-300 text-sm font-medium mb-2">
+                <label className="block text-amber-200 text-sm font-medium mb-2">
                   Guild Name *
                 </label>
                 <input
@@ -526,14 +562,14 @@ export default function GuildPageSimple() {
                   value={guildName}
                   onChange={(e) => setGuildName(e.target.value)}
                   placeholder="Enter guild name (3-20 characters)"
-                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
                   required
                   maxLength={20}
                 />
               </div>
 
               <div>
-                <label className="block text-purple-300 text-sm font-medium mb-2">
+                <label className="block text-amber-200 text-sm font-medium mb-2">
                   Description (Optional)
                 </label>
                 <textarea
@@ -541,16 +577,18 @@ export default function GuildPageSimple() {
                   onChange={(e) => setGuildDescription(e.target.value)}
                   placeholder="Enter guild description"
                   rows={3}
-                  className="w-full px-3 py-2 bg-purple-800/50 border border-amber-400/30 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40 resize-none"
                 />
               </div>
 
               {createGuildMessage && (
-                <div className={`p-3 rounded-lg text-sm ${
-                  createGuildMessage.includes('successfully') 
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                }`}>
+                <div
+                  className={`p-3 rounded-lg text-sm border ${
+                    createGuildMessage.includes('successfully')
+                      ? 'bg-emerald-900/40 text-emerald-200 border-emerald-500/40'
+                      : 'bg-red-900/40 text-red-200 border-red-500/40'
+                  }`}
+                >
                   {createGuildMessage}
                 </div>
               )}
@@ -559,7 +597,7 @@ export default function GuildPageSimple() {
                 <button
                   type="button"
                   onClick={closeCreateGuildModal}
-                  className="flex-1 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg transition-all duration-300"
+                  className="flex-1 px-4 py-2 bg-amber-950/70 hover:bg-amber-900/60 border border-amber-900/40 text-amber-200 rounded-lg transition-all duration-300"
                 >
                   Cancel
                 </button>

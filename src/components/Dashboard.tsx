@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
@@ -15,6 +15,7 @@ import { getPhaseDisplayName } from '@/types/tournament';
 import ConfirmModal from '@/components/ConfirmModal';
 import InfoModal from '@/components/InfoModal';
 import NotificationBar from '@/components/NotificationBar';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -70,6 +71,26 @@ export default function Dashboard() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+
+  const pageBackgroundStyle: CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: tavernPalette.background,
+    backgroundImage: `radial-gradient(circle at top, rgba(15, 35, 29, 0.65), transparent 55%), radial-gradient(circle at bottom, rgba(12, 24, 20, 0.6), transparent 60%)`,
+    color: tavernPalette.parchment
+  };
+
+  const headerStyle: CSSProperties = {
+    background: 'linear-gradient(135deg, rgba(21, 49, 39, 0.95), rgba(13, 32, 26, 0.95))',
+    borderBottom: `1px solid ${tavernPalette.border}`,
+    boxShadow: `0 10px 35px ${tavernPalette.shadow}`
+  };
+
+  const tournamentPanelStyle: CSSProperties = {
+    backgroundImage: tavernPalette.panelGradient,
+    border: `1px solid ${tavernPalette.border}`,
+    boxShadow: `0 20px 60px ${tavernPalette.shadow}`,
+    color: tavernPalette.parchment
+  };
 
   const router = useRouter();
 
@@ -458,11 +479,11 @@ export default function Dashboard() {
       {message && <div className="text-sm text-amber-300">{message}</div>}
       <div>
         <label className="block text-amber-300 text-sm mb-1">Name</label>
-        <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
       </div>
       <div>
         <label className="block text-amber-300 text-sm mb-1">Game</label>
-        <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+        <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
@@ -472,7 +493,7 @@ export default function Dashboard() {
             placeholder="dd.mm.yyyy"
             value={tournamentDate}
             onChange={e=>setTournamentDate(e.target.value)}
-            className="w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100"
+            className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100"
             pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
             title="Enter date as DD.MM.YYYY"
             required
@@ -480,24 +501,24 @@ export default function Dashboard() {
         </div>
         <div>
           <label className="block text-amber-300 text-sm mb-1">Max Members</label>
-          <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
         </div>
         <div>
           <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
-          <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
         </div>
         <div>
           <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
-          <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
-          <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100" required />
+          <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
         </div>
       </div>
-      <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg">
+      <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg">
         {creating ? 'Creating...' : 'Create Tournament'}
       </button>
     </form>
@@ -645,61 +666,20 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-green-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
-          <p className="text-amber-400 text-lg">Loading your realm...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-400 mx-auto mb-4"></div>
+          <p className="text-orange-400 text-lg">Loading your realm...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
-      {/* Cosmic Background */}
-      <div className="absolute inset-0 hidden sm:block">
-        {/* Stars */}
-        <div className="absolute inset-0">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Star Clusters */}
-        <div className="absolute top-20 left-20 w-4 h-4 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute top-32 left-16 w-2 h-2 bg-cyan-200 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute top-28 left-24 w-3 h-3 bg-cyan-400 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.8s' }} />
-        
-        <div className="absolute top-40 right-32 w-3 h-3 bg-blue-300 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-52 right-28 w-2 h-2 bg-blue-200 rounded-full opacity-90 animate-pulse" style={{ animationDelay: '0.3s' }} />
-        <div className="absolute top-44 right-36 w-4 h-4 bg-blue-400 rounded-full opacity-40 animate-pulse" style={{ animationDelay: '2.1s' }} />
-        
-        <div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
-        <div className="absolute bottom-40 left-36 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
-        <div className="absolute bottom-36 left-44 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
-        
-        {/* Cosmic Dust/Nebula */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-purple-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-radial from-blue-400/8 via-cyan-400/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
-        
-        {/* Shooting Stars */}
-        <div className="absolute top-20 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
-        <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-blue-300 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '1.5s' }} />
-      </div>
+    <div className="relative overflow-hidden" style={pageBackgroundStyle}>
 
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-sm border-b border-amber-400/30" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.9), rgba(15, 66, 52, 0.9))'}}>
+      <header className="relative z-10 backdrop-blur-sm border-b border-orange-500/40" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.95), rgba(15, 66, 52, 0.95))'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3 relative">
             {/* Left side - Logo and Title */}
@@ -710,7 +690,7 @@ export default function Dashboard() {
                 className="w-12 h-12 object-contain"
               />
               <div>
-                <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
+                <h1 className="text-2xl font-bold text-orange-400">Guild</h1>
                 <p className="text-emerald-200 text-sm">Chronicle Your Adventures</p>
               </div>
             </div>
@@ -726,14 +706,14 @@ export default function Dashboard() {
             
             {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
-              <span className="text-purple-200 text-sm sm:text-base">Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
+              <span className="text-emerald-200 text-sm sm:text-base">Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
               
               <button
                 onClick={() => router.push('/settings')}
-                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm"
+                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 text-sm"
               >
                 Settings
               </button>
@@ -755,15 +735,17 @@ export default function Dashboard() {
           <div className="flex-1">
 
             {/* Leaderboard - Mobile Optimized */}
-            <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20" />
+            <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8" />
 
             {/* Guild Scoreboard */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
+            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
+              style={tournamentPanelStyle}
+            >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-amber-400">Top Guilds</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-orange-300">Top Guilds</h2>
                 <button
                   onClick={fetchGuilds}
-                  className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm"
+                  className="px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg text-sm"
                 >
                   Refresh
                 </button>
@@ -771,23 +753,23 @@ export default function Dashboard() {
 
               {guildsLoading ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400 mr-2" />
-                  <span className="text-amber-400">Loading guilds...</span>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-400 mr-2" />
+                  <span className="text-orange-300">Loading guilds...</span>
                 </div>
               ) : guilds.length > 0 ? (
                 <div className="space-y-3">
                   {guilds.map((g, idx) => (
-                    <div key={g.id} className="flex items-center justify-between bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 border border-amber-400/20">
+                    <div key={g.id} className="flex items-center justify-between bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-lg p-3 border border-amber-900/50">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-purple-900 font-bold flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-amber-900 font-bold flex items-center justify-center flex-shrink-0">
                           {idx + 1}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-amber-300 font-semibold truncate">{g.name}</div>
-                          <div className="text-purple-400 text-xs truncate">Leader: {g.creatorName}</div>
+                          <div className="text-orange-200 font-semibold truncate">{g.name}</div>
+                          <div className="text-amber-300/80 text-xs truncate">Leader: {g.creatorName}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 flex-shrink-0 text-xs text-purple-300">
+                      <div className="flex items-center gap-3 flex-shrink-0 text-xs text-amber-300">
                         <span className="whitespace-nowrap">Lv {g.level ?? 1}</span>
                         <span className="whitespace-nowrap">{g.memberCount}/{(g as any).maxMember || (g as any).maxMembers || 0} members</span>
                       </div>
@@ -795,13 +777,13 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6 text-purple-300">No guilds found</div>
+                <div className="text-center py-6 text-amber-300">No guilds found</div>
               )}
 
               <div className="mt-4">
                 <button
                   onClick={() => router.push('/guild')}
-                  className="w-full py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-lg transition-all duration-300"
+                  className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300"
                 >
                   View All Guilds
                 </button>
@@ -811,9 +793,11 @@ export default function Dashboard() {
 
             {/* My Tournaments - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30 mb-6 sm:mb-8">
+              <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
+                style={tournamentPanelStyle}
+              >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-                  <h2 className="text-lg sm:text-xl font-bold text-amber-400">My Tournaments</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-orange-300">My Tournaments</h2>
                   <button
                     onClick={async () => {
                       try {
@@ -831,24 +815,24 @@ export default function Dashboard() {
                         console.error('Error refreshing tournaments:', error);
                       }
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
+                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
                   >
                     Refresh
                   </button>
                 </div>
                 
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
                   {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
                     <div
                       key={tournament.id}
                       onClick={() => openTournamentModal(tournament, true)}
-                      className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-3 sm:p-4 border border-amber-400/20 hover:border-amber-400/40 transition-all duration-300 cursor-pointer"
+                      className="bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-lg p-3 sm:p-4 border border-amber-900/50 hover:border-amber-800/60 transition-all duration-300 cursor-pointer"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex-1">
-                          <h3 className="text-amber-300 font-semibold text-sm sm:text-base">{tournament.name}</h3>
-                          <p className="text-purple-300 text-xs sm:text-sm">{tournament.game}</p>
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-purple-400">
+                          <h3 className="text-orange-200 font-semibold text-sm sm:text-base">{tournament.name}</h3>
+                          <p className="text-amber-300/80 text-xs sm:text-sm">{tournament.game}</p>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-amber-300">
                             <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
                             <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
                             <span>{tournament.xpReward || 100} XP</span>
@@ -858,7 +842,7 @@ export default function Dashboard() {
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
                             tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
-                            tournament.phase === 2 ? 'bg-emerald-500/20 text-purple-300' :
+                            tournament.phase === 2 ? 'bg-emerald-500/20 text-emerald-300' :
                             'bg-red-500/20 text-red-300'
                           }`}>
                             {tournament.phase === 0 ? 'Registration' :
@@ -870,8 +854,8 @@ export default function Dashboard() {
                     </div>
                   )) : (
                     <div className="text-center py-8">
-                      <div className="text-purple-300">No tournaments created yet</div>
-                      <div className="text-purple-400 text-sm mt-2">Create your first tournament below</div>
+                      <div className="text-amber-300">No tournaments created yet</div>
+                      <div className="text-amber-300/80 text-sm mt-2">Create your first tournament below</div>
                     </div>
                   )}
                 </div>
@@ -880,11 +864,13 @@ export default function Dashboard() {
 
             {/* Create Tournament - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
+              <div className="rounded-xl border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
+                style={tournamentPanelStyle}
+              >
                 {/* Expandable Button */}
                 <button
                   onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-amber-950/80 via-amber-900/80 to-amber-950/80 hover:from-amber-950/90 hover:via-amber-900/90 hover:to-amber-950/90 text-orange-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between border-b border-amber-900/50"
                 >
                   <span className="text-base sm:text-lg font-bold">Create Tournament</span>
                   <svg 
@@ -899,7 +885,7 @@ export default function Dashboard() {
                 
                 {/* Expandable Form */}
                 {isCreateTournamentExpanded && (
-                  <div className="p-4 sm:p-6 border-t border-amber-400/20">
+                  <div className="p-4 sm:p-6 border-t border-amber-900/50">
                     <CreateTournamentForm />
                   </div>
                 )}
@@ -908,11 +894,13 @@ export default function Dashboard() {
 
             {/* Appoint GM - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl border border-amber-400/30 mb-6 sm:mb-8">
+              <div className="rounded-xl border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
+                style={tournamentPanelStyle}
+              >
                 {/* Expandable Button */}
                 <button
                   onClick={() => setIsAppointGMExpanded(!isAppointGMExpanded)}
-                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-800/50 to-purple-700/50 hover:from-purple-800/60 hover:to-purple-700/60 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 hover:from-amber-950/80 hover:via-amber-900/80 hover:to-amber-950/80 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
                 >
                   <span className="text-base sm:text-lg font-bold">Appoint GM</span>
                   <svg 
@@ -927,7 +915,7 @@ export default function Dashboard() {
                 
                 {/* Expandable Content */}
                 {isAppointGMExpanded && (
-                  <div className="p-4 sm:p-6 border-t border-amber-400/20">
+                  <div className="p-4 sm:p-6 border-t border-amber-900/50">
                     <div className="space-y-4">
                       <div>
                         <label className="block text-amber-300 text-sm font-medium mb-2">
@@ -938,18 +926,18 @@ export default function Dashboard() {
                           value={appointGMUsername}
                           onChange={(e) => setAppointGMUsername(e.target.value)}
                           placeholder="Enter username to appoint as GM"
-                          className="w-full px-4 py-3 bg-purple-800/50 border border-amber-400/30 rounded-lg text-amber-300 placeholder-purple-400 focus:outline-none focus:border-amber-400/60 focus:ring-2 focus:ring-amber-400/20 transition-all duration-300"
+                          className="w-full px-4 py-3 bg-amber-950/80 border border-amber-900/60 rounded-lg text-amber-300 placeholder-amber-500 focus:outline-none focus:border-amber-900/60 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300"
                         />
                       </div>
                       
                       <button
                         onClick={handleAppointGM}
                         disabled={!appointGMUsername.trim() || isAppointingGM}
-                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-purple-900 font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
                       >
                         {isAppointingGM ? (
                           <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-900"></div>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                             Appointing...
                           </>
                         ) : (
@@ -968,15 +956,17 @@ export default function Dashboard() {
             )}
 
             {/* Your Player Card - Mobile Optimized */}
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 sm:border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 mb-6 sm:mb-8">
+            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden shadow-lg"
+              style={tournamentPanelStyle}
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-amber-400">Your Profile</h2>
-                <button className="px-3 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto">
+                <h2 className="text-lg sm:text-xl font-bold text-orange-300">Your Profile</h2>
+                <button className="px-3 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto">
                   Edit Profile
                 </button>
               </div>
               
-              <div className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-xl p-4 sm:p-6 border border-amber-400/20">
+              <div className="bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-xl p-4 sm:p-6 border border-amber-900/50">
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-6">
                   {/* Profile Picture - Mobile Friendly */}
                   <div className="relative">
@@ -995,7 +985,7 @@ export default function Dashboard() {
                         />
                       ) : null}
                       <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
-                        <span className="text-3xl sm:text-2xl font-bold text-purple-900">
+                        <span className="text-3xl sm:text-2xl font-bold text-white">
                           {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
@@ -1003,7 +993,7 @@ export default function Dashboard() {
                     
                     {/* Upload Button - Mobile Friendly */}
                     <div className="absolute -bottom-1 -right-1">
-                      <label className="w-8 h-8 sm:w-6 sm:h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-purple-900 cursor-pointer hover:from-green-500 hover:to-green-700 active:scale-95 transition-all duration-200 touch-manipulation">
+                      <label className="w-8 h-8 sm:w-6 sm:h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-amber-900 cursor-pointer hover:from-green-500 hover:to-green-700 active:scale-95 transition-all duration-200 touch-manipulation">
                         <input
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp,image/heic"
@@ -1042,10 +1032,10 @@ export default function Dashboard() {
 
                     {/* Level and XP Bar - Mobile Friendly */}
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
-                      <span className="text-lg sm:text-xl font-bold text-amber-400">
+                      <span className="text-lg sm:text-xl font-bold text-orange-300">
                         LVL {userProfile?.stats?.level || userPlayer?.level || 1}
                       </span>
-                      <div className="flex-1 bg-purple-900/50 rounded-full h-3 sm:h-4 overflow-hidden border-2 border-amber-400/60">
+                      <div className="flex-1 bg-amber-950/80 rounded-full h-3 sm:h-4 overflow-hidden border-2 border-amber-900/60">
                         {(userProfile?.stats || userPlayer) ? (() => {
                           // Derive from actual XP to avoid mismatch with level calc
                           const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
@@ -1079,16 +1069,16 @@ export default function Dashboard() {
                     {/* Stats Row - Mobile Friendly */}
                     <div className="grid grid-cols-3 gap-2 sm:gap-4">
                       <div className="text-center">
-                        <div className="text-xl sm:text-2xl font-bold text-amber-400">{userPlayer?.matchesPlayed || 0}</div>
-                        <div className="text-xs text-purple-300">Games Played</div>
+                        <div className="text-xl sm:text-2xl font-bold text-orange-300">{userPlayer?.matchesPlayed || 0}</div>
+                        <div className="text-xs text-amber-300">Games Played</div>
                       </div>
                       <div className="text-center">
                         <div className="text-xl sm:text-2xl font-bold text-green-400">{userPlayer?.wins || 0}</div>
-                        <div className="text-xs text-purple-300">Games Won</div>
+                        <div className="text-xs text-amber-300">Games Won</div>
                       </div>
                       <div className="text-center">
                         <div className="text-xl sm:text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
-                        <div className="text-xs text-purple-300">Win Rate</div>
+                        <div className="text-xs text-amber-300">Win Rate</div>
                       </div>
                     </div>
 
@@ -1098,7 +1088,7 @@ export default function Dashboard() {
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                           (userPlayer?.role || userPlayer?.Role) === 'GM' 
                             ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/50' 
-                            : 'bg-purple-500/20 text-purple-300 border border-purple-400/50'
+                            : 'bg-amber-800/40 text-amber-300 border border-amber-700/50'
                         }`}>
                           {(userPlayer?.role || userPlayer?.Role) === 'GM' ? '👑 Game Master' : `🎮 ${userPlayer?.role || userPlayer?.Role}`}
                         </span>
@@ -1111,8 +1101,8 @@ export default function Dashboard() {
                   {/* Achievements */}
                   <div className="flex flex-col space-y-2">
                     <div className="text-center">
-                      <div className="text-xl sm:text-2xl font-bold text-amber-400">+{userPlayer?.totalScore || 0}</div>
-                      <div className="text-xs text-purple-300">Total Points</div>
+                      <div className="text-xl sm:text-2xl font-bold text-orange-300">+{userPlayer?.totalScore || 0}</div>
+                      <div className="text-xs text-amber-300">Total Points</div>
                     </div>
                     <div className="flex space-x-1 sm:space-x-2 justify-center">
                       {userPlayer?.mvps > 0 && (
@@ -1142,84 +1132,44 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-amber-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-amber-400 font-medium">Add New Game</h3>
-                    <p className="text-purple-300 text-sm">Record a new game session</p>
-                  </div>
-                </div>
-              </button>
-
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-green-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-green-400 font-medium">View Statistics</h3>
-                    <p className="text-purple-300 text-sm">Detailed game analytics</p>
-                  </div>
-                </div>
-              </button>
-
-              <button className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border-4 border-sky-200/70 hover:border-sky-200/90 shadow-lg shadow-sky-200/20 hover:shadow-sky-200/30 transition-all duration-300 text-left">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-500/20 rounded-lg">
-                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-blue-400 font-medium">Game Library</h3>
-                    <p className="text-purple-300 text-sm">Manage your collection</p>
-                  </div>
-                </div>
-              </button>
-            </div>
+            
           </div>
 
           {/* Right Sidebar - Tournaments List */}
           <div className="w-full lg:w-96 flex-shrink-0 relative">
             {/* Stardust around Board Games */}
-            <div className="absolute -top-4 -left-4 w-6 h-6 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
-            <div className="absolute -top-2 -right-2 w-3 h-3 bg-blue-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.5s' }} />
-            <div className="absolute top-8 -left-6 w-2 h-2 bg-purple-300 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '2.2s' }} />
-            <div className="absolute top-16 -right-4 w-4 h-4 bg-cyan-200 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.3s' }} />
+            <div className="absolute -top-4 -left-4 w-6 h-6 bg-orange-400 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
+            <div className="absolute -top-2 -right-2 w-3 h-3 bg-emerald-400 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute top-8 -left-6 w-2 h-2 bg-orange-400 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '2.2s' }} />
+            <div className="absolute top-16 -right-4 w-4 h-4 bg-emerald-300 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.3s' }} />
             <div className="absolute top-24 -left-2 w-1 h-1 bg-white rounded-full opacity-90 animate-pulse" style={{ animationDelay: '1.8s' }} />
-            <div className="absolute top-32 -right-6 w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '2.7s' }} />
+            <div className="absolute top-32 -right-6 w-3 h-3 bg-emerald-400 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '2.7s' }} />
             
             {/* Floating stardust particles */}
-            <div className="absolute top-12 left-2 w-1 h-1 bg-cyan-400 rounded-full opacity-80 animate-ping" style={{ animationDuration: '3s', animationDelay: '1.2s' }} />
-            <div className="absolute top-20 right-1 w-1 h-1 bg-purple-400 rounded-full opacity-70 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '2.8s' }} />
-            <div className="absolute top-28 left-1 w-1 h-1 bg-blue-300 rounded-full opacity-90 animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+            <div className="absolute top-12 left-2 w-1 h-1 bg-orange-400 rounded-full opacity-80 animate-ping" style={{ animationDuration: '3s', animationDelay: '1.2s' }} />
+            <div className="absolute top-20 right-1 w-1 h-1 bg-orange-400 rounded-full opacity-70 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '2.8s' }} />
+            <div className="absolute top-28 left-1 w-1 h-1 bg-emerald-400 rounded-full opacity-90 animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
             
             {/* Cosmic dust near board games */}
-            <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-radial from-cyan-500/5 via-blue-500/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
-            <div className="absolute -top-4 -right-8 w-24 h-24 bg-gradient-radial from-purple-500/6 via-cyan-500/2 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '2.5s' }} />
+            <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-radial from-orange-500/5 via-emerald-500/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+            <div className="absolute -top-4 -right-8 w-24 h-24 bg-gradient-radial from-orange-500/6 via-emerald-500/2 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '2.5s' }} />
             
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-4 border-sky-200/70 shadow-lg shadow-sky-200/20 lg:sticky lg:top-8">
+            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 shadow-lg lg:sticky lg:top-8 relative overflow-hidden"
+              style={tournamentPanelStyle}
+            >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-amber-400">Tournaments</h2>
+                <h2 className="text-xl font-bold text-orange-300">Tournaments</h2>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={fetchTournaments}
-                    className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm"
+                    className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-sm"
                   >
                     Refresh
                   </button>
                   {isGM && (
                     <button 
                       onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                      className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg transition-all duration-300"
+                      className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg transition-all duration-300"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -1235,10 +1185,10 @@ export default function Dashboard() {
                   <input
                     type="text"
                     placeholder="Search tournaments..."
-                    className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
@@ -1250,13 +1200,13 @@ export default function Dashboard() {
                 {tournamentsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
-                    <p className="text-amber-400 text-lg">Loading tournaments...</p>
+                    <p className="text-orange-300 text-lg">Loading tournaments...</p>
                   </div>
                 ) : tournaments.length > 0 ? tournaments.map((t: any) => (
                   <div
                     key={t.id}
                     onClick={() => openTournamentModal(t, false)}
-                    className="group bg-gradient-to-r from-purple-900/50 to-purple-800/50 hover:from-purple-800/60 hover:to-purple-700/60 rounded-lg p-5 border-4 border-sky-200/40 hover:border-sky-200/70 shadow-md shadow-sky-200/10 hover:shadow-sky-200/20 transition-all duration-300 cursor-pointer"
+                    className="group bg-gradient-to-r from-amber-950/70 to-amber-900/70 hover:from-amber-950/80 hover:via-amber-900/80 hover:to-amber-950/80 rounded-lg p-5 border-4 border-orange-500/40 hover:border-orange-500/40 shadow-md shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
@@ -1269,18 +1219,18 @@ export default function Dashboard() {
                         <h3 className="text-amber-300 font-semibold text-sm truncate group-hover:text-amber-200 transition-colors">
                           {t.name}
                         </h3>
-                        <p className="text-purple-300 text-xs mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-amber-300 text-xs mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           Click to view tournament details
                         </p>
-                        <p className="text-purple-300 text-xs mb-1">{t.game}</p>
-                        <p className="text-purple-400 text-xs">
+                        <p className="text-amber-300 text-xs mb-1">{t.game}</p>
+                        <p className="text-amber-300/80 text-xs">
                           GM: {t.gameMasterUsername || 'Unknown'}
                         </p>
                         
                         {/* Game Details - Flexible layout */}
                         <div className="space-y-2">
                           {/* Details with flex-wrap */}
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-purple-400">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-amber-300/80">
                             <span className="flex items-center whitespace-nowrap">
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -1311,10 +1261,10 @@ export default function Dashboard() {
                         {/* Status */}
                         <div className="flex items-center justify-between mt-2 min-w-0">
                           <div className="flex items-center space-x-1 min-w-0 flex-1">
-                            <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 text-orange-300 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            <span className="text-amber-400 text-xs font-medium truncate">{t.name}</span>
+                            <span className="text-orange-300 text-xs font-medium truncate">{t.name}</span>
                           </div>
                           
                           <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
@@ -1333,7 +1283,7 @@ export default function Dashboard() {
                               e.stopPropagation();
                               openMembersModal(t);
                             }}
-                            className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-xs"
+                            className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-xs"
                           >
                             View Members
                           </button>
@@ -1343,15 +1293,15 @@ export default function Dashboard() {
                   </div>
                 )) : (
                   <div className="text-center py-8">
-                    <div className="text-purple-300 text-lg">No tournaments available</div>
-                    <div className="text-purple-400 text-sm mt-2">Tournaments will appear here as they are created</div>
+                    <div className="text-amber-300 text-lg">No tournaments available</div>
+                    <div className="text-amber-300/80 text-sm mt-2">Tournaments will appear here as they are created</div>
                   </div>
                 )}
               </div>
 
               {/* View All Button */}
-              <div className="mt-6 pt-4 border-t border-purple-700/30">
-                <button className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">
+              <div className="mt-6 pt-4 border-t border-amber-900/50">
+                <button className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">
                   View All Tournaments
                 </button>
               </div>
@@ -1362,7 +1312,7 @@ export default function Dashboard() {
             <div className="mt-6 sm:mt-8">
               <button
                 onClick={() => router.push('/guild')}
-                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg"
+                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg"
               >
                 <svg 
                   className="w-6 h-6" 
@@ -1382,13 +1332,24 @@ export default function Dashboard() {
       {/* Tournament Management Modal */}
       {isTournamentModalOpen && selectedTournament && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-2xl shadow-sky-200/20 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+          <div className="rounded-xl border-2 border-amber-900/40 shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden relative"
+            style={{
+              backgroundColor: 'rgb(68, 36, 19)',
+              background: 'linear-gradient(to bottom right, rgb(68, 36, 19) 0%, rgb(87, 44, 23) 50%, rgb(68, 36, 19) 100%)',
+              backgroundImage: `
+                linear-gradient(90deg, transparent 0%, rgba(68, 36, 19, 0.06) 50%, transparent 100%),
+                linear-gradient(0deg, rgba(68, 36, 19, 0.03) 0%, transparent 30%, rgba(68, 36, 19, 0.03) 50%, transparent 70%, rgba(68, 36, 19, 0.03) 100%)
+              `,
+              backgroundSize: '100% 3px, 100% 30px',
+              opacity: '1'
+            }}
+          >
             {/* Modal Header */}
-            <div className="p-6 border-b border-sky-200/20">
+            <div className="p-6 border-b border-amber-900/40">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-amber-400">{selectedTournament.name}</h2>
-                  <p className="text-purple-300">{selectedTournament.game}</p>
+                  <h2 className="text-2xl font-bold text-orange-300">{selectedTournament.name}</h2>
+                  <p className="text-amber-300">{selectedTournament.game}</p>
                 </div>
                 <button
                   onClick={closeTournamentModal}
@@ -1406,30 +1367,30 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Tournament Stats */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-amber-400">Tournament Stats</h3>
+                  <h3 className="text-lg font-bold text-orange-300">Tournament Stats</h3>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
-                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.memberCount}</div>
-                      <div className="text-xs text-purple-300 truncate">Current Members</div>
+                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
+                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.memberCount}</div>
+                      <div className="text-xs text-amber-300 truncate">Current Members</div>
                     </div>
-                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
-                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.maxMembers}</div>
-                      <div className="text-xs text-purple-300 truncate">Max Members</div>
+                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
+                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.maxMembers}</div>
+                      <div className="text-xs text-amber-300 truncate">Max Members</div>
                     </div>
-                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
-                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.xpReward || 100}</div>
-                      <div className="text-xs text-purple-300 truncate">XP Reward</div>
+                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
+                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.xpReward || 100}</div>
+                      <div className="text-xs text-amber-300 truncate">XP Reward</div>
                     </div>
-                    <div className="bg-purple-800/40 rounded-lg p-3 border border-sky-200/20 min-w-0">
-                      <div className="text-xl font-bold text-amber-400 truncate">{selectedTournament.mvpXpReward || 50}</div>
-                      <div className="text-xs text-purple-300 truncate">MVP XP Reward</div>
+                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
+                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.mvpXpReward || 50}</div>
+                      <div className="text-xs text-amber-300 truncate">MVP XP Reward</div>
                     </div>
                   </div>
 
-                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
-                    <div className="text-sm text-purple-300 mb-2">Tournament Date</div>
-                    <div className="text-amber-400 font-semibold">
+                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
+                    <div className="text-sm text-amber-300 mb-2">Tournament Date</div>
+                    <div className="text-orange-300 font-semibold">
                       {new Date(selectedTournament.tournamentDate).toLocaleDateString('de-DE', {
                         weekday: 'long',
                         year: 'numeric',
@@ -1439,15 +1400,15 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
-                    <div className="text-sm text-purple-300 mb-2">Status</div>
+                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
+                    <div className="text-sm text-amber-300 mb-2">Status</div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       selectedTournament.phase === 0 
                         ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
                         : selectedTournament.phase === 1
                         ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
                         : selectedTournament.phase === 2
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30'
+                        ? 'bg-amber-800/40 text-amber-300 border border-amber-900/50'
                         : selectedTournament.phase === 3
                         ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30'
                         : 'bg-red-500/20 text-red-300 border border-red-400/30'
@@ -1456,9 +1417,9 @@ export default function Dashboard() {
                     </span>
                   </div>
 
-                  <div className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20">
-                    <div className="text-sm text-purple-300 mb-2">Game Master</div>
-                    <div className="text-amber-400 font-semibold">
+                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
+                    <div className="text-sm text-amber-300 mb-2">Game Master</div>
+                    <div className="text-orange-300 font-semibold">
                       {selectedTournament.gameMasterUsername || 'Unknown GM'}
                     </div>
                   </div>
@@ -1467,13 +1428,13 @@ export default function Dashboard() {
                 {/* Tournament Members */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-amber-400">Tournament Members</h3>
+                    <h3 className="text-lg font-bold text-orange-300">Tournament Members</h3>
                     {/* Only show Add Player functionality for tournaments from My Tournaments section and not finished */}
                     {selectedTournament && isFromMyTournaments && selectedTournament.phase !== 2 && (
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => openAddMemberModal(selectedTournament)}
-                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 rounded-lg text-sm font-medium transition-all duration-300"
+                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-sm font-medium transition-all duration-300"
                         >
                           Add Member
                         </button>
@@ -1481,25 +1442,25 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <div className="bg-purple-800/40 rounded-lg border border-sky-200/20 max-h-80 overflow-y-auto">
+                  <div className="bg-amber-950/70 rounded-lg border border-amber-900/40 max-h-80 overflow-y-auto">
                     {membersLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
-                        <p className="text-amber-400">Loading members...</p>
+                        <p className="text-orange-300">Loading members...</p>
                       </div>
                     ) : tournamentMembers.length > 0 ? (
                       <div className="space-y-2 p-4">
                         {tournamentMembers.map((member: any, index: number) => (
-                          <div key={member.id} className="flex items-center justify-between bg-purple-700/30 rounded-lg p-3 min-w-0">
+                          <div key={member.id} className="flex items-center justify-between bg-amber-900/60 rounded-lg p-3 min-w-0">
                             <div className="flex items-center space-x-3 min-w-0 flex-1">
                               <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-sm font-bold text-purple-900">
+                                <span className="text-sm font-bold text-white">
                                   {member.nickname?.charAt(0).toUpperCase() || 'P'}
                                 </span>
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="text-amber-300 font-medium text-sm truncate">{member.nickname}</div>
-                                <div className="text-purple-400 text-xs truncate">
+                                <div className="text-amber-300/80 text-xs truncate">
                                   Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
                                 </div>
                               </div>
@@ -1535,8 +1496,8 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <div className="text-purple-300 text-lg">No members yet</div>
-                        <div className="text-purple-400 text-sm mt-2">Players will appear here when they join</div>
+                        <div className="text-amber-300 text-lg">No members yet</div>
+                        <div className="text-amber-300/80 text-sm mt-2">Players will appear here when they join</div>
                       </div>
                     )}
                   </div>
@@ -1545,23 +1506,23 @@ export default function Dashboard() {
 
               {/* Tournament Finished Banner */}
               {selectedTournament.phase === 2 && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-purple-800/50 to-purple-700/50 border border-purple-400/30 rounded-lg">
+                <div className="mt-6 p-4 bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 border border-amber-900/50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-purple-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
                       <h3 className="text-amber-300 font-semibold">Tournament Finished</h3>
-                      <p className="text-purple-300 text-sm">This tournament has been completed. XP rewards have been distributed and no further changes can be made.</p>
+                      <p className="text-amber-300 text-sm">This tournament has been completed. XP rewards have been distributed and no further changes can be made.</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="mt-6 pt-6 border-t border-sky-200/20">
+              <div className="mt-6 pt-6 border-t border-amber-900/40">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap gap-2">
                     <button 
@@ -1580,14 +1541,14 @@ export default function Dashboard() {
                     <button 
                       onClick={openEndModal}
                       disabled={selectedTournament.phase === 2}
-                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-purple-900 rounded-lg font-medium text-sm transition-all duration-300"
+                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
                     >
                       {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Finish Tournament'}
                     </button>
                   </div>
                   <button
                     onClick={closeTournamentModal}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium text-sm"
+                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium text-sm"
                   >
                     Close
                   </button>
@@ -1680,7 +1641,7 @@ export default function Dashboard() {
       {/* Avatar Modal */}
       {isAvatarModalOpen && selectedAvatar && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-400/30">
+          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-900/60">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-amber-300">
@@ -1688,7 +1649,7 @@ export default function Dashboard() {
               </h3>
               <button
                 onClick={handleAvatarModalClose}
-                className="text-purple-300 hover:text-amber-400 transition-colors p-2 hover:bg-purple-800/50 rounded-full"
+                className="text-amber-300 hover:text-orange-300 transition-colors p-2 hover:bg-amber-950/80 rounded-full"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1710,7 +1671,7 @@ export default function Dashboard() {
                   }}
                 />
                 <div className="w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center hidden">
-                  <span className="text-6xl font-bold text-purple-900">
+                  <span className="text-6xl font-bold text-white">
                     {selectedAvatar.nickname.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -1719,7 +1680,7 @@ export default function Dashboard() {
             
             {/* Footer */}
             <div className="text-center">
-              <p className="text-purple-200 text-sm">
+              <p className="text-amber-300 text-sm">
                 Click outside or press ESC to close
               </p>
             </div>
