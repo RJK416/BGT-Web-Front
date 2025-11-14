@@ -1,3 +1,7 @@
+.font-medieval {
+  font-family: var(--font-medieval), "Cinzel", "Times New Roman", serif;
+}
+
 .medieval-panel {
   position: relative;
   border-radius: 18px;

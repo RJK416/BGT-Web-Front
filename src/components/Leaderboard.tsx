@@ -134,6 +134,96 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
     color: tavernPalette.parchment
   };
 
+  const rowContainerStyle: CSSProperties = {
+    background: 'linear-gradient(180deg, rgba(41, 26, 17, 0.96) 0%, rgba(27, 18, 12, 0.98) 100%)',
+    border: '1px solid rgba(78, 49, 28, 0.65)',
+    borderRadius: '16px',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 28px rgba(8, 6, 4, 0.55)',
+    padding: '18px 22px',
+    position: 'relative'
+  };
+
+  const rankBadgeStyle: CSSProperties = {
+    width: '42px',
+    height: '42px',
+    borderRadius: '9999px',
+    background: 'radial-gradient(circle at 30% 30%, #6c4729 0%, #2f1b10 70%)',
+    border: '1px solid rgba(120, 80, 46, 0.85)',
+    boxShadow: 'inset 0 2px 4px rgba(255, 255, 255, 0.12), 0 6px 10px rgba(0, 0, 0, 0.45)',
+    color: '#f4ebd0',
+    fontSize: '1.05rem',
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  const avatarBadgeStyle: CSSProperties = {
+    width: '44px',
+    height: '44px',
+    borderRadius: '9999px',
+    background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+    border: '1px solid rgba(231, 180, 93, 0.7)',
+    boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+    color: '#2a1d12',
+    fontSize: '1.1rem',
+    fontWeight: 700,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  const guildBadgeStyle: CSSProperties = {
+    padding: '2px 10px',
+    borderRadius: '9999px',
+    border: '1px solid rgba(156, 107, 62, 0.45)',
+    background: 'rgba(60, 122, 87, 0.15)',
+    color: '#d8e6ce',
+    fontSize: '0.65rem',
+    fontWeight: 600,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase'
+  };
+
+  const xpTrackStyle: CSSProperties = {
+    flex: 1,
+    height: '7px',
+    borderRadius: '9999px',
+    background: 'linear-gradient(180deg, rgba(21, 31, 28, 0.95) 0%, rgba(16, 22, 18, 0.95) 100%)',
+    border: '1px solid rgba(46, 32, 22, 0.7)',
+    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.6)',
+    overflow: 'hidden'
+  };
+
+  const xpFillBaseStyle: CSSProperties = {
+    height: '100%',
+    borderRadius: '9999px',
+    background: 'linear-gradient(180deg, #c08a37 0%, #8b5c20 100%)',
+    boxShadow: '0 0 12px rgba(192, 138, 55, 0.45)'
+  };
+
+  const pointsBadgeStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    width: '110px'
+  };
+
+  const pointsBadgeInnerStyle: CSSProperties = {
+    width: '110px',
+    minWidth: '110px',
+    padding: '7px 0',
+    fontWeight: 700,
+    fontSize: '1rem',
+    color: '#f4ebd0',
+    background: 'linear-gradient(180deg, #3a2a1d 0%, #23160d 100%)',
+    border: '1px solid rgba(120, 80, 46, 0.9)',
+    borderRadius: '12px',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 10px rgba(0, 0, 0, 0.45)',
+    textAlign: 'center'
+  };
+
   const mergedContainerStyle: CSSProperties = {
     ...baseContainerStyle,
     ...style
@@ -146,7 +236,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       >
         {showTitle && (
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-[#F4EBD0]">Top Players</h2>
+            <h2 className="text-2xl font-bold text-[#F4EBD0] medieval-heading">Top Players</h2>
           </div>
         )}
         <div className="flex items-center justify-center py-8">
@@ -164,7 +254,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       >
         {showTitle && (
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-[#F4EBD0]">Top Players</h2>
+            <h2 className="text-2xl font-bold text-[#F4EBD0] medieval-heading">Top Players</h2>
           </div>
         )}
         <div className="text-center py-8">
@@ -187,7 +277,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
     >
       {showTitle && (
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-[#F4EBD0]">Top Players</h2>
+          <h2 className="text-2xl font-bold text-[#F4EBD0] medieval-heading">Top Players</h2>
         </div>
       )}
 
@@ -234,104 +324,89 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
           const xpInCurrentLevel = xp - levelBase;
           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
 
+          const guildStyle = {
+            ...guildBadgeStyle,
+            background: player.guild ? 'rgba(60, 122, 87, 0.18)' : 'rgba(60, 122, 87, 0.08)',
+            color: player.guild ? '#d7ead3' : '#ccba93'
+          };
+
           return (
             <div
-              key={player.id} 
-              className="rounded-xl p-4 border border-[#9C6B3E]/60 bg-[#2A1D12]/80 hover:bg-[#3B2A1E]/85 hover:border-[#E7B45D]/60 transition-all duration-300 cursor-pointer shadow-[0_8px_20px_rgba(10,8,6,0.6)]"
+              key={player.id}
+              style={rowContainerStyle}
+              className="group cursor-pointer"
               onClick={() => handlePlayerClick(player.nickname)}
             >
-              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-                {/* Rank */}
-                <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-[#E7B45D] to-[#B17A3D] rounded-full flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]">
-                  <span className="text-sm font-bold text-[#2A1D12]">{index + 1}</span>
-                </div>
-                
-                {/* Profile Picture */}
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-400">
-                    {player.avatarUrl ? (
-                      <img
-                        src={player.avatarUrl}
-                        alt={player.nickname}
-                        className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent triggering the row click
-                          handleAvatarClick(player.avatarUrl!, player.nickname);
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center ${player.avatarUrl ? 'hidden' : ''}`}>
-                      <span className="text-lg font-bold text-amber-900">
-                        {player.nickname.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex items-center gap-4 sm:gap-5 flex-wrap">
+                <div style={rankBadgeStyle} className="font-medieval select-none">
+                  {index + 1}
                 </div>
 
-                {/* Player Info */}
-                <div className="flex-1 min-w-[220px]">
-                  <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                    <h3 className="text-base sm:text-lg font-bold text-[#F4EBD0] truncate">
+                <div
+                  style={avatarBadgeStyle}
+                  className="select-none transition-transform duration-200 group-hover:scale-105"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (player.avatarUrl) {
+                      handleAvatarClick(player.avatarUrl, player.nickname);
+                    }
+                  }}
+                >
+                  {player.nickname.charAt(0).toUpperCase()}
+                </div>
+
+                <div className="flex-1 min-w-[240px]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold text-[#F4EBD0] truncate" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
                       {player.nickname}
                     </h3>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold border ${
-                      player.guild 
-                        ? 'bg-[#3C7A57]/30 text-[#CFE6D8] border-[#3C7A57]/80 shadow-[0_0_10px_rgba(60,122,87,0.4)]'
-                        : 'bg-[#2A1D12]/80 text-[#E7B45D] border-[#9C6B3E]/70 shadow-[0_0_8px_rgba(156,107,62,0.35)]'
-                    }`}>
-                      {player.guild || "No guild"}
-                    </span>
+                    <span style={guildStyle}>{player.guild || 'No guild'}</span>
                   </div>
 
-                  {/* Level and XP Bar */}
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-xs sm:text-sm font-semibold text-[#F4EBD0]">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#d4b077] font-medieval">
                       LVL {player.level}
                     </span>
-                    <div className="flex-1 bg-[#1C352D]/80 rounded-full h-2 sm:h-3 overflow-hidden border border-[#9C6B3E]/50">
-                      <div 
-                        className="h-full bg-gradient-to-r from-[#E7B45D] to-[#B17A3D] transition-all duration-500"
-                        style={{ width: `${xpPercentage}%` }}
+                    <div style={xpTrackStyle}>
+                      <div
+                        style={{
+                          ...xpFillBaseStyle,
+                          width: `${xpPercentage}%`
+                        }}
                       ></div>
                     </div>
-                    <span className="text-[10px] sm:text-xs font-medium text-[#B6AA96]">
+                    <span className="text-xs font-medium text-[#9f8f79]">
                       {xpPercentage}%
                     </span>
                   </div>
                 </div>
 
-                {/* Achievements and Score */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                  {/* Achievement Icons */}
-                  <div className="flex gap-2">
-                    {player.mvps > 0 && (
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-[#E7B45D] to-[#B17A3D] rounded-full flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.35)]" title={`${player.mvps} MVP${player.mvps > 1 ? 's' : ''}`}>
-                        <span className="text-[#2A1D12] text-sm">⭐</span>
-                      </div>
-                    )}
-                    {player.tournamentsWon > 0 && (
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-[#C99845] to-[#8B5E24] rounded-full flex items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.25)]" title={`${player.tournamentsWon} Tournament Win${player.tournamentsWon > 1 ? 's' : ''}`}>
-                        <span className="text-[#2A1D12] text-sm">👑</span>
-                      </div>
-                    )}
-                    {player.wins > 0 && (
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-[#2A1D12] rounded-full flex items-center justify-center border border-[#9C6B3E]/70 shadow-[0_0_6px_rgba(0,0,0,0.6)]" title={`${player.wins} Win${player.wins > 1 ? 's' : ''}`}>
-                        <span className="text-[#E7B45D] text-sm">🏆</span>
-                      </div>
-                    )}
-                  </div>
+                <div className="flex items-center gap-5">
+                  {player.mvps > 0 || player.tournamentsWon > 0 || player.wins > 0 ? (
+                    <div className="flex items-center gap-2">
+                      {player.mvps > 0 && (
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#c08a37] to-[#8b5c20] flex items-center justify-center text-[#2a1d12] text-sm shadow-[inset_0_1px_3px_rgba(255,255,255,0.28)]" title={`${player.mvps} MVP${player.mvps > 1 ? 's' : ''}`}>
+                          ⭐
+                        </div>
+                      )}
+                      {player.tournamentsWon > 0 && (
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#c99845] to-[#8b5e24] flex items-center justify-center text-[#2a1d12] text-sm shadow-[inset_0_1px_3px_rgba(255,255,255,0.22)]" title={`${player.tournamentsWon} Tournament Win${player.tournamentsWon > 1 ? 's' : ''}`}>
+                          👑
+                        </div>
+                      )}
+                      {player.wins > 0 && (
+                        <div className="w-7 h-7 rounded-full bg-[#2a1d12] border border-[#9c6b3e]/70 flex items-center justify-center text-[#d4b077] text-sm shadow-[0_0_6px_rgba(0,0,0,0.55)]" title={`${player.wins} Win${player.wins > 1 ? 's' : ''}`}>
+                          🏆
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
 
-                  {/* Score */}
-                  <div className="text-right">
-                    <div className="text-base sm:text-lg font-bold text-[#E7B45D]">
+                    <div style={pointsBadgeStyle}>
+                    <div style={pointsBadgeInnerStyle} className="font-medieval">
                       +{player.totalScore}
                     </div>
-                    <div className="text-[10px] sm:text-xs text-[#B6AA96]">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-[#8f7d66] font-semibold">
                       points
                     </div>
                   </div>
