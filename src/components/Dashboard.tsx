@@ -476,49 +476,104 @@ export default function Dashboard() {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      {message && <div className="text-sm text-amber-300">{message}</div>}
+      {message && <div className="text-sm text-[#F4EBD0]">{message}</div>}
       <div>
-        <label className="block text-amber-300 text-sm mb-1">Name</label>
-        <input value={name} onChange={e=>setName(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+        <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Name</label>
+        <input 
+          value={name} 
+          onChange={e=>setName(e.target.value)} 
+          className="w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+          required 
+        />
       </div>
       <div>
-        <label className="block text-amber-300 text-sm mb-1">Game</label>
-        <input value={game} onChange={e=>setGame(e.target.value)} className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+        <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Game</label>
+        <input 
+          value={game} 
+          onChange={e=>setGame(e.target.value)} 
+          className="w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+          required 
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label className="block text-amber-300 text-sm mb-1">Date (DD.MM.YYYY)</label>
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Date (DD.MM.YYYY)</label>
           <input
             type="text"
             placeholder="dd.mm.yyyy"
             value={tournamentDate}
             onChange={e=>setTournamentDate(e.target.value)}
-            className="w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100"
+            className="w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all"
             pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
             title="Enter date as DD.MM.YYYY"
             required
           />
         </div>
         <div>
-          <label className="block text-amber-300 text-sm mb-1">Max Members</label>
-          <input type="number" min={1} value={maxMembers} onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Max Members</label>
+          <input 
+            type="number" 
+            min={1} 
+            value={maxMembers} 
+            onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} 
+            className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+            required 
+          />
         </div>
         <div>
-          <label className="block text-amber-300 text-sm mb-1">Initial Members</label>
-          <input type="number" min={0} value={memberCount} onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Initial Members</label>
+          <input 
+            type="number" 
+            min={0} 
+            value={memberCount} 
+            onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} 
+            className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+            required 
+          />
         </div>
         <div>
-          <label className="block text-amber-300 text-sm mb-1">XP Reward</label>
-          <input type="number" min={0} value={xpReward} onChange={e=>setXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">XP Reward</label>
+          <input 
+            type="number" 
+            min={0} 
+            value={xpReward} 
+            onChange={e=>setXpReward(parseInt(e.target.value||'0'))} 
+            className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+            required 
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-amber-300 text-sm mb-1">MVP XP Reward</label>
-          <input type="number" min={0} value={mvpXpReward} onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} className="no-spinner w-full pl-3 pr-3 py-2 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100" required />
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">MVP XP Reward</label>
+          <input 
+            type="number" 
+            min={0} 
+            value={mvpXpReward} 
+            onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} 
+            className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
+            required 
+          />
         </div>
       </div>
-      <button disabled={creating} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg">
+      <button 
+        disabled={creating} 
+        style={{
+          padding: '10px 16px',
+          background: creating 
+            ? 'linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%)'
+            : 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+          border: '1px solid rgba(156, 107, 62, 0.7)',
+          borderRadius: '8px',
+          color: creating ? '#999' : '#2A1D12',
+          fontSize: '0.875rem',
+          fontWeight: 600,
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.3s',
+          cursor: creating ? 'not-allowed' : 'pointer'
+        }}
+        className="hover:opacity-90"
+      >
         {creating ? 'Creating...' : 'Create Tournament'}
       </button>
     </form>
@@ -738,14 +793,24 @@ export default function Dashboard() {
             <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8" />
 
             {/* Guild Scoreboard */}
-            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
-              style={tournamentPanelStyle}
+            <div className="medieval-panel p-4 sm:p-6 mb-6 sm:mb-8"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-orange-300">Top Guilds</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-[#F4EBD0] medieval-heading">Top Guilds</h2>
                 <button
                   onClick={fetchGuilds}
-                  className="px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg text-sm"
+                  style={{
+                    padding: '6px 12px',
+                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                    border: '1px solid rgba(156, 107, 62, 0.7)',
+                    borderRadius: '8px',
+                    color: '#2A1D12',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                    transition: 'all 0.3s'
+                  }}
+                  className="hover:opacity-90"
                 >
                   Refresh
                 </button>
@@ -753,37 +818,81 @@ export default function Dashboard() {
 
               {guildsLoading ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-400 mr-2" />
-                  <span className="text-orange-300">Loading guilds...</span>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#E7B45D] mr-2" />
+                  <span className="text-[#F4EBD0]">Loading guilds...</span>
                 </div>
               ) : guilds.length > 0 ? (
                 <div className="space-y-3">
                   {guilds.map((g, idx) => (
-                    <div key={g.id} className="flex items-center justify-between bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-lg p-3 border border-amber-900/50">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-amber-900 font-bold flex items-center justify-center flex-shrink-0">
+                    <div 
+                      key={g.id} 
+                      style={{
+                        background: 'linear-gradient(180deg, rgba(20, 12, 8, 0.98) 0%, rgba(15, 9, 6, 0.99) 100%)',
+                        border: '1px solid rgba(60, 35, 20, 0.8)',
+                        borderRadius: '16px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 14px 28px rgba(0, 0, 0, 0.8)',
+                        padding: '18px 22px',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s'
+                      }}
+                      className="flex items-center justify-between hover:bg-[#2A1D12]/90 hover:border-[#E7B45D]/60"
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div 
+                          style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '9999px',
+                            background: 'radial-gradient(circle at 30% 30%, #6c4729 0%, #2f1b10 70%)',
+                            border: '1px solid rgba(120, 80, 46, 0.85)',
+                            boxShadow: 'inset 0 2px 4px rgba(255, 255, 255, 0.12), 0 6px 10px rgba(0, 0, 0, 0.45)',
+                            color: '#f4ebd0',
+                            fontSize: '1.05rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}
+                          className="font-medieval"
+                        >
                           {idx + 1}
                         </div>
-                        <div className="min-w-0">
-                          <div className="text-orange-200 font-semibold truncate">{g.name}</div>
-                          <div className="text-amber-300/80 text-xs truncate">Leader: {g.creatorName}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[#F4EBD0] font-semibold text-base truncate" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
+                            {g.name}
+                          </div>
+                          <div className="text-[#B6AA96] text-xs truncate mt-1">Leader: {g.creatorName}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 flex-shrink-0 text-xs text-amber-300">
-                        <span className="whitespace-nowrap">Lv {g.level ?? 1}</span>
+                      <div className="flex items-center gap-3 flex-shrink-0 text-xs text-[#B6AA96]">
+                        <span className="whitespace-nowrap font-semibold">Lv {g.level ?? 1}</span>
                         <span className="whitespace-nowrap">{g.memberCount}/{(g as any).maxMember || (g as any).maxMembers || 0} members</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6 text-amber-300">No guilds found</div>
+                <div className="text-center py-6 text-[#F4EBD0]">No guilds found</div>
               )}
 
               <div className="mt-4">
                 <button
                   onClick={() => router.push('/guild')}
-                  className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300"
+                  style={{
+                    width: '100%',
+                    padding: '10px 0',
+                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                    border: '1px solid rgba(156, 107, 62, 0.7)',
+                    borderRadius: '8px',
+                    color: '#2A1D12',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                    transition: 'all 0.3s'
+                  }}
+                  className="hover:opacity-90"
                 >
                   View All Guilds
                 </button>
@@ -793,11 +902,10 @@ export default function Dashboard() {
 
             {/* My Tournaments - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
-                style={tournamentPanelStyle}
+              <div className="medieval-panel p-4 sm:p-6 mb-6 sm:mb-8"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-                  <h2 className="text-lg sm:text-xl font-bold text-orange-300">My Tournaments</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-[#F4EBD0] medieval-heading">My Tournaments</h2>
                   <button
                     onClick={async () => {
                       try {
@@ -815,7 +923,18 @@ export default function Dashboard() {
                         console.error('Error refreshing tournaments:', error);
                       }
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto"
+                    style={{
+                      padding: '8px 16px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s'
+                    }}
+                    className="hover:opacity-90 self-start sm:self-auto"
                   >
                     Refresh
                   </button>
@@ -826,25 +945,53 @@ export default function Dashboard() {
                     <div
                       key={tournament.id}
                       onClick={() => openTournamentModal(tournament, true)}
-                      className="bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-lg p-3 sm:p-4 border border-amber-900/50 hover:border-amber-800/60 transition-all duration-300 cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(180deg, rgba(20, 12, 8, 0.98) 0%, rgba(15, 9, 6, 0.99) 100%)',
+                        border: '1px solid rgba(60, 35, 20, 0.8)',
+                        borderRadius: '16px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 14px 28px rgba(0, 0, 0, 0.8)',
+                        padding: '18px 22px',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s'
+                      }}
+                      className="hover:bg-[#2A1D12]/90 hover:border-[#E7B45D]/60"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex-1">
-                          <h3 className="text-orange-200 font-semibold text-sm sm:text-base">{tournament.name}</h3>
-                          <p className="text-amber-300/80 text-xs sm:text-sm">{tournament.game}</p>
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-amber-300">
+                          <h3 className="text-[#F4EBD0] font-semibold text-base" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
+                            {tournament.name}
+                          </h3>
+                          <p className="text-[#B6AA96] text-xs sm:text-sm mt-1">{tournament.game}</p>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-[#B6AA96]">
                             <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
                             <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
                             <span>{tournament.xpReward || 100} XP</span>
                           </div>
                         </div>
                         <div className="flex justify-end sm:text-right">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            tournament.phase === 0 ? 'bg-green-500/20 text-green-300' :
-                            tournament.phase === 1 ? 'bg-blue-500/20 text-blue-300' :
-                            tournament.phase === 2 ? 'bg-emerald-500/20 text-emerald-300' :
-                            'bg-red-500/20 text-red-300'
-                          }`}>
+                          <span 
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '9999px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              letterSpacing: '0.05em',
+                              textTransform: 'uppercase',
+                              border: tournament.phase === 0 ? '1px solid rgba(60, 122, 87, 0.8)' :
+                                      tournament.phase === 1 ? '1px solid rgba(78, 49, 28, 0.7)' :
+                                      tournament.phase === 2 ? '1px solid rgba(60, 122, 87, 0.8)' :
+                                      '1px solid rgba(128, 44, 44, 0.7)',
+                              background: tournament.phase === 0 ? 'rgba(60, 122, 87, 0.18)' :
+                                         tournament.phase === 1 ? 'rgba(60, 122, 87, 0.08)' :
+                                         tournament.phase === 2 ? 'rgba(60, 122, 87, 0.18)' :
+                                         'rgba(128, 44, 44, 0.15)',
+                              color: tournament.phase === 0 ? '#d7ead3' :
+                                     tournament.phase === 1 ? '#ccba93' :
+                                     tournament.phase === 2 ? '#d7ead3' :
+                                     '#e8a8a8'
+                            }}
+                          >
                             {tournament.phase === 0 ? 'Registration' :
                              tournament.phase === 1 ? 'Started' :
                              tournament.phase === 2 ? 'Finished' : 'Cancelled'}
@@ -854,8 +1001,8 @@ export default function Dashboard() {
                     </div>
                   )) : (
                     <div className="text-center py-8">
-                      <div className="text-amber-300">No tournaments created yet</div>
-                      <div className="text-amber-300/80 text-sm mt-2">Create your first tournament below</div>
+                      <div className="text-[#F4EBD0]">No tournaments created yet</div>
+                      <div className="text-[#B6AA96] text-sm mt-2">Create your first tournament below</div>
                     </div>
                   )}
                 </div>
@@ -864,19 +1011,33 @@ export default function Dashboard() {
 
             {/* Create Tournament - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="rounded-xl border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
-                style={tournamentPanelStyle}
+              <div className="medieval-panel mb-6 sm:mb-8"
               >
                 {/* Expandable Button */}
                 <button
                   onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-amber-950/80 via-amber-900/80 to-amber-950/80 hover:from-amber-950/90 hover:via-amber-900/90 hover:to-amber-950/90 text-orange-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between border-b border-amber-900/50"
+                  style={{
+                    width: '100%',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(180deg, rgba(20, 12, 8, 0.95) 0%, rgba(15, 9, 6, 0.98) 100%)',
+                    border: 'none',
+                    borderBottom: '1px solid rgba(60, 35, 20, 0.6)',
+                    borderRadius: '12px 12px 0 0',
+                    color: '#F4EBD0',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    transition: 'all 0.3s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                  className="hover:bg-[#2A1D12]/90"
                 >
-                  <span className="text-base sm:text-lg font-bold">Create Tournament</span>
+                  <span className="text-base sm:text-lg font-bold medieval-heading">Create Tournament</span>
                   <svg 
                     className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isCreateTournamentExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
-                    stroke="currentColor" 
+                    stroke="#F4EBD0" 
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -885,7 +1046,7 @@ export default function Dashboard() {
                 
                 {/* Expandable Form */}
                 {isCreateTournamentExpanded && (
-                  <div className="p-4 sm:p-6 border-t border-amber-900/50">
+                  <div className="p-4 sm:p-6" style={{ borderTop: '1px solid rgba(60, 35, 20, 0.6)' }}>
                     <CreateTournamentForm />
                   </div>
                 )}
@@ -894,19 +1055,33 @@ export default function Dashboard() {
 
             {/* Appoint GM - Mobile Optimized - Only show for GMs */}
             {isGM && (
-              <div className="rounded-xl border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden"
-                style={tournamentPanelStyle}
+              <div className="medieval-panel mb-6 sm:mb-8"
               >
                 {/* Expandable Button */}
                 <button
                   onClick={() => setIsAppointGMExpanded(!isAppointGMExpanded)}
-                  className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 hover:from-amber-950/80 hover:via-amber-900/80 hover:to-amber-950/80 text-amber-300 font-medium rounded-t-xl transition-all duration-300 flex items-center justify-between"
+                  style={{
+                    width: '100%',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(180deg, rgba(20, 12, 8, 0.95) 0%, rgba(15, 9, 6, 0.98) 100%)',
+                    border: 'none',
+                    borderBottom: '1px solid rgba(60, 35, 20, 0.6)',
+                    borderRadius: '12px 12px 0 0',
+                    color: '#F4EBD0',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    transition: 'all 0.3s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                  className="hover:bg-[#2A1D12]/90"
                 >
-                  <span className="text-base sm:text-lg font-bold">Appoint GM</span>
+                  <span className="text-base sm:text-lg font-bold medieval-heading">Appoint GM</span>
                   <svg 
                     className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ${isAppointGMExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
-                    stroke="currentColor" 
+                    stroke="#F4EBD0" 
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -915,10 +1090,10 @@ export default function Dashboard() {
                 
                 {/* Expandable Content */}
                 {isAppointGMExpanded && (
-                  <div className="p-4 sm:p-6 border-t border-amber-900/50">
+                  <div className="p-4 sm:p-6" style={{ borderTop: '1px solid rgba(60, 35, 20, 0.6)' }}>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-amber-300 text-sm font-medium mb-2">
+                        <label className="block text-[#F4EBD0] text-sm font-medium mb-2">
                           Username
                         </label>
                         <input
@@ -926,14 +1101,33 @@ export default function Dashboard() {
                           value={appointGMUsername}
                           onChange={(e) => setAppointGMUsername(e.target.value)}
                           placeholder="Enter username to appoint as GM"
-                          className="w-full px-4 py-3 bg-amber-950/80 border border-amber-900/60 rounded-lg text-amber-300 placeholder-amber-500 focus:outline-none focus:border-amber-900/60 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all duration-300"
                         />
                       </div>
                       
                       <button
                         onClick={handleAppointGM}
                         disabled={!appointGMUsername.trim() || isAppointingGM}
-                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                        style={{
+                          width: '100%',
+                          padding: '12px 0',
+                          background: !appointGMUsername.trim() || isAppointingGM 
+                            ? 'linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%)'
+                            : 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                          border: '1px solid rgba(156, 107, 62, 0.7)',
+                          borderRadius: '8px',
+                          color: !appointGMUsername.trim() || isAppointingGM ? '#999' : '#2A1D12',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                          transition: 'all 0.3s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          cursor: (!appointGMUsername.trim() || isAppointingGM) ? 'not-allowed' : 'pointer'
+                        }}
+                        className="hover:opacity-90"
                       >
                         {isAppointingGM ? (
                           <>
@@ -956,21 +1150,49 @@ export default function Dashboard() {
             )}
 
             {/* Your Player Card - Mobile Optimized */}
-            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 mb-6 sm:mb-8 relative overflow-hidden shadow-lg"
-              style={tournamentPanelStyle}
+            <div className="medieval-panel p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-orange-300">Your Profile</h2>
-                <button className="px-3 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base self-start sm:self-auto">
+                <h2 className="text-lg sm:text-xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>Your Profile</h2>
+                <button 
+                  style={{
+                    padding: '8px 16px',
+                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                    border: '1px solid rgba(156, 107, 62, 0.7)',
+                    borderRadius: '8px',
+                    color: '#2A1D12',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                    transition: 'all 0.3s'
+                  }}
+                  className="hover:opacity-90 self-start sm:self-auto"
+                >
                   Edit Profile
                 </button>
               </div>
               
-              <div className="bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 rounded-xl p-4 sm:p-6 border border-amber-900/50">
+              <div style={{
+                background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                border: '1px solid rgba(78, 49, 28, 0.7)',
+                borderRadius: '16px',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                padding: '18px 22px'
+              }}>
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-6">
                   {/* Profile Picture - Mobile Friendly */}
                   <div className="relative">
-                    <div className="w-24 h-24 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400">
+                    <div 
+                      style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '9999px',
+                        background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                        border: '1px solid rgba(231, 180, 93, 0.7)',
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                        overflow: 'hidden'
+                      }}
+                    >
                       {userProfile?.avatarUrl ? (
                         <img
                           src={userProfile.avatarUrl}
@@ -984,8 +1206,13 @@ export default function Dashboard() {
                           }}
                         />
                       ) : null}
-                      <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
-                        <span className="text-3xl sm:text-2xl font-bold text-white">
+                      <div 
+                        className={`w-full h-full flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}
+                        style={{
+                          background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)'
+                        }}
+                      >
+                        <span className="text-2xl font-bold text-[#2a1d12]">
                           {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
@@ -993,7 +1220,18 @@ export default function Dashboard() {
                     
                     {/* Upload Button - Mobile Friendly */}
                     <div className="absolute -bottom-1 -right-1">
-                      <label className="w-8 h-8 sm:w-6 sm:h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center border-2 border-amber-900 cursor-pointer hover:from-green-500 hover:to-green-700 active:scale-95 transition-all duration-200 touch-manipulation">
+                      <label 
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          background: 'linear-gradient(180deg, rgba(60, 122, 87, 0.9) 0%, rgba(40, 82, 58, 0.95) 100%)',
+                          borderRadius: '9999px',
+                          border: '2px solid rgba(78, 49, 28, 0.7)',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
+                          cursor: 'pointer'
+                        }}
+                        className="flex items-center justify-center hover:opacity-90 active:scale-95 transition-all duration-200 touch-manipulation"
+                      >
                         <input
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp,image/heic"
@@ -1007,9 +1245,9 @@ export default function Dashboard() {
                           disabled={isUploadingAvatar}
                         />
                         {isUploadingAvatar ? (
-                          <div className="animate-spin w-4 h-4 sm:w-3 sm:h-3 border border-white border-t-transparent rounded-full"></div>
+                          <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
                         ) : (
-                          <svg className="w-4 h-4 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
@@ -1022,20 +1260,41 @@ export default function Dashboard() {
                   {/* Player Info - Mobile Friendly */}
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-3">
-                      <h3 className="text-xl sm:text-2xl font-bold text-amber-300 truncate">
+                      <h3 className="text-xl sm:text-2xl font-semibold text-[#F4EBD0] truncate" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
                         {userProfile?.stats?.nickname || userProfile?.userName || (user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}
                       </h3>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-400/30 self-start">
+                      <span style={{
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        border: '1px solid rgba(78, 49, 28, 0.7)',
+                        background: 'rgba(60, 122, 87, 0.18)',
+                        color: '#ccba93',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        textTransform: 'none',
+                        whiteSpace: 'nowrap'
+                      }}>
                         {userPlayer?.guild || userPlayer?.Guild || 'No Guild'}
                       </span>
                     </div>
 
                     {/* Level and XP Bar - Mobile Friendly */}
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
-                      <span className="text-lg sm:text-xl font-bold text-orange-300">
+                      <span className="text-lg sm:text-xl font-semibold text-[#d4b077] font-medieval" style={{ textTransform: 'none' }}>
                         LVL {userProfile?.stats?.level || userPlayer?.level || 1}
                       </span>
-                      <div className="flex-1 bg-amber-950/80 rounded-full h-3 sm:h-4 overflow-hidden border-2 border-amber-900/60">
+                      <div 
+                        style={{
+                          flex: 1,
+                          background: 'rgba(42, 29, 18, 0.8)',
+                          borderRadius: '9999px',
+                          height: '16px',
+                          overflow: 'hidden',
+                          border: '1px solid rgba(78, 49, 28, 0.5)',
+                          boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)'
+                        }}
+                      >
                         {(userProfile?.stats || userPlayer) ? (() => {
                           // Derive from actual XP to avoid mismatch with level calc
                           const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
@@ -1044,18 +1303,28 @@ export default function Dashboard() {
                           const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
                           return (
                             <div 
-                              className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
-                              style={{ width: `${xpPercentage}%` }}
+                              style={{
+                                height: '100%',
+                                background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                                width: `${xpPercentage}%`,
+                                transition: 'width 0.5s',
+                                boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                              }}
                             ></div>
                           );
                         })() : (
                           <div 
-                            className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-500"
-                            style={{ width: '65%' }}
+                            style={{
+                              height: '100%',
+                              background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                              width: '65%',
+                              transition: 'width 0.5s',
+                              boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                            }}
                           ></div>
                         )}
                       </div>
-                      <span className="text-sm font-medium text-amber-300">
+                      <span className="text-sm font-medium text-[#9f8f79]" style={{ textTransform: 'none' }}>
                         {(userProfile?.stats || userPlayer) ? (() => {
                           const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
                           const levelBase = Math.floor(xp / 1000) * 1000;
@@ -1069,27 +1338,34 @@ export default function Dashboard() {
                     {/* Stats Row - Mobile Friendly */}
                     <div className="grid grid-cols-3 gap-2 sm:gap-4">
                       <div className="text-center">
-                        <div className="text-xl sm:text-2xl font-bold text-orange-300">{userPlayer?.matchesPlayed || 0}</div>
-                        <div className="text-xs text-amber-300">Games Played</div>
+                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.matchesPlayed || 0}</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Games Played</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-xl sm:text-2xl font-bold text-green-400">{userPlayer?.wins || 0}</div>
-                        <div className="text-xs text-amber-300">Games Won</div>
+                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.wins || 0}</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Games Won</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-xl sm:text-2xl font-bold text-blue-400">{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
-                        <div className="text-xs text-amber-300">Win Rate</div>
+                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Win Rate</div>
                       </div>
                     </div>
 
                     {/* Role Display */}
                     {(userPlayer?.role || userPlayer?.Role) && (
                       <div className="mt-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          (userPlayer?.role || userPlayer?.Role) === 'GM' 
-                            ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/50' 
-                            : 'bg-amber-800/40 text-amber-300 border border-amber-700/50'
-                        }`}>
+                        <span 
+                          style={{
+                            padding: '4px 12px',
+                            borderRadius: '9999px',
+                            border: '1px solid rgba(231, 180, 93, 0.5)',
+                            background: 'rgba(231, 180, 93, 0.15)',
+                            color: '#d4b077',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            textTransform: 'none'
+                          }}
+                        >
                           {(userPlayer?.role || userPlayer?.Role) === 'GM' ? '👑 Game Master' : `🎮 ${userPlayer?.role || userPlayer?.Role}`}
                         </span>
                       </div>
@@ -1101,28 +1377,79 @@ export default function Dashboard() {
                   {/* Achievements */}
                   <div className="flex flex-col space-y-2">
                     <div className="text-center">
-                      <div className="text-xl sm:text-2xl font-bold text-orange-300">+{userPlayer?.totalScore || 0}</div>
-                      <div className="text-xs text-amber-300">Total Points</div>
+                      <div className="text-xl sm:text-2xl font-bold text-[#d4b077] font-medieval" style={{ textTransform: 'none' }}>+{userPlayer?.totalScore || 0}</div>
+                      <div className="text-xs text-[#9f8f79]" style={{ textTransform: 'none' }}>Total Points</div>
                     </div>
                     <div className="flex space-x-1 sm:space-x-2 justify-center">
                       {userPlayer?.mvps > 0 && (
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-500 rounded-full flex items-center justify-center" title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}>
-                          <span className="text-yellow-900 text-xs sm:text-sm">⭐</span>
+                        <div 
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '9999px',
+                            background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                            border: '1px solid rgba(231, 180, 93, 0.7)',
+                            boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}
+                        >
+                          <span className="text-[#2a1d12] text-sm">⭐</span>
                         </div>
                       )}
                       {userPlayer?.tournamentsWon > 0 && (
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-600 rounded-full flex items-center justify-center" title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}>
-                          <span className="text-yellow-100 text-xs sm:text-sm">👑</span>
+                        <div 
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '9999px',
+                            background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                            border: '1px solid rgba(231, 180, 93, 0.7)',
+                            boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}
+                        >
+                          <span className="text-[#2a1d12] text-sm">👑</span>
                         </div>
                       )}
                       {userPlayer?.wins > 0 && (
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-800 rounded-full flex items-center justify-center" title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}>
-                          <span className="text-white text-xs sm:text-sm">🏆</span>
+                        <div 
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '9999px',
+                            background: '#2a1d12',
+                            border: '1px solid rgba(156, 107, 62, 0.7)',
+                            boxShadow: '0 0 6px rgba(0, 0, 0, 0.55)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}
+                        >
+                          <span className="text-[#d4b077] text-sm">🏆</span>
                         </div>
                       )}
                       {(!userPlayer || (userPlayer.mvps === 0 && userPlayer.tournamentsWon === 0 && userPlayer.wins === 0)) && (
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-600 rounded-full flex items-center justify-center" title="No achievements yet">
-                          <span className="text-gray-300 text-xs sm:text-sm">🎯</span>
+                        <div 
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '9999px',
+                            background: 'rgba(42, 29, 18, 0.6)',
+                            border: '1px solid rgba(78, 49, 28, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="No achievements yet"
+                        >
+                          <span className="text-[#9f8f79] text-sm">🎯</span>
                         </div>
                       )}
                     </div>
@@ -1154,11 +1481,10 @@ export default function Dashboard() {
             <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-radial from-orange-500/5 via-emerald-500/3 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
             <div className="absolute -top-4 -right-8 w-24 h-24 bg-gradient-radial from-orange-500/6 via-emerald-500/2 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '2.5s' }} />
             
-            <div className="rounded-xl p-4 sm:p-6 border-2 border-amber-900/40 shadow-lg lg:sticky lg:top-8 relative overflow-hidden"
-              style={tournamentPanelStyle}
+            <div className="medieval-panel p-4 sm:p-6 shadow-lg lg:sticky lg:top-8"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-orange-300">Tournaments</h2>
+                <h2 className="text-xl font-bold text-[#F4EBD0] medieval-heading">Tournaments</h2>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={fetchTournaments}
@@ -1185,10 +1511,10 @@ export default function Dashboard() {
                   <input
                     type="text"
                     placeholder="Search tournaments..."
-                    className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all"
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-[#E7B45D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
@@ -1206,31 +1532,52 @@ export default function Dashboard() {
                   <div
                     key={t.id}
                     onClick={() => openTournamentModal(t, false)}
-                    className="group bg-gradient-to-r from-amber-950/70 to-amber-900/70 hover:from-amber-950/80 hover:via-amber-900/80 hover:to-amber-950/80 rounded-lg p-5 border-4 border-orange-500/40 hover:border-orange-500/40 shadow-md shadow-orange-500/10 hover:shadow-orange-500/20 transition-all duration-300 cursor-pointer"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '16px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '18px 22px',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s'
+                    }}
+                    className="group hover:bg-[#3B2A1E]/85 hover:border-[#E7B45D]/60"
                   >
                     <div className="flex items-start space-x-3">
                       {/* Game Icon */}
-                      <div className="text-3xl bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg p-2 flex-shrink-0">
-🏟️
+                      <div 
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '9999px',
+                          background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                          border: '1px solid rgba(231, 180, 93, 0.7)',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.5rem',
+                          flexShrink: 0
+                        }}
+                      >
+                        🏟️
                       </div>
                       
                       {/* Game Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-amber-300 font-semibold text-sm truncate group-hover:text-amber-200 transition-colors">
+                        <h3 className="text-[#F4EBD0] font-semibold text-base truncate" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
                           {t.name}
                         </h3>
-                        <p className="text-amber-300 text-xs mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          Click to view tournament details
-                        </p>
-                        <p className="text-amber-300 text-xs mb-1">{t.game}</p>
-                        <p className="text-amber-300/80 text-xs">
+                        <p className="text-[#B6AA96] text-xs mb-1">{t.game}</p>
+                        <p className="text-[#B6AA96] text-xs mb-2">
                           GM: {t.gameMasterUsername || 'Unknown'}
                         </p>
                         
                         {/* Game Details - Flexible layout */}
                         <div className="space-y-2">
                           {/* Details with flex-wrap */}
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-amber-300/80">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#B6AA96]">
                             <span className="flex items-center whitespace-nowrap">
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -1267,11 +1614,21 @@ export default function Dashboard() {
                             <span className="text-orange-300 text-xs font-medium truncate">{t.name}</span>
                           </div>
                           
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
-                            t.memberCount < t.maxMembers 
-                              ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
-                              : 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-                          }`}>
+                          <span 
+                            style={{
+                              padding: '2px 10px',
+                              borderRadius: '9999px',
+                              border: `1px solid ${t.memberCount < t.maxMembers ? 'rgba(60, 122, 87, 0.8)' : 'rgba(78, 49, 28, 0.7)'}`,
+                              background: t.memberCount < t.maxMembers ? 'rgba(60, 122, 87, 0.18)' : 'rgba(60, 122, 87, 0.08)',
+                              color: t.memberCount < t.maxMembers ? '#d7ead3' : '#ccba93',
+                              fontSize: '0.65rem',
+                              fontWeight: 600,
+                              letterSpacing: '0.05em',
+                              textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
+                            }}
+                          >
                             {t.memberCount < t.maxMembers ? 'Open' : 'Full'}
                           </span>
                         </div>
@@ -1283,7 +1640,18 @@ export default function Dashboard() {
                               e.stopPropagation();
                               openMembersModal(t);
                             }}
-                            className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-xs"
+                            style={{
+                              padding: '6px 12px',
+                              background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                              border: '1px solid rgba(156, 107, 62, 0.7)',
+                              borderRadius: '8px',
+                              color: '#2A1D12',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                              transition: 'all 0.3s'
+                            }}
+                            className="hover:opacity-90"
                           >
                             View Members
                           </button>

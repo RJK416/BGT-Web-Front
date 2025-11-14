@@ -272,7 +272,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
   }
 
   return (
-    <div className={`medieval-panel p-4 sm:p-6 relative overflow-hidden ${className}`}
+    <div className={`medieval-panel p-4 sm:p-6 relative ${className}`}
       style={mergedContainerStyle}
     >
       {showTitle && (
