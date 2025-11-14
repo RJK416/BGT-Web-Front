@@ -343,13 +343,37 @@ export default function GuildPageSimple() {
               <span className="text-amber-200/90">Welcome, {(user as any)?.name || (user as any)?.unique_name || (user as any)?.username || 'User'}</span>
               <button
                 onClick={() => router.push('/dashboard')}
-                className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#2A1D12',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 Dashboard
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300 shadow-lg"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(180deg, rgba(128, 44, 44, 0.9) 0%, rgba(90, 25, 25, 0.95) 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#F4EBD0',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 Logout
               </button>

@@ -768,13 +768,37 @@ export default function Dashboard() {
               
               <button
                 onClick={() => router.push('/settings')}
-                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 text-sm"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#2A1D12',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 Settings
               </button>
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all duration-300 text-sm"
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(180deg, rgba(128, 44, 44, 0.9) 0%, rgba(90, 25, 25, 0.95) 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#F4EBD0',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 Logout
               </button>
@@ -1488,16 +1512,38 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={fetchTournaments}
-                    className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-sm"
+                    style={{
+                      padding: '6px 12px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s',
+                      cursor: 'pointer'
+                    }}
+                    className="hover:opacity-90"
                   >
                     Refresh
                   </button>
                   {isGM && (
                     <button 
                       onClick={() => setIsCreateTournamentExpanded(!isCreateTournamentExpanded)}
-                      className="p-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg transition-all duration-300"
+                      style={{
+                        padding: '8px',
+                        background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                        border: '1px solid rgba(156, 107, 62, 0.7)',
+                        borderRadius: '8px',
+                        color: '#2A1D12',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                        transition: 'all 0.3s',
+                        cursor: 'pointer'
+                      }}
+                      className="hover:opacity-90"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5" fill="none" stroke="#2A1D12" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
                     </button>
@@ -1669,7 +1715,22 @@ export default function Dashboard() {
 
               {/* View All Button */}
               <div className="mt-6 pt-4 border-t border-amber-900/50">
-                <button className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105">
+                <button 
+                  style={{
+                    width: '100%',
+                    padding: '12px 0',
+                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                    border: '1px solid rgba(156, 107, 62, 0.7)',
+                    borderRadius: '8px',
+                    color: '#2A1D12',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:opacity-90"
+                >
                   View All Tournaments
                 </button>
               </div>
@@ -1677,10 +1738,27 @@ export default function Dashboard() {
             </div>
 
             {/* Guild Button - Separate Container */}
-            <div className="mt-6 sm:mt-8">
+            <div className="mt-10 sm:mt-12">
               <button
                 onClick={() => router.push('/guild')}
-                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg"
+                style={{
+                  width: '100%',
+                  padding: '16px 0',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '12px',
+                  color: '#2A1D12',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                className="hover:opacity-90"
               >
                 <svg 
                   className="w-6 h-6" 
@@ -1721,7 +1799,16 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={closeTournamentModal}
-                  className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all duration-300"
+                  style={{
+                    padding: '8px',
+                    background: 'rgba(128, 44, 44, 0.2)',
+                    border: '1px solid rgba(156, 107, 62, 0.5)',
+                    borderRadius: '8px',
+                    color: '#e8a8a8',
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:bg-red-500/30"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1802,7 +1889,19 @@ export default function Dashboard() {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => openAddMemberModal(selectedTournament)}
-                          className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg text-sm font-medium transition-all duration-300"
+                          style={{
+                            padding: '8px 16px',
+                            background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                            border: '1px solid rgba(156, 107, 62, 0.7)',
+                            borderRadius: '8px',
+                            color: '#2A1D12',
+                            fontSize: '0.875rem',
+                            fontWeight: 600,
+                            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                            transition: 'all 0.3s',
+                            cursor: 'pointer'
+                          }}
+                          className="hover:opacity-90"
                         >
                           Add Member
                         </button>
@@ -1895,28 +1994,82 @@ export default function Dashboard() {
                   <div className="flex flex-wrap gap-2">
                     <button 
                       disabled={selectedTournament.phase === 2}
-                      className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
+                      style={{
+                        padding: '8px 12px',
+                        background: selectedTournament.phase === 2 
+                          ? 'linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%)'
+                          : 'linear-gradient(180deg, rgba(60, 122, 87, 0.9) 0%, rgba(40, 82, 58, 0.95) 100%)',
+                        border: '1px solid rgba(156, 107, 62, 0.7)',
+                        borderRadius: '8px',
+                        color: selectedTournament.phase === 2 ? '#999' : '#F4EBD0',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                        transition: 'all 0.3s',
+                        cursor: selectedTournament.phase === 2 ? 'not-allowed' : 'pointer'
+                      }}
+                      className={selectedTournament.phase === 2 ? '' : 'hover:opacity-90'}
                     >
                       {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Start Tournament'}
                     </button>
                     <button 
                       onClick={openUpdateModal}
                       disabled={selectedTournament.phase === 2}
-                      className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
+                      style={{
+                        padding: '8px 12px',
+                        background: selectedTournament.phase === 2 
+                          ? 'linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%)'
+                          : 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                        border: '1px solid rgba(156, 107, 62, 0.7)',
+                        borderRadius: '8px',
+                        color: selectedTournament.phase === 2 ? '#999' : '#2A1D12',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                        transition: 'all 0.3s',
+                        cursor: selectedTournament.phase === 2 ? 'not-allowed' : 'pointer'
+                      }}
+                      className={selectedTournament.phase === 2 ? '' : 'hover:opacity-90'}
                     >
                       {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Edit Tournament'}
                     </button>
                     <button 
                       onClick={openEndModal}
                       disabled={selectedTournament.phase === 2}
-                      className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all duration-300"
+                      style={{
+                        padding: '8px 12px',
+                        background: selectedTournament.phase === 2 
+                          ? 'linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%)'
+                          : 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                        border: '1px solid rgba(156, 107, 62, 0.7)',
+                        borderRadius: '8px',
+                        color: selectedTournament.phase === 2 ? '#999' : '#2A1D12',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                        transition: 'all 0.3s',
+                        cursor: selectedTournament.phase === 2 ? 'not-allowed' : 'pointer'
+                      }}
+                      className={selectedTournament.phase === 2 ? '' : 'hover:opacity-90'}
                     >
                       {selectedTournament.phase === 2 ? 'Tournament Finished' : 'Finish Tournament'}
                     </button>
                   </div>
                   <button
                     onClick={closeTournamentModal}
-                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium text-sm"
+                    style={{
+                      padding: '10px 16px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s',
+                      cursor: 'pointer'
+                    }}
+                    className="hover:opacity-90"
                   >
                     Close
                   </button>

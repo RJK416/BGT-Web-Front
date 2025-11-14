@@ -272,7 +272,19 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="text-amber-400 hover:text-amber-300 transition-colors text-sm sm:text-base"
+                style={{
+                  padding: '6px 12px',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#2A1D12',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 ← Back to Dashboard
               </button>
