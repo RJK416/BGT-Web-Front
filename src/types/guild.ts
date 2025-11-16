@@ -17,6 +17,7 @@ export interface GuildMember {
   role: string;
   joinedAt: string;
   playerLevel?: number;
+  avatarUrl?: string;
 }
 
 export interface GuildInvitation {

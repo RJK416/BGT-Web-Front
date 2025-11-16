@@ -145,8 +145,22 @@ export default function TournamentMembersModal({
                 <div key={member.id} className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20 flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     {/* Avatar Circle */}
-                    <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-lg">
-                      {member.nickname.charAt(0).toUpperCase()}
+                    <div className="relative">
+                      {member.avatarUrl ? (
+                        <img
+                          src={member.avatarUrl}
+                          alt={member.nickname}
+                          className="w-10 h-10 rounded-full object-cover border-2 border-amber-400"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`w-10 h-10 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-lg ${member.avatarUrl ? 'hidden' : ''}`}>
+                        {member.nickname.charAt(0).toUpperCase()}
+                      </div>
                     </div>
                     
                     {/* Member Info */}

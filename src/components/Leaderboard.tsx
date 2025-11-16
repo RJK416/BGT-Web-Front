@@ -342,17 +342,36 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                   {index + 1}
                 </div>
 
-                <div
-                  style={avatarBadgeStyle}
-                  className="select-none transition-transform duration-200 group-hover:scale-105"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (player.avatarUrl) {
-                      handleAvatarClick(player.avatarUrl, player.nickname);
-                    }
-                  }}
-                >
-                  {player.nickname.charAt(0).toUpperCase()}
+                <div className="relative">
+                  {player.avatarUrl ? (
+                    <img
+                      src={player.avatarUrl}
+                      alt={player.nickname}
+                      style={avatarBadgeStyle}
+                      className="select-none transition-transform duration-200 group-hover:scale-105 object-cover cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAvatarClick(player.avatarUrl!, player.nickname);
+                      }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    style={avatarBadgeStyle}
+                    className={`select-none transition-transform duration-200 group-hover:scale-105 ${player.avatarUrl ? 'hidden' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (player.avatarUrl) {
+                        handleAvatarClick(player.avatarUrl, player.nickname);
+                      }
+                    }}
+                  >
+                    {player.nickname.charAt(0).toUpperCase()}
+                  </div>
                 </div>
 
                 <div className="flex-1 min-w-[240px]">

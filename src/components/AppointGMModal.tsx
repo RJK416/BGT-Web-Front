@@ -102,8 +102,22 @@ export default function AppointGMModal({
                       onClick={() => setSelectedMember(member)}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-sm">
-                          {member.playerName.charAt(0).toUpperCase()}
+                        <div className="relative">
+                          {member.avatarUrl ? (
+                            <img
+                              src={member.avatarUrl}
+                              alt={member.playerName}
+                              className="w-8 h-8 rounded-full object-cover border border-amber-400"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-sm ${member.avatarUrl ? 'hidden' : ''}`}>
+                            {member.playerName.charAt(0).toUpperCase()}
+                          </div>
                         </div>
                         <div>
                           <span className="text-purple-200 font-medium">{member.playerName}</span>

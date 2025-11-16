@@ -57,6 +57,7 @@ export interface TournamentMember {
   joinedAt: string;
   placement?: number;
   score?: number;
+  avatarUrl?: string;
 }
 
 export interface Tournament {

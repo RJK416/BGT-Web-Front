@@ -14,6 +14,7 @@ interface GuildMember {
   role: string;
   joinedAt: string;
   playerLevel?: number;
+  avatarUrl?: string;
 }
 
 interface Guild {
@@ -451,8 +452,22 @@ export default function GuildPageSimple() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-amber-950 font-bold text-lg">
-                          {member.playerName.charAt(0).toUpperCase()}
+                        <div className="relative">
+                          {member.avatarUrl ? (
+                            <img
+                              src={member.avatarUrl}
+                              alt={member.playerName}
+                              className="w-12 h-12 rounded-full object-cover border-2 border-amber-400"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-amber-950 font-bold text-lg ${member.avatarUrl ? 'hidden' : ''}`}>
+                            {member.playerName.charAt(0).toUpperCase()}
+                          </div>
                         </div>
                         <div>
                           <h4 className="text-amber-300 font-semibold text-lg">{member.playerName}</h4>

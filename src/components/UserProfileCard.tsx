@@ -36,6 +36,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
   const [error, setError] = useState<string | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const fetchProfile = async () => {
     if (!username) return;
@@ -51,6 +52,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
 
       if (response.ok && response.status === 200) {
         setProfile(response.data);
+        setAvatarError(false); // Reset avatar error when profile is fetched
       } else {
         setError(response.error || response.message || 'Failed to fetch profile');
       }
@@ -173,7 +175,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
               {/* Avatar and Basic Info */}
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  {profile.avatarUrl ? (
+                  {profile.avatarUrl && !avatarError ? (
                     <img
                       src={profile.avatarUrl}
                       alt={profile.userName}
@@ -187,15 +189,13 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                       }}
                       className="object-cover hover:opacity-80 transition-opacity"
                       onClick={() => handleAvatarClick(profile.avatarUrl!, profile.userName)}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.nextElementSibling?.classList.remove('hidden');
+                      onError={() => {
+                        setAvatarError(true);
                       }}
                     />
                   ) : null}
                   <div 
-                    className={`flex items-center justify-center ${profile.avatarUrl ? 'hidden' : ''}`}
+                    className={`flex items-center justify-center ${profile.avatarUrl && !avatarError ? 'hidden' : ''}`}
                     style={{
                       width: '64px',
                       height: '64px',

@@ -408,8 +408,22 @@ export default function GuildPage() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold">
-                              {member.playerName.charAt(0).toUpperCase()}
+                            <div className="relative">
+                              {member.avatarUrl ? (
+                                <img
+                                  src={member.avatarUrl}
+                                  alt={member.playerName}
+                                  className="w-10 h-10 rounded-full object-cover border-2 border-amber-400"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    target.nextElementSibling?.classList.remove('hidden');
+                                  }}
+                                />
+                              ) : null}
+                              <div className={`w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold ${member.avatarUrl ? 'hidden' : ''}`}>
+                                {member.playerName.charAt(0).toUpperCase()}
+                              </div>
                             </div>
                             <div>
                               <h4 className="text-amber-300 font-semibold">{member.playerName}</h4>

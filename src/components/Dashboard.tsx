@@ -1206,40 +1206,41 @@ export default function Dashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-6">
                   {/* Profile Picture - Mobile Friendly */}
                   <div className="relative">
+                    {userProfile?.avatarUrl ? (
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.userName || 'User'}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          borderRadius: '9999px',
+                          border: '1px solid rgba(231, 180, 93, 0.7)',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                          cursor: 'pointer'
+                        }}
+                        className="object-cover hover:opacity-80 transition-opacity"
+                        onClick={() => handleAvatarClick(userProfile.avatarUrl!, userProfile.userName || 'User')}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
                     <div 
+                      className={`flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}
                       style={{
                         width: '80px',
                         height: '80px',
                         borderRadius: '9999px',
                         background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
                         border: '1px solid rgba(231, 180, 93, 0.7)',
-                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
-                        overflow: 'hidden'
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)'
                       }}
                     >
-                      {userProfile?.avatarUrl ? (
-                        <img
-                          src={userProfile.avatarUrl}
-                          alt={userProfile.userName || 'User'}
-                          className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => handleAvatarClick(userProfile.avatarUrl!, userProfile.userName || 'User')}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`w-full h-full flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}
-                        style={{
-                          background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)'
-                        }}
-                      >
-                        <span className="text-2xl font-bold text-[#2a1d12]">
-                          {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      </div>
+                      <span className="text-2xl font-bold text-[#2a1d12]">
+                        {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
+                      </span>
                     </div>
                     
                     {/* Upload Button - Mobile Friendly */}
@@ -1920,10 +1921,24 @@ export default function Dashboard() {
                         {tournamentMembers.map((member: any, index: number) => (
                           <div key={member.id} className="flex items-center justify-between bg-amber-900/60 rounded-lg p-3 min-w-0">
                             <div className="flex items-center space-x-3 min-w-0 flex-1">
-                              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-sm font-bold text-white">
-                                  {member.nickname?.charAt(0).toUpperCase() || 'P'}
-                                </span>
+                              <div className="relative flex-shrink-0">
+                                {member.avatarUrl ? (
+                                  <img
+                                    src={member.avatarUrl}
+                                    alt={member.nickname || 'Player'}
+                                    className="w-8 h-8 rounded-full object-cover border border-amber-400"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      target.nextElementSibling?.classList.remove('hidden');
+                                    }}
+                                  />
+                                ) : null}
+                                <div className={`w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center ${member.avatarUrl ? 'hidden' : ''}`}>
+                                  <span className="text-sm font-bold text-white">
+                                    {member.nickname?.charAt(0).toUpperCase() || 'P'}
+                                  </span>
+                                </div>
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="text-amber-300 font-medium text-sm truncate">{member.nickname}</div>

@@ -3,6 +3,10 @@ export const API_CONFIG = {
   // Base URL for your API
   BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://guild-api-1011546854121.europe-west3.run.app',
   
+  // Base URL for static assets (avatars, images, etc.)
+  // Google Cloud Storage bucket for hosting pictures
+  ASSETS_BASE_URL: process.env.NEXT_PUBLIC_ASSETS_URL || 'https://storage.googleapis.com/guild-hosting-pictures',
+  
   // API Endpoints
   ENDPOINTS: {
     // Account Service Endpoints
@@ -133,4 +137,30 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     clearTimeout(timeoutId);
     throw error;
   }
+};
+
+/**
+ * Helper function to build full avatar URL from relative path
+ * @param avatarPath - Relative path from database (e.g., "avatars/1/915cb1546f274393a9066c33540ca9bc.png")
+ * @returns Full URL to the avatar image, or null if path is invalid
+ */
+export const getAvatarUrl = (avatarPath: string | null | undefined): string | null => {
+  if (!avatarPath || avatarPath.trim() === '') {
+    return null;
+  }
+  
+  // If it's already a full URL, return as is
+  if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+    return avatarPath;
+  }
+  
+  // Remove leading slash if present to avoid double slashes
+  const cleanPath = avatarPath.startsWith('/') ? avatarPath.slice(1) : avatarPath;
+  
+  // Construct full URL
+  const baseUrl = API_CONFIG.ASSETS_BASE_URL.endsWith('/') 
+    ? API_CONFIG.ASSETS_BASE_URL.slice(0, -1) 
+    : API_CONFIG.ASSETS_BASE_URL;
+  
+  return `${baseUrl}/${cleanPath}`;
 }; 
