@@ -68,7 +68,12 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
 
       if (response.ok && response.status === 200) {
         const data = response.data;
-        setLeaderboard(data.players || []);
+        const players = data.players || [];
+        // Debug: Log first player's avatarUrl
+        if (players.length > 0) {
+          console.log('First player avatarUrl:', players[0].avatarUrl);
+        }
+        setLeaderboard(players);
         setPagination({
           page: data.page || 1,
           pageSize: data.pageSize || limit,
@@ -80,12 +85,25 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
         console.log('🔍 Leaderboard data set:', data);
       } else {
         console.error('🔍 Failed to fetch leaderboard:', response);
-        setError(response.error || response.message || 'Failed to fetch leaderboard');
+        // Hide technical backend errors from users, show generic message
+        const errorMessage = response.error || response.message || 'Failed to fetch leaderboard';
+        // Filter out technical file path errors
+        if (errorMessage.includes('Could not find file') || errorMessage.includes('.json')) {
+          setError('Unable to load leaderboard at this time. Please try again later.');
+        } else {
+          setError(errorMessage);
+        }
         setLeaderboard([]);
       }
     } catch (error) {
       console.error('🔍 Error fetching leaderboard:', error);
-      setError(error instanceof Error ? error.message : 'Error fetching leaderboard');
+      // Hide technical errors from users
+      const errorMessage = error instanceof Error ? error.message : 'Error fetching leaderboard';
+      if (errorMessage.includes('Could not find file') || errorMessage.includes('.json')) {
+        setError('Unable to load leaderboard at this time. Please try again later.');
+      } else {
+        setError('Unable to load leaderboard. Please check your connection and try again.');
+      }
       setLeaderboard([]);
     } finally {
       setIsLoading(false);
@@ -342,12 +360,21 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                   {index + 1}
                 </div>
 
-                <div className="relative">
+                <div className="relative" style={{ width: '44px', height: '44px' }}>
                   {player.avatarUrl ? (
                     <img
                       src={player.avatarUrl}
                       alt={player.nickname}
-                      style={avatarBadgeStyle}
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '9999px',
+                        border: '1px solid rgba(231, 180, 93, 0.7)',
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                        position: 'relative',
+                        zIndex: 10,
+                        display: 'block'
+                      }}
                       className="select-none transition-transform duration-200 group-hover:scale-105 object-cover cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -356,12 +383,33 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
-                        target.nextElementSibling?.classList.remove('hidden');
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) {
+                          fallback.classList.remove('hidden');
+                          fallback.style.display = 'flex';
+                        }
                       }}
                     />
                   ) : null}
                   <div
-                    style={avatarBadgeStyle}
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '9999px',
+                      background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                      border: '1px solid rgba(231, 180, 93, 0.7)',
+                      boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                      color: '#2a1d12',
+                      fontSize: '1.1rem',
+                      fontWeight: 700,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      zIndex: player.avatarUrl ? 0 : 1,
+                      display: player.avatarUrl ? 'none' : 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
                     className={`select-none transition-transform duration-200 group-hover:scale-105 ${player.avatarUrl ? 'hidden' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
