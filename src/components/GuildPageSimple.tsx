@@ -14,7 +14,7 @@ interface GuildMember {
   role: string;
   joinedAt: string;
   playerLevel?: number;
-  avatarUrl?: string;
+  avatarUrl?: string ;
 }
 
 interface Guild {
