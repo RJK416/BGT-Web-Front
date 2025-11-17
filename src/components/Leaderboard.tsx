@@ -27,9 +27,10 @@ interface LeaderboardProps {
   showPagination?: boolean;
   showSearch?: boolean;
   style?: CSSProperties;
+  refreshTrigger?: number; // When this changes, refresh the leaderboard
 }
 
-export default function Leaderboard({ limit = 10, showTitle = true, className = '', showPagination = false, showSearch = true, style }: LeaderboardProps) {
+export default function Leaderboard({ limit = 10, showTitle = true, className = '', showPagination = false, showSearch = true, style, refreshTrigger }: LeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardPlayer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +113,14 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [limit]);
+  }, [limit, fetchLeaderboard]);
+
+  // Refresh when refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger !== undefined && refreshTrigger > 0) {
+      fetchLeaderboard();
+    }
+  }, [refreshTrigger, fetchLeaderboard]);
 
   // Filter leaderboard based on search term
   const filteredLeaderboard = useMemo(() => {

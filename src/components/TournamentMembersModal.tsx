@@ -100,49 +100,78 @@ export default function TournamentMembersModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-gradient-to-br from-purple-950/95 to-purple-900/95 backdrop-blur-sm rounded-xl border-4 border-sky-200/70 shadow-2xl shadow-sky-200/20 w-full max-w-2xl max-h-[80vh] overflow-hidden">
+      <div className="medieval-panel rounded-xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
         {/* Modal Header */}
-        <div className="p-6 border-b border-sky-200/20">
+        <div className="p-6 border-b border-[#9C6B3E]/50">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-amber-400">Tournament Members</h2>
-              <p className="text-purple-300">{tournamentName}</p>
+              <h2 className="text-2xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>Tournament Members</h2>
+              <p className="text-[#d4b077] text-sm mt-1">{tournamentName}</p>
             </div>
             <button
               onClick={onClose}
-              className="text-purple-300 hover:text-white transition-colors text-2xl"
+              style={{
+                padding: '8px',
+                background: 'rgba(128, 44, 44, 0.2)',
+                border: '1px solid rgba(156, 107, 62, 0.5)',
+                borderRadius: '8px',
+                color: '#e8a8a8',
+                transition: 'all 0.3s',
+                cursor: 'pointer'
+              }}
+              className="hover:bg-red-500/30"
             >
-              ✕
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         </div>
 
         {/* Modal Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-140px)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(80vh-140px)] custom-scrollbar">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E7B45D]" />
             </div>
           ) : error ? (
             <div className="text-center py-8">
-              <div className="text-red-400 text-lg mb-2">Error Loading Members</div>
-              <div className="text-purple-300 text-sm">{error}</div>
+              <div className="text-[#e8a8a8] text-lg mb-2" style={{ textTransform: 'none' }}>Error Loading Members</div>
+              <div className="text-[#B6AA96] text-sm mb-4">{error}</div>
               <button
                 onClick={fetchMembers}
-                className="mt-4 px-4 py-2 bg-amber-500/20 text-amber-300 rounded-lg border border-amber-400/30 hover:bg-amber-500/30 transition-colors"
+                style={{
+                  padding: '10px 16px',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#2A1D12',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:opacity-90"
               >
                 Try Again
               </button>
             </div>
           ) : members.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-purple-300 text-lg">No Members Yet</div>
-              <div className="text-purple-400 text-sm mt-2">Members will appear here when they join the tournament</div>
+              <div className="text-[#F4EBD0] text-lg" style={{ textTransform: 'none' }}>No Members Yet</div>
+              <div className="text-[#B6AA96] text-sm mt-2" style={{ textTransform: 'none' }}>Members will appear here when they join the tournament</div>
             </div>
           ) : (
             <div className="space-y-3">
               {members.map((member) => (
-                <div key={member.id} className="bg-purple-800/40 rounded-lg p-4 border border-sky-200/20 flex items-center justify-between">
+                <div key={member.id} style={{
+                  background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                  border: '1px solid rgba(78, 49, 28, 0.7)',
+                  borderRadius: '12px',
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                  padding: '16px'
+                }} className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     {/* Avatar Circle */}
                     <div className="relative">
@@ -150,7 +179,14 @@ export default function TournamentMembersModal({
                         <img
                           src={member.avatarUrl}
                           alt={member.nickname}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-amber-400"
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '9999px',
+                            border: '1px solid rgba(231, 180, 93, 0.7)',
+                            boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)'
+                          }}
+                          className="object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -158,15 +194,21 @@ export default function TournamentMembersModal({
                           }}
                         />
                       ) : null}
-                      <div className={`w-10 h-10 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-lg ${member.avatarUrl ? 'hidden' : ''}`}>
-                        {member.nickname.charAt(0).toUpperCase()}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${member.avatarUrl ? 'hidden' : ''}`} style={{
+                        background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                        border: '1px solid rgba(231, 180, 93, 0.7)',
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)'
+                      }}>
+                        <span className="text-lg font-bold text-[#2a1d12]">
+                          {member.nickname.charAt(0).toUpperCase()}
+                        </span>
                       </div>
                     </div>
                     
                     {/* Member Info */}
                     <div>
-                      <div className="text-amber-300 font-semibold">{member.nickname}</div>
-                      <div className="text-purple-300 text-sm">
+                      <div className="text-[#F4EBD0] font-semibold">{member.nickname}</div>
+                      <div className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
                         Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
                       </div>
                     </div>
@@ -176,17 +218,17 @@ export default function TournamentMembersModal({
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
                       {member.placement && (
-                        <div className="text-amber-400 font-bold text-lg">
+                        <div className="text-[#d4b077] font-bold text-lg">
                           #{member.placement}
                         </div>
                       )}
                       {typeof member.score === 'number' && (
-                        <div className="text-purple-300 text-sm">
+                        <div className="text-[#B6AA96] text-sm">
                           {member.score} pts
                         </div>
                       )}
                       {!member.placement && !member.score && (
-                        <div className="text-purple-400 text-sm">
+                        <div className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
                           Participant
                         </div>
                       )}
@@ -196,13 +238,22 @@ export default function TournamentMembersModal({
                     <button
                       onClick={() => removeMember(member)}
                       disabled={removingMember === member.id}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        padding: '8px',
+                        color: '#e8a8a8',
+                        transition: 'all 0.3s',
+                        cursor: removingMember === member.id ? 'not-allowed' : 'pointer',
+                        opacity: removingMember === member.id ? 0.5 : 1
+                      }}
+                      className="hover:text-red-300"
                       title="Remove member from tournament"
                     >
                       {removingMember === member.id ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400" />
                       ) : (
-                        <span className="text-lg">✕</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       )}
                     </button>
                   </div>
@@ -213,14 +264,26 @@ export default function TournamentMembersModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-sky-200/20">
+        <div className="p-6 border-t border-[#9C6B3E]/50">
           <div className="flex justify-between items-center">
-            <div className="text-purple-300 text-sm">
+            <div className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
               {members.length} member{members.length !== 1 ? 's' : ''}
             </div>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium transition-colors"
+              style={{
+                padding: '10px 16px',
+                background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                border: '1px solid rgba(156, 107, 62, 0.7)',
+                borderRadius: '8px',
+                color: '#2A1D12',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.3s',
+                cursor: 'pointer'
+              }}
+              className="hover:opacity-90"
             >
               Close
             </button>

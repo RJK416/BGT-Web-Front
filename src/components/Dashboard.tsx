@@ -35,6 +35,7 @@ export default function Dashboard() {
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userPlayer, setUserPlayer] = useState<any>(null);
+  const [leaderboardRefreshTrigger, setLeaderboardRefreshTrigger] = useState(0);
   const isGM = (() => {
     // Try both 'role' and 'Role' properties since the API returns 'Role' but JS might convert it
     const r = userPlayer?.role || userPlayer?.Role;
@@ -246,6 +247,8 @@ export default function Dashboard() {
         setInfoOpen(true);
         // Refresh profile to show new avatar
         await fetchUserProfile();
+        // Refresh leaderboard to show updated avatar
+        setLeaderboardRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(result.error || result.message || 'Failed to upload avatar');
       }
@@ -414,22 +417,30 @@ export default function Dashboard() {
   const [name, setName] = useState('');
   const [game, setGame] = useState('');
   const [tournamentDate, setTournamentDate] = useState('');
-  const [maxMembers, setMaxMembers] = useState<number>(8);
-  const [memberCount, setMemberCount] = useState<number>(0);
-  const [xpReward, setXpReward] = useState<number>(100);
-  const [mvpXpReward, setMvpXpReward] = useState<number>(50);
+  const [maxMembers, setMaxMembers] = useState<string>('8');
+  const [memberCount, setMemberCount] = useState<string>('0');
+  const [xpReward, setXpReward] = useState<string>('100');
+  const [mvpXpReward, setMvpXpReward] = useState<string>('50');
   const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const parseEuropeanDateToIsoUtc = (value: string) => {
-    const parts = value.trim().split('.');
+    // Format: dd.mm.yyyy HH:mm or dd.mm.yyyy
+    const trimmed = value.trim();
+    const dateTimeParts = trimmed.split(' ');
+    const datePart = dateTimeParts[0];
+    const timePart = dateTimeParts[1] || '00:00';
+    
+    const parts = datePart.split('.');
     if (parts.length !== 3) return '';
     const [dd, mm, yyyy] = parts.map(p => p.trim());
     const day = parseInt(dd, 10);
     const month = parseInt(mm, 10);
     const year = parseInt(yyyy, 10);
     if (!day || !month || !year) return '';
-    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0)).toISOString();
+    
+    const [hours, minutes] = timePart.split(':').map(p => parseInt(p.trim()) || 0);
+    return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0)).toISOString();
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -439,15 +450,15 @@ export default function Dashboard() {
     try {
       const token = getAuthToken();
       const utcIsoDate = parseEuropeanDateToIsoUtc(tournamentDate);
-      if (!utcIsoDate) throw new Error('Please enter a valid date as DD.MM.YYYY');
+      if (!utcIsoDate) throw new Error('Please enter a valid date as DD.MM.YYYY HH:mm');
       const body = {
         Name: name,
         Game: game,
         TournamentDate: utcIsoDate,
-        MaxMembers: maxMembers,
-        MemberCount: memberCount,
-        XpReward: xpReward,
-        MvpXpReward: mvpXpReward,
+        MaxMembers: parseInt(maxMembers) || 0,
+        MemberCount: parseInt(memberCount) || 0,
+        XpReward: parseInt(xpReward) || 0,
+        MvpXpReward: parseInt(mvpXpReward) || 0,
       };
       const res = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOARDGAME.CREATE_TOURNAMENT}`, {
         method: 'POST',
@@ -459,7 +470,7 @@ export default function Dashboard() {
       setInfoSuccess(true);
       setInfoMessage(res.message || 'Tournament created successfully!');
       setInfoOpen(true);
-      setName(''); setGame(''); setTournamentDate(''); setMaxMembers(8); setMemberCount(0); setXpReward(100); setMvpXpReward(50);
+      setName(''); setGame(''); setTournamentDate(''); setMaxMembers('8'); setMemberCount('0'); setXpReward('100'); setMvpXpReward('50');
       // refresh list after a short delay to ensure backend has processed the creation
       setTimeout(() => {
         if (typeof fetchMyTournaments === 'function') fetchMyTournaments();
@@ -497,15 +508,15 @@ export default function Dashboard() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Date (DD.MM.YYYY)</label>
+          <label className="block text-[#F4EBD0] text-sm mb-1 font-medium">Date (DD.MM.YYYY HH:mm)</label>
           <input
             type="text"
-            placeholder="dd.mm.yyyy"
+            placeholder="dd.mm.yyyy HH:mm"
             value={tournamentDate}
             onChange={e=>setTournamentDate(e.target.value)}
             className="w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all"
-            pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}$"
-            title="Enter date as DD.MM.YYYY"
+            pattern="^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[0-2])\.(19|20)\d{2}(\s+([01]?[0-9]|2[0-3]):[0-5][0-9])?$"
+            title="Enter date as DD.MM.YYYY HH:mm (hours are optional)"
             required
           />
         </div>
@@ -515,7 +526,7 @@ export default function Dashboard() {
             type="number" 
             min={1} 
             value={maxMembers} 
-            onChange={e=>setMaxMembers(parseInt(e.target.value||'0'))} 
+            onChange={e=>setMaxMembers(e.target.value)} 
             className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
             required 
           />
@@ -526,7 +537,7 @@ export default function Dashboard() {
             type="number" 
             min={0} 
             value={memberCount} 
-            onChange={e=>setMemberCount(parseInt(e.target.value||'0'))} 
+            onChange={e=>setMemberCount(e.target.value)} 
             className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
             required 
           />
@@ -537,7 +548,7 @@ export default function Dashboard() {
             type="number" 
             min={0} 
             value={xpReward} 
-            onChange={e=>setXpReward(parseInt(e.target.value||'0'))} 
+            onChange={e=>setXpReward(e.target.value)} 
             className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
             required 
           />
@@ -550,7 +561,7 @@ export default function Dashboard() {
             type="number" 
             min={0} 
             value={mvpXpReward} 
-            onChange={e=>setMvpXpReward(parseInt(e.target.value||'0'))} 
+            onChange={e=>setMvpXpReward(e.target.value)} 
             className="no-spinner w-full pl-3 pr-3 py-2 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all" 
             required 
           />
@@ -814,7 +825,7 @@ export default function Dashboard() {
           <div className="flex-1">
 
             {/* Leaderboard - Mobile Optimized */}
-            <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8" />
+            <Leaderboard limit={5} showPagination={false} showSearch={false} className="mb-6 sm:mb-8" refreshTrigger={leaderboardRefreshTrigger} />
 
             {/* Guild Scoreboard */}
             <div className="medieval-panel p-4 sm:p-6 mb-6 sm:mb-8"
@@ -1173,10 +1184,10 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Your Player Card - Mobile Optimized */}
-            <div className="medieval-panel p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg"
+            {/* Your Player Card - Square for Desktop, Slim for Mobile */}
+            <div className="medieval-panel p-4 sm:p-5 md:p-6 mb-6 sm:mb-8 shadow-lg"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 md:mb-5 gap-3">
                 <h2 className="text-lg sm:text-xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>Your Profile</h2>
                 <button 
                   style={{
@@ -1196,7 +1207,8 @@ export default function Dashboard() {
                 </button>
               </div>
               
-              <div style={{
+              {/* Mobile: Slim horizontal layout */}
+              <div className="md:hidden" style={{
                 background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
                 border: '1px solid rgba(78, 49, 28, 0.7)',
                 borderRadius: '16px',
@@ -1280,7 +1292,6 @@ export default function Dashboard() {
                       </label>
                     </div>
                   </div>
-
 
                   {/* Player Info - Mobile Friendly */}
                   <div className="flex-1 min-w-0">
@@ -1395,8 +1406,6 @@ export default function Dashboard() {
                         </span>
                       </div>
                     )}
-
-
                   </div>
 
                   {/* Achievements */}
@@ -1480,6 +1489,304 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Desktop: Square card layout */}
+              <div className="hidden md:block" style={{
+                background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                border: '1px solid rgba(78, 49, 28, 0.7)',
+                borderRadius: '16px',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                padding: '20px',
+                maxWidth: '420px',
+                margin: '0 auto'
+              }}>
+                {/* Top Section: Avatar and Name */}
+                <div className="flex flex-col items-center mb-4">
+                  <div className="relative mb-3">
+                    {userProfile?.avatarUrl ? (
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.userName || 'User'}
+                        style={{
+                          width: '100px',
+                          height: '100px',
+                          borderRadius: '9999px',
+                          border: '2px solid rgba(231, 180, 93, 0.8)',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25), 0 0 20px rgba(231, 180, 93, 0.15)',
+                          cursor: 'pointer'
+                        }}
+                        className="object-cover hover:opacity-80 transition-opacity"
+                        onClick={() => handleAvatarClick(userProfile.avatarUrl!, userProfile.userName || 'User')}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div 
+                      className={`flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}
+                      style={{
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '9999px',
+                        background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                        border: '2px solid rgba(231, 180, 93, 0.8)',
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25), 0 0 20px rgba(231, 180, 93, 0.15)'
+                      }}
+                    >
+                      <span className="text-3xl font-bold text-[#2a1d12]">
+                        {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                    
+                    {/* Upload Button */}
+                    <div className="absolute -bottom-1 -right-1">
+                      <label 
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          background: 'linear-gradient(180deg, rgba(60, 122, 87, 0.9) 0%, rgba(40, 82, 58, 0.95) 100%)',
+                          borderRadius: '9999px',
+                          border: '2px solid rgba(78, 49, 28, 0.7)',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.4)',
+                          cursor: 'pointer'
+                        }}
+                        className="flex items-center justify-center hover:opacity-90 active:scale-95 transition-all duration-200"
+                      >
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/heic"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleAvatarUpload(file);
+                            }
+                          }}
+                          className="hidden"
+                          disabled={isUploadingAvatar}
+                        />
+                        {isUploadingAvatar ? (
+                          <div className="animate-spin w-4 h-4 border border-white border-t-transparent rounded-full"></div>
+                        ) : (
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl font-semibold text-[#F4EBD0] mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
+                    {userProfile?.stats?.nickname || userProfile?.userName || (user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}
+                  </h3>
+                  <span style={{
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    background: 'rgba(60, 122, 87, 0.18)',
+                    color: '#ccba93',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                    textTransform: 'none',
+                    whiteSpace: 'nowrap',
+                    marginBottom: '12px'
+                  }}>
+                    {userPlayer?.guild || userPlayer?.Guild || 'No Guild'}
+                  </span>
+                </div>
+
+                {/* Level and XP Bar */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-lg font-semibold text-[#d4b077] font-medieval" style={{ textTransform: 'none' }}>
+                      LVL {userProfile?.stats?.level || userPlayer?.level || 1}
+                    </span>
+                    <span className="text-sm font-medium text-[#9f8f79]" style={{ textTransform: 'none' }}>
+                      {(userProfile?.stats || userPlayer) ? (() => {
+                        const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
+                        const levelBase = Math.floor(xp / 1000) * 1000;
+                        const xpInCurrentLevel = xp - levelBase;
+                        const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
+                        return `${xpPercentage}%`;
+                      })() : '65%'}
+                    </span>
+                  </div>
+                  <div 
+                    style={{
+                      width: '100%',
+                      background: 'rgba(42, 29, 18, 0.8)',
+                      borderRadius: '9999px',
+                      height: '18px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(78, 49, 28, 0.5)',
+                      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)'
+                    }}
+                  >
+                    {(userProfile?.stats || userPlayer) ? (() => {
+                      const xp = Math.max(0, userProfile?.stats?.xp || userPlayer?.xp || 0);
+                      const levelBase = Math.floor(xp / 1000) * 1000;
+                      const xpInCurrentLevel = xp - levelBase;
+                      const xpPercentage = Math.min(100, Math.max(0, Math.round((xpInCurrentLevel / 1000) * 100)));
+                      return (
+                        <div 
+                          style={{
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                            width: `${xpPercentage}%`,
+                            transition: 'width 0.5s',
+                            boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                          }}
+                        ></div>
+                      );
+                    })() : (
+                      <div 
+                        style={{
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                          width: '65%',
+                          transition: 'width 0.5s',
+                          boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="text-center" style={{
+                    background: 'rgba(42, 29, 18, 0.4)',
+                    borderRadius: '8px',
+                    padding: '12px 8px',
+                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                  }}>
+                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.matchesPlayed || 0}</div>
+                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Games</div>
+                  </div>
+                  <div className="text-center" style={{
+                    background: 'rgba(42, 29, 18, 0.4)',
+                    borderRadius: '8px',
+                    padding: '12px 8px',
+                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                  }}>
+                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.wins || 0}</div>
+                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Wins</div>
+                  </div>
+                  <div className="text-center" style={{
+                    background: 'rgba(42, 29, 18, 0.4)',
+                    borderRadius: '8px',
+                    padding: '12px 8px',
+                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                  }}>
+                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
+                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Win Rate</div>
+                  </div>
+                </div>
+
+                {/* Bottom Section: Points and Achievements */}
+                <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'rgba(78, 49, 28, 0.5)' }}>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-[#d4b077] font-medieval mb-1" style={{ textTransform: 'none' }}>+{userPlayer?.totalScore || 0}</div>
+                    <div className="text-xs text-[#9f8f79]" style={{ textTransform: 'none' }}>Points</div>
+                  </div>
+                  <div className="flex space-x-2">
+                    {userPlayer?.mvps > 0 && (
+                      <div 
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '9999px',
+                          background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                          border: '1px solid rgba(231, 180, 93, 0.7)',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title={`${userPlayer.mvps} MVP${userPlayer.mvps > 1 ? 's' : ''}`}
+                      >
+                        <span className="text-[#2a1d12] text-base">⭐</span>
+                      </div>
+                    )}
+                    {userPlayer?.tournamentsWon > 0 && (
+                      <div 
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '9999px',
+                          background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                          border: '1px solid rgba(231, 180, 93, 0.7)',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title={`${userPlayer.tournamentsWon} Tournament Win${userPlayer.tournamentsWon > 1 ? 's' : ''}`}
+                      >
+                        <span className="text-[#2a1d12] text-base">👑</span>
+                      </div>
+                    )}
+                    {userPlayer?.wins > 0 && (
+                      <div 
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '9999px',
+                          background: '#2a1d12',
+                          border: '1px solid rgba(156, 107, 62, 0.7)',
+                          boxShadow: '0 0 6px rgba(0, 0, 0, 0.55)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title={`${userPlayer.wins} Win${userPlayer.wins > 1 ? 's' : ''}`}
+                      >
+                        <span className="text-[#d4b077] text-base">🏆</span>
+                      </div>
+                    )}
+                    {(!userPlayer || (userPlayer.mvps === 0 && userPlayer.tournamentsWon === 0 && userPlayer.wins === 0)) && (
+                      <div 
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '9999px',
+                          background: 'rgba(42, 29, 18, 0.6)',
+                          border: '1px solid rgba(78, 49, 28, 0.5)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        title="No achievements yet"
+                      >
+                        <span className="text-[#9f8f79] text-base">🎯</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Role Display */}
+                {(userPlayer?.role || userPlayer?.Role) && (
+                  <div className="mt-3 text-center">
+                    <span 
+                      style={{
+                        padding: '6px 16px',
+                        borderRadius: '9999px',
+                        border: '1px solid rgba(231, 180, 93, 0.5)',
+                        background: 'rgba(231, 180, 93, 0.15)',
+                        color: '#d4b077',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      {(userPlayer?.role || userPlayer?.Role) === 'GM' ? '👑 Game Master' : `🎮 ${userPlayer?.role || userPlayer?.Role}`}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1779,24 +2086,14 @@ export default function Dashboard() {
       {/* Tournament Management Modal */}
       {isTournamentModalOpen && selectedTournament && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl border-2 border-amber-900/40 shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden relative"
-            style={{
-              backgroundColor: 'rgb(68, 36, 19)',
-              background: 'linear-gradient(to bottom right, rgb(68, 36, 19) 0%, rgb(87, 44, 23) 50%, rgb(68, 36, 19) 100%)',
-              backgroundImage: `
-                linear-gradient(90deg, transparent 0%, rgba(68, 36, 19, 0.06) 50%, transparent 100%),
-                linear-gradient(0deg, rgba(68, 36, 19, 0.03) 0%, transparent 30%, rgba(68, 36, 19, 0.03) 50%, transparent 70%, rgba(68, 36, 19, 0.03) 100%)
-              `,
-              backgroundSize: '100% 3px, 100% 30px',
-              opacity: '1'
-            }}
+          <div className="medieval-panel rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden relative shadow-2xl"
           >
             {/* Modal Header */}
-            <div className="p-6 border-b border-amber-900/40">
+            <div className="p-6 border-b border-[#9C6B3E]/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-orange-300">{selectedTournament.name}</h2>
-                  <p className="text-amber-300">{selectedTournament.game}</p>
+                  <h2 className="text-2xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>{selectedTournament.name}</h2>
+                  <p className="text-[#d4b077] text-sm mt-1">{selectedTournament.game}</p>
                 </div>
                 <button
                   onClick={closeTournamentModal}
@@ -1823,59 +2120,112 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Tournament Stats */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-orange-300">Tournament Stats</h3>
+                  <h3 className="text-lg font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>Tournament Stats</h3>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
-                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.memberCount}</div>
-                      <div className="text-xs text-amber-300 truncate">Current Members</div>
+                    <div style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '12px',
+                      textAlign: 'center'
+                    }} className="min-w-0">
+                      <div className="text-xl font-bold text-[#60c878] truncate">{selectedTournament.memberCount}</div>
+                      <div className="text-xs text-[#B6AA96] truncate mt-1" style={{ textTransform: 'none' }}>Current Members</div>
                     </div>
-                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
-                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.maxMembers}</div>
-                      <div className="text-xs text-amber-300 truncate">Max Members</div>
+                    <div style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '12px',
+                      textAlign: 'center'
+                    }} className="min-w-0">
+                      <div className="text-xl font-bold text-[#60c878] truncate">{selectedTournament.maxMembers}</div>
+                      <div className="text-xs text-[#B6AA96] truncate mt-1" style={{ textTransform: 'none' }}>Max Members</div>
                     </div>
-                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
-                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.xpReward || 100}</div>
-                      <div className="text-xs text-amber-300 truncate">XP Reward</div>
+                    <div style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '12px',
+                      textAlign: 'center'
+                    }} className="min-w-0">
+                      <div className="text-xl font-bold text-[#60c878] truncate">{selectedTournament.xpReward || 100}</div>
+                      <div className="text-xs text-[#B6AA96] truncate mt-1" style={{ textTransform: 'none' }}>XP Reward</div>
                     </div>
-                    <div className="bg-amber-950/70 rounded-lg p-3 border border-amber-900/40 min-w-0">
-                      <div className="text-xl font-bold text-orange-300 truncate">{selectedTournament.mvpXpReward || 50}</div>
-                      <div className="text-xs text-amber-300 truncate">MVP XP Reward</div>
+                    <div style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '12px',
+                      textAlign: 'center'
+                    }} className="min-w-0">
+                      <div className="text-xl font-bold text-[#60c878] truncate">{selectedTournament.mvpXpReward || 50}</div>
+                      <div className="text-xs text-[#B6AA96] truncate mt-1" style={{ textTransform: 'none' }}>MVP XP Reward</div>
                     </div>
                   </div>
 
-                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
-                    <div className="text-sm text-amber-300 mb-2">Tournament Date</div>
-                    <div className="text-orange-300 font-semibold">
+                  <div style={{
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '16px'
+                  }}>
+                    <div className="text-sm text-[#d4b077] mb-2 font-medieval" style={{ textTransform: 'none' }}>Tournament Date</div>
+                    <div className="text-[#F4EBD0] font-semibold">
                       {new Date(selectedTournament.tournamentDate).toLocaleDateString('de-DE', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
-                        day: 'numeric'
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
                       })}
                     </div>
                   </div>
 
-                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
-                    <div className="text-sm text-amber-300 mb-2">Status</div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedTournament.phase === 0 
-                        ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
+                  <div style={{
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '16px'
+                  }}>
+                    <div className="text-sm text-[#d4b077] mb-2 font-medieval" style={{ textTransform: 'none' }}>Status</div>
+                    <span style={{
+                      padding: '6px 12px',
+                      borderRadius: '9999px',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      ...(selectedTournament.phase === 0 
+                        ? { background: 'rgba(60, 122, 87, 0.18)', color: '#d7ead3', border: '1px solid rgba(60, 122, 87, 0.5)' }
                         : selectedTournament.phase === 1
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
+                        ? { background: 'rgba(59, 130, 246, 0.18)', color: '#93c5fd', border: '1px solid rgba(59, 130, 246, 0.5)' }
                         : selectedTournament.phase === 2
-                        ? 'bg-amber-800/40 text-amber-300 border border-amber-900/50'
+                        ? { background: 'rgba(156, 107, 62, 0.18)', color: '#d4b077', border: '1px solid rgba(156, 107, 62, 0.5)' }
                         : selectedTournament.phase === 3
-                        ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30'
-                        : 'bg-red-500/20 text-red-300 border border-red-400/30'
-                    }`}>
+                        ? { background: 'rgba(234, 179, 8, 0.18)', color: '#fbbf24', border: '1px solid rgba(234, 179, 8, 0.5)' }
+                        : { background: 'rgba(239, 68, 68, 0.18)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.5)' }
+                      )
+                    }}>
                       {getPhaseDisplayName(selectedTournament.phase)}
                     </span>
                   </div>
 
-                  <div className="bg-amber-950/70 rounded-lg p-4 border border-amber-900/40">
-                    <div className="text-sm text-amber-300 mb-2">Game Master</div>
-                    <div className="text-orange-300 font-semibold">
+                  <div style={{
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '16px'
+                  }}>
+                    <div className="text-sm text-[#d4b077] mb-2 font-medieval" style={{ textTransform: 'none' }}>Game Master</div>
+                    <div className="text-[#F4EBD0] font-semibold">
                       {selectedTournament.gameMasterUsername || 'Unknown GM'}
                     </div>
                   </div>
@@ -1884,7 +2234,7 @@ export default function Dashboard() {
                 {/* Tournament Members */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-orange-300">Tournament Members</h3>
+                    <h3 className="text-lg font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>Tournament Members</h3>
                     {/* Only show Add Player functionality for tournaments from My Tournaments section and not finished */}
                     {selectedTournament && isFromMyTournaments && selectedTournament.phase !== 2 && (
                       <div className="flex items-center space-x-2">
@@ -1910,23 +2260,42 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <div className="bg-amber-950/70 rounded-lg border border-amber-900/40 max-h-80 overflow-y-auto">
+                  <div style={{
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    maxHeight: '320px',
+                    overflowY: 'auto'
+                  }} className="custom-scrollbar">
                     {membersLoading ? (
                       <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
-                        <p className="text-orange-300">Loading members...</p>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E7B45D] mr-2"></div>
+                        <p className="text-[#F4EBD0]">Loading members...</p>
                       </div>
                     ) : tournamentMembers.length > 0 ? (
                       <div className="space-y-2 p-4">
                         {tournamentMembers.map((member: any, index: number) => (
-                          <div key={member.id} className="flex items-center justify-between bg-amber-900/60 rounded-lg p-3 min-w-0">
+                          <div key={member.id} style={{
+                            background: 'rgba(42, 29, 18, 0.4)',
+                            border: '1px solid rgba(78, 49, 28, 0.3)',
+                            borderRadius: '8px',
+                            padding: '12px'
+                          }} className="flex items-center justify-between min-w-0">
                             <div className="flex items-center space-x-3 min-w-0 flex-1">
                               <div className="relative flex-shrink-0">
                                 {member.avatarUrl ? (
                                   <img
                                     src={member.avatarUrl}
                                     alt={member.nickname || 'Player'}
-                                    className="w-8 h-8 rounded-full object-cover border border-amber-400"
+                                    style={{
+                                      width: '32px',
+                                      height: '32px',
+                                      borderRadius: '9999px',
+                                      border: '1px solid rgba(231, 180, 93, 0.7)',
+                                      boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)'
+                                    }}
+                                    className="object-cover"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
                                       target.style.display = 'none';
@@ -1934,34 +2303,63 @@ export default function Dashboard() {
                                     }}
                                   />
                                 ) : null}
-                                <div className={`w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center ${member.avatarUrl ? 'hidden' : ''}`}>
-                                  <span className="text-sm font-bold text-white">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${member.avatarUrl ? 'hidden' : ''}`} style={{
+                                  background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                                  border: '1px solid rgba(231, 180, 93, 0.7)',
+                                  boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)'
+                                }}>
+                                  <span className="text-sm font-bold text-[#2a1d12]">
                                     {member.nickname?.charAt(0).toUpperCase() || 'P'}
                                   </span>
                                 </div>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-amber-300 font-medium text-sm truncate">{member.nickname}</div>
-                                <div className="text-amber-300/80 text-xs truncate">
+                                <div className="text-[#F4EBD0] font-medium text-sm truncate">{member.nickname}</div>
+                                <div className="text-[#B6AA96] text-xs truncate" style={{ textTransform: 'none' }}>
                                   Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center space-x-1 flex-shrink-0">
                               {member.placement && (
-                                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs whitespace-nowrap">
+                                <span style={{
+                                  padding: '4px 8px',
+                                  background: 'rgba(234, 179, 8, 0.18)',
+                                  color: '#fbbf24',
+                                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  whiteSpace: 'nowrap'
+                                }}>
                                   #{member.placement}
                                 </span>
                               )}
                               {member.score && (
-                                <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs whitespace-nowrap">
+                                <span style={{
+                                  padding: '4px 8px',
+                                  background: 'rgba(59, 130, 246, 0.18)',
+                                  color: '#93c5fd',
+                                  border: '1px solid rgba(59, 130, 246, 0.5)',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  whiteSpace: 'nowrap'
+                                }}>
                                   {member.score} pts
                                 </span>
                               )}
                               <button
                                 onClick={() => promptRemoveMember(member)}
                                 disabled={removingMemberId === member.id}
-                                className="p-1 text-red-400 hover:text-red-300 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{
+                                  padding: '4px',
+                                  color: '#e8a8a8',
+                                  transition: 'all 0.3s',
+                                  cursor: removingMemberId === member.id ? 'not-allowed' : 'pointer',
+                                  opacity: removingMemberId === member.id ? 0.5 : 1
+                                }}
+                                className="hover:text-red-300 flex-shrink-0"
                                 title="Remove member from tournament"
                               >
                                 {removingMemberId === member.id ? (
@@ -1978,8 +2376,8 @@ export default function Dashboard() {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <div className="text-amber-300 text-lg">No members yet</div>
-                        <div className="text-amber-300/80 text-sm mt-2">Players will appear here when they join</div>
+                        <div className="text-[#F4EBD0] text-lg" style={{ textTransform: 'none' }}>No members yet</div>
+                        <div className="text-[#B6AA96] text-sm mt-2" style={{ textTransform: 'none' }}>Players will appear here when they join</div>
                       </div>
                     )}
                   </div>
@@ -1988,23 +2386,40 @@ export default function Dashboard() {
 
               {/* Tournament Finished Banner */}
               {selectedTournament.phase === 2 && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-amber-950/70 via-amber-900/70 to-amber-950/70 border border-amber-900/50 rounded-lg">
+                <div style={{
+                  background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                  border: '1px solid rgba(78, 49, 28, 0.7)',
+                  borderRadius: '12px',
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                  padding: '16px',
+                  marginTop: '24px'
+                }}>
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                      borderRadius: '9999px',
+                      border: '1px solid rgba(231, 180, 93, 0.7)',
+                      boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg className="w-5 h-5 text-[#2a1d12]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-amber-300 font-semibold">Tournament Finished</h3>
-                      <p className="text-amber-300 text-sm">This tournament has been completed. XP rewards have been distributed and no further changes can be made.</p>
+                      <h3 className="text-[#d4b077] font-semibold" style={{ textTransform: 'none' }}>Tournament Finished</h3>
+                      <p className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>This tournament has been completed. XP rewards have been distributed and no further changes can be made.</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="mt-6 pt-6 border-t border-amber-900/40">
+              <div className="mt-6 pt-6 border-t border-[#9C6B3E]/50">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex flex-wrap gap-2">
                     <button 
