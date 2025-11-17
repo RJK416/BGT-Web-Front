@@ -975,7 +975,7 @@ export default function Dashboard() {
                   </button>
                 </div>
                 
-                <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-4 pb-4">
                   {myTournaments.length > 0 ? myTournaments.map((tournament: any) => (
                     <div
                       key={tournament.id}
@@ -1876,7 +1876,7 @@ export default function Dashboard() {
               </div>
 
               {/* Tournaments List */}
-              <div className="space-y-4 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden">
+              <div className="space-y-4 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden pb-4 pr-4">
                 {tournamentsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
@@ -1988,7 +1988,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Members button */}
-                        <div className="mt-3">
+                        <div className="mt-4 mb-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -2022,7 +2022,7 @@ export default function Dashboard() {
               </div>
 
               {/* View All Button */}
-              <div className="mt-6 pt-4 border-t border-amber-900/50">
+              <div className="mt-8 pt-6 border-t border-[#9C6B3E]/50">
                 <button 
                   style={{
                     width: '100%',
