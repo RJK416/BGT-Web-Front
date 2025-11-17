@@ -752,23 +752,14 @@ export default function Dashboard() {
             {/* Left side - Logo and Title */}
             <div className="flex items-center space-x-3 sm:space-x-4">
               <img 
-                src="/4447.png" 
-                alt="Castle Logo" 
-                className="w-12 h-12 object-contain"
+                src="/mainLogo.png" 
+                alt="Guild Logo" 
+                className="w-16 h-16 object-contain"
               />
               <div>
                 <h1 className="text-2xl font-bold text-orange-400">Guild</h1>
                 <p className="text-emerald-200 text-sm">Chronicle Your Adventures</p>
               </div>
-            </div>
-            
-            {/* Center - Dragon Logo */}
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <img 
-                src="/6669.png" 
-                alt="Dragon Logo" 
-                className="w-12 h-12 object-contain"
-              />
             </div>
             
             {/* Right side - User controls */}
