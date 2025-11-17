@@ -15,6 +15,8 @@ interface BoardgameStats {
   tournamentsWon: number;
   tournamentsPlayed?: number; // Optional field for tournaments participated
   winRate: number;
+  role?: string | number; // Optional role field
+  Role?: string | number; // Optional role field (capitalized variant)
 }
 
 interface UserProfile {
