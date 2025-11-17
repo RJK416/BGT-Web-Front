@@ -336,7 +336,19 @@ export default function GuildPageSimple() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <img src="/mainLogo.png" alt="Guild Logo" className="w-16 h-16 object-contain" />
+              <img 
+                src="/mainLogo.png" 
+                alt="Guild Logo" 
+                className="w-16 h-16 object-contain"
+                onError={(e) => {
+                  console.error('Logo failed to load:', e);
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+                onLoad={() => {
+                  console.log('Logo loaded successfully');
+                }}
+              />
               <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
             </div>
             

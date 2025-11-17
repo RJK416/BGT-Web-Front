@@ -209,6 +209,14 @@ export default function GuildPage() {
                 src="/mainLogo.png" 
                 alt="Guild Logo" 
                 className="w-16 h-16 object-contain"
+                onError={(e) => {
+                  console.error('Logo failed to load:', e);
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+                onLoad={() => {
+                  console.log('Logo loaded successfully');
+                }}
               />
               <div>
                 <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
