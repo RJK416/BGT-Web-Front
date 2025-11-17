@@ -198,75 +198,28 @@ export default function SettingsPage() {
     }
   };
 
+  const pageBackgroundStyle = {
+    background: 'linear-gradient(135deg, rgba(21, 49, 39, 0.95), rgba(13, 32, 26, 0.95))',
+    minHeight: '100vh',
+    position: 'relative' as const,
+    overflow: 'hidden' as const
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={pageBackgroundStyle}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
-          <p className="text-amber-400 text-lg">Loading settings...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#E7B45D] mx-auto mb-4"></div>
+          <p className="text-[#F4EBD0] text-lg">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 relative overflow-hidden">
-      {/* Background decorative shapes */}
-      <div className="absolute inset-0 opacity-20">
-        {/* Geometric shapes */}
-        <div className="absolute top-20 left-20 w-24 h-24 border-2 border-amber-400 transform rotate-45 rounded-lg"></div>
-        <div className="absolute top-40 right-20 w-20 h-20 border-2 border-amber-300 transform -rotate-12 rounded-full"></div>
-        <div className="absolute bottom-40 left-20 w-28 h-28 border-2 border-amber-500 transform rotate-30 rounded-lg"></div>
-        <div className="absolute bottom-20 right-40 w-16 h-16 border-2 border-amber-400 transform -rotate-45 rounded-full"></div>
-        <div className="absolute top-1/2 left-1/4 w-18 h-18 border-2 border-amber-300 transform rotate-60 rounded-lg"></div>
-        <div className="absolute top-1/3 right-1/4 w-14 h-14 border-2 border-amber-500 transform -rotate-30 rounded-full"></div>
-        
-        {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-amber-400 rounded-full animate-pulse"></div>
-        <div className="absolute top-2/3 right-1/3 w-2 h-2 bg-amber-300 rounded-full animate-pulse delay-700"></div>
-        <div className="absolute bottom-1/4 left-1/2 w-4 h-4 bg-amber-500 rounded-full animate-pulse delay-300"></div>
-        
-        {/* Dice pairs */}
-        <div className="absolute top-24 left-24 flex gap-2">
-          <div className="dice dice-6 animate-float">
-            <div className="dice-dots">
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-            </div>
-          </div>
-          <div className="dice dice-1 animate-float-delayed">
-            <div className="dice-dots">
-              <div className="dice-dot"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-40 left-24 flex gap-2">
-          <div className="dice dice-3 animate-float-slow">
-            <div className="dice-dots">
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-            </div>
-          </div>
-          <div className="dice dice-5 animate-float">
-            <div className="dice-dots">
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-              <div className="dice-dot"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
+    <div className="min-h-screen relative overflow-hidden" style={pageBackgroundStyle}>
       {/* Header - Mobile Optimized */}
-      <header className="bg-gradient-to-r from-purple-950/90 to-purple-900/90 backdrop-blur-sm border-b border-amber-400/30">
+      <header className="relative z-10 backdrop-blur-sm border-b border-[#9C6B3E]/40" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.95), rgba(15, 66, 52, 0.95))'}}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3">
             <div className="flex items-center space-x-3 sm:space-x-4">
@@ -286,9 +239,9 @@ export default function SettingsPage() {
                 }}
                 className="hover:opacity-90"
               >
-                ← Back to Dashboard
+Back to Dashboard
               </button>
-              <h1 className="text-xl sm:text-2xl font-bold text-amber-400">Settings</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading">SETTINGS</h1>
             </div>
           </div>
         </div>
@@ -299,15 +252,15 @@ export default function SettingsPage() {
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Sidebar - Mobile Optimized */}
           <div className="w-full lg:w-64 flex-shrink-0">
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-amber-400/30">
-              <h2 className="text-base sm:text-lg font-semibold text-amber-400 mb-4">Account Settings</h2>
+            <div className="medieval-panel p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-[#F4EBD0] medieval-heading mb-4">ACCOUNT SETTINGS</h2>
               <nav className="space-y-2">
                 <button
                   onClick={() => setActiveSection('avatar')}
                   className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base ${
                     activeSection === 'avatar'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50'
-                      : 'text-purple-200 hover:bg-purple-800/50 hover:text-amber-300'
+                      ? 'bg-[#E7B45D]/20 text-[#F4EBD0] border border-[#E7B45D]/50'
+                      : 'text-[#B6AA96] hover:bg-[#2A1D12]/50 hover:text-[#F4EBD0]'
                   }`}
                 >
                   Profile Avatar
@@ -316,8 +269,8 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('password')}
                   className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base ${
                     activeSection === 'password'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50'
-                      : 'text-purple-200 hover:bg-purple-800/50 hover:text-amber-300'
+                      ? 'bg-[#E7B45D]/20 text-[#F4EBD0] border border-[#E7B45D]/50'
+                      : 'text-[#B6AA96] hover:bg-[#2A1D12]/50 hover:text-[#F4EBD0]'
                   }`}
                 >
                   Change Password
@@ -326,8 +279,8 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('email')}
                   className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base ${
                     activeSection === 'email'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50'
-                      : 'text-purple-200 hover:bg-purple-800/50 hover:text-amber-300'
+                      ? 'bg-[#E7B45D]/20 text-[#F4EBD0] border border-[#E7B45D]/50'
+                      : 'text-[#B6AA96] hover:bg-[#2A1D12]/50 hover:text-[#F4EBD0]'
                   }`}
                 >
                   Change Email
@@ -339,14 +292,14 @@ export default function SettingsPage() {
           {/* Main Content - Mobile Optimized */}
           <div className="flex-1">
             {activeSection === 'avatar' && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-amber-400/30">
-                <h2 className="text-xl sm:text-2xl font-bold text-amber-400 mb-4 sm:mb-6">Profile Avatar</h2>
+              <div className="medieval-panel p-4 sm:p-6 lg:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">PROFILE AVATAR</h2>
                 
                 {/* Current Avatar Display - Mobile Optimized */}
                 <div className="mb-6 sm:mb-8">
-                  <h3 className="text-base sm:text-lg font-semibold text-amber-300 mb-3 sm:mb-4">Current Avatar</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#d4b077] mb-3 sm:mb-4">CURRENT AVATAR</h3>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-amber-400 mx-auto sm:mx-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#E7B45D] mx-auto sm:mx-0" style={{boxShadow: '0 0 10px rgba(231, 180, 93, 0.3)'}}>
                       {userProfile?.avatarUrl ? (
                         <img
                           src={userProfile.avatarUrl}
@@ -359,17 +312,17 @@ export default function SettingsPage() {
                           }}
                         />
                       ) : null}
-                      <div className={`w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
-                        <span className="text-2xl sm:text-3xl font-bold text-purple-900">
+                      <div className={`w-full h-full bg-gradient-to-br from-[#E7B45D] to-[#B17A3D] flex items-center justify-center ${userProfile?.avatarUrl ? 'hidden' : ''}`}>
+                        <span className="text-2xl sm:text-3xl font-bold text-[#2A1D12]">
                           {userProfile?.userName?.charAt(0).toUpperCase() || (user as any)?.username?.charAt(0).toUpperCase() || (user as any)?.name?.charAt(0).toUpperCase() || (user as any)?.unique_name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                     </div>
                     <div className="text-center sm:text-left">
-                      <p className="text-purple-200 text-sm sm:text-base">
+                      <p className="text-[#F4EBD0] text-sm sm:text-base">
                         {userProfile?.avatarUrl ? 'You have a custom avatar' : 'Using default avatar'}
                       </p>
-                      <p className="text-purple-300 text-xs sm:text-sm mt-1">
+                      <p className="text-[#B6AA96] text-xs sm:text-sm mt-1">
                         Supported formats: JPG, PNG, WebP (max 5MB)
                       </p>
                     </div>
@@ -378,10 +331,10 @@ export default function SettingsPage() {
 
                 {/* Upload New Avatar - Mobile Optimized */}
                 <div className="mb-4 sm:mb-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-amber-300 mb-3 sm:mb-4">Upload New Avatar</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#d4b077] mb-3 sm:mb-4">UPLOAD NEW AVATAR</h3>
                   
                   {/* Drag and Drop Area - Mobile Optimized */}
-                  <div className="border-2 border-dashed border-amber-400/40 rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:border-amber-400/60 transition-colors">
+                  <div className="border-2 border-dashed border-[#9C6B3E]/50 rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:border-[#E7B45D]/60 transition-colors" style={{background: 'linear-gradient(135deg, rgba(42, 29, 18, 0.5) 0%, rgba(52, 28, 15, 0.5) 100%)'}}>
                     <input
                       type="file"
                       id="avatar-upload"
@@ -402,18 +355,18 @@ export default function SettingsPage() {
                     >
                       <div className="mb-3 sm:mb-4">
                         {isUploadingAvatar ? (
-                          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-amber-400 mx-auto"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-[#E7B45D] mx-auto"></div>
                         ) : (
-                          <svg className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-8 h-8 sm:w-12 sm:h-12 text-[#E7B45D] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                         )}
                       </div>
-                      <p className="text-amber-300 font-medium mb-2 text-sm sm:text-base">
+                      <p className="text-[#F4EBD0] font-medium mb-2 text-sm sm:text-base">
                         {isUploadingAvatar ? 'Uploading...' : 'Tap to choose from gallery or camera'}
                       </p>
-                      <p className="text-purple-300 text-xs sm:text-sm">
+                      <p className="text-[#B6AA96] text-xs sm:text-sm">
                         JPG, PNG, WebP up to 5MB
                       </p>
                     </label>
@@ -422,15 +375,15 @@ export default function SettingsPage() {
 
                 {/* Error Message */}
                 {avatarError && (
-                  <div className="mb-4 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
-                    <p className="text-red-300 text-sm">{avatarError}</p>
+                  <div className="mb-4 p-3 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
+                    <p className="text-[#F4EBD0] text-sm">{avatarError}</p>
                   </div>
                 )}
 
                 {/* Success Message */}
                 {avatarSuccess && (
-                  <div className="mb-4 p-3 bg-green-500/20 border border-green-400/30 rounded-lg">
-                    <p className="text-green-300 text-sm">{avatarSuccess}</p>
+                  <div className="mb-4 p-3 rounded-lg" style={{background: 'rgba(60, 122, 87, 0.2)', border: '1px solid rgba(60, 122, 87, 0.5)'}}>
+                    <p className="text-[#F4EBD0] text-sm">{avatarSuccess}</p>
                   </div>
                 )}
 
@@ -438,13 +391,26 @@ export default function SettingsPage() {
                 <div className="text-center">
                   <label
                     htmlFor="avatar-upload"
-                    className={`inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold rounded-lg transition-all duration-300 transform hover:scale-105 ${
-                      isUploadingAvatar ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
+                    style={{
+                      padding: '12px 24px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s',
+                      cursor: isUploadingAvatar ? 'not-allowed' : 'pointer',
+                      opacity: isUploadingAvatar ? 0.5 : 1,
+                      display: 'inline-flex',
+                      alignItems: 'center'
+                    }}
+                    className="hover:opacity-90"
                   >
                     {isUploadingAvatar ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#2A1D12] mr-2"></div>
                         Uploading...
                       </>
                     ) : (
@@ -461,21 +427,21 @@ export default function SettingsPage() {
             )}
 
             {activeSection === 'password' && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-amber-400/30">
-                <h2 className="text-xl sm:text-2xl font-bold text-amber-400 mb-4 sm:mb-6">Change Password</h2>
+              <div className="medieval-panel p-4 sm:p-6 lg:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">CHANGE PASSWORD</h2>
                 
                 {/* Password Change Form - Mobile Optimized */}
                 <form onSubmit={handlePasswordChange} className="space-y-4 sm:space-y-6">
                   {/* Current Password */}
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-[#F4EBD0] text-sm font-medium mb-2">
                       Current Password
                     </label>
                     <input
                       type="password"
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all text-sm sm:text-base"
                       placeholder="Enter current password"
                       required
                     />
@@ -483,14 +449,14 @@ export default function SettingsPage() {
 
                   {/* New Password */}
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-[#F4EBD0] text-sm font-medium mb-2">
                       New Password
                     </label>
                     <input
                       type="password"
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all text-sm sm:text-base"
                       placeholder="Enter new password"
                       required
                       minLength={6}
@@ -499,14 +465,14 @@ export default function SettingsPage() {
 
                   {/* Confirm New Password */}
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-[#F4EBD0] text-sm font-medium mb-2">
                       Repeat New Password
                     </label>
                     <input
                       type="password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all text-sm sm:text-base"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#2A1D12]/90 border border-[#9C6B3E]/50 rounded-lg text-[#F4EBD0] placeholder-[#B6AA96] focus:outline-none focus:ring-2 focus:ring-[#E7B45D]/60 focus:border-[#E7B45D]/40 transition-all text-sm sm:text-base"
                       placeholder="Confirm new password"
                       required
                       minLength={6}
@@ -515,15 +481,15 @@ export default function SettingsPage() {
 
                   {/* Error Message */}
                   {passwordError && (
-                    <div className="p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
-                      <p className="text-red-300 text-sm">{passwordError}</p>
+                    <div className="p-3 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
+                      <p className="text-[#F4EBD0] text-sm">{passwordError}</p>
                     </div>
                   )}
 
                   {/* Success Message */}
                   {passwordSuccess && (
-                    <div className="p-3 bg-green-500/20 border border-green-400/30 rounded-lg">
-                      <p className="text-green-300 text-sm">{passwordSuccess}</p>
+                    <div className="p-3 rounded-lg" style={{background: 'rgba(60, 122, 87, 0.2)', border: '1px solid rgba(60, 122, 87, 0.5)'}}>
+                      <p className="text-[#F4EBD0] text-sm">{passwordSuccess}</p>
                     </div>
                   )}
 
@@ -531,11 +497,25 @@ export default function SettingsPage() {
                   <button
                     type="submit"
                     disabled={isPasswordLoading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-2 sm:py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s',
+                      opacity: isPasswordLoading ? 0.5 : 1,
+                      cursor: isPasswordLoading ? 'not-allowed' : 'pointer'
+                    }}
+                    className="hover:opacity-90"
                   >
                     {isPasswordLoading ? (
                       <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#2A1D12] mr-2"></div>
                         Changing Password...
                       </div>
                     ) : (
@@ -547,9 +527,9 @@ export default function SettingsPage() {
             )}
 
             {activeSection === 'email' && (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-amber-400/30">
-                <h2 className="text-xl sm:text-2xl font-bold text-amber-400 mb-4 sm:mb-6">Change Email</h2>
-                <p className="text-purple-200 text-sm sm:text-base">Email change functionality coming soon...</p>
+              <div className="medieval-panel p-4 sm:p-6 lg:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">CHANGE EMAIL</h2>
+                <p className="text-[#B6AA96] text-sm sm:text-base">Email change functionality coming soon...</p>
               </div>
             )}
           </div>

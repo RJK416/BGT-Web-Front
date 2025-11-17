@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
@@ -1371,19 +1372,113 @@ export default function Dashboard() {
                       </span>
                     </div>
 
-                    {/* Stats Row - Mobile Friendly */}
-                    <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                      <div className="text-center">
+                    {/* Stats Grid - Mobile Friendly */}
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                      <div className="text-center" style={{
+                        background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                        border: '1px solid rgba(78, 49, 28, 0.7)',
+                        borderRadius: '12px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                        padding: '10px 12px'
+                      }}>
                         <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.matchesPlayed || 0}</div>
-                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Games Played</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Matches</div>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center" style={{
+                        background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                        border: '1px solid rgba(78, 49, 28, 0.7)',
+                        borderRadius: '12px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                        padding: '10px 12px'
+                      }}>
                         <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.wins || 0}</div>
-                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Games Won</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Wins</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
-                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Win Rate</div>
+                      <div className="text-center" style={{
+                        background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                        border: '1px solid rgba(78, 49, 28, 0.7)',
+                        borderRadius: '12px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                        padding: '10px 12px'
+                      }}>
+                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.mvps || 0}</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>MVPs</div>
+                      </div>
+                      <div className="text-center" style={{
+                        background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                        border: '1px solid rgba(78, 49, 28, 0.7)',
+                        borderRadius: '12px',
+                        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                        padding: '10px 12px'
+                      }}>
+                        <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0}</div>
+                        <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Tournaments Played</div>
+                      </div>
+                    </div>
+                    
+                    {/* Additional Tournament Stats */}
+                    {(userPlayer?.tournamentsPlayed !== undefined && userPlayer?.tournamentsPlayed !== userPlayer?.tournamentsWon) && (
+                      <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-2">
+                        <div className="text-center" style={{
+                          background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                          border: '1px solid rgba(78, 49, 28, 0.7)',
+                          borderRadius: '12px',
+                          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                          padding: '10px 12px'
+                        }}>
+                          <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.tournamentsWon || 0}</div>
+                          <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Tournaments Won</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Win Rate Section */}
+                    <div className="mt-3" style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '10px 12px'
+                    }}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[#d4b077] font-semibold font-medieval text-sm" style={{ textTransform: 'none' }}>Win Rate</span>
+                        <span className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>
+                          {(() => {
+                            // Calculate win rate: total wins / (matches played + tournaments played) * 100
+                            // Use tournamentsPlayed if available, otherwise fall back to tournamentsWon
+                            const matchesPlayed = userPlayer?.matchesPlayed || 0;
+                            const wins = userPlayer?.wins || 0;
+                            const tournamentsPlayed = userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0;
+                            const totalGames = matchesPlayed + tournamentsPlayed;
+                            const calculatedWinRate = totalGames > 0 ? (wins / totalGames) * 100 : 0;
+                            return calculatedWinRate.toFixed(1);
+                          })()}%
+                        </span>
+                      </div>
+                      <div style={{
+                        background: 'rgba(42, 29, 18, 0.8)',
+                        borderRadius: '9999px',
+                        height: '12px',
+                        overflow: 'hidden',
+                        border: '1px solid rgba(78, 49, 28, 0.5)',
+                        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)'
+                      }}>
+                        <div 
+                          style={{
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                            width: `${(() => {
+                              const matchesPlayed = userPlayer?.matchesPlayed || 0;
+                              const wins = userPlayer?.wins || 0;
+                              const tournamentsPlayed = userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0;
+                              const totalGames = matchesPlayed + tournamentsPlayed;
+                              const calculatedWinRate = totalGames > 0 ? (wins / totalGames) * 100 : 0;
+                              return Math.min(100, calculatedWinRate);
+                            })()}%`,
+                            transition: 'width 0.5s',
+                            boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                          }}
+                        ></div>
                       </div>
                     </div>
 
@@ -1657,33 +1752,112 @@ export default function Dashboard() {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
                   <div className="text-center" style={{
-                    background: 'rgba(42, 29, 18, 0.4)',
-                    borderRadius: '8px',
-                    padding: '12px 8px',
-                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '10px 12px'
                   }}>
-                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.matchesPlayed || 0}</div>
-                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Games</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.matchesPlayed || 0}</div>
+                    <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Matches</div>
                   </div>
                   <div className="text-center" style={{
-                    background: 'rgba(42, 29, 18, 0.4)',
-                    borderRadius: '8px',
-                    padding: '12px 8px',
-                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '10px 12px'
                   }}>
-                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.wins || 0}</div>
-                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Wins</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.wins || 0}</div>
+                    <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Wins</div>
                   </div>
                   <div className="text-center" style={{
-                    background: 'rgba(42, 29, 18, 0.4)',
-                    borderRadius: '8px',
-                    padding: '12px 8px',
-                    border: '1px solid rgba(78, 49, 28, 0.3)'
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '10px 12px'
                   }}>
-                    <div className="text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer ? Math.round(userPlayer.winRate * 100) : 0}%</div>
-                    <div className="text-xs text-[#B6AA96] mt-1" style={{ textTransform: 'none' }}>Win Rate</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.mvps || 0}</div>
+                    <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>MVPs</div>
+                  </div>
+                  <div className="text-center" style={{
+                    background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: '1px solid rgba(78, 49, 28, 0.7)',
+                    borderRadius: '12px',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                    padding: '10px 12px'
+                  }}>
+                    <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0}</div>
+                    <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Tournaments Played</div>
+                  </div>
+                </div>
+                
+                {/* Additional Tournament Stats */}
+                {(userPlayer?.tournamentsPlayed !== undefined && userPlayer?.tournamentsPlayed !== userPlayer?.tournamentsWon) && (
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
+                    <div className="text-center" style={{
+                      background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                      border: '1px solid rgba(78, 49, 28, 0.7)',
+                      borderRadius: '12px',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                      padding: '10px 12px'
+                    }}>
+                      <div className="text-xl sm:text-2xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{userPlayer?.tournamentsWon || 0}</div>
+                      <div className="text-xs text-[#B6AA96]" style={{ textTransform: 'none' }}>Tournaments Won</div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Win Rate Section */}
+                <div className="mb-4" style={{
+                  background: 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                  border: '1px solid rgba(78, 49, 28, 0.7)',
+                  borderRadius: '12px',
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 28px rgba(0, 0, 0, 0.7)',
+                  padding: '10px 12px'
+                }}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[#d4b077] font-semibold font-medieval text-sm" style={{ textTransform: 'none' }}>Win Rate</span>
+                    <span className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>
+                      {(() => {
+                        // Calculate win rate: total wins / (matches played + tournaments played) * 100
+                        // Use tournamentsPlayed if available, otherwise fall back to tournamentsWon
+                        const matchesPlayed = userPlayer?.matchesPlayed || 0;
+                        const wins = userPlayer?.wins || 0;
+                        const tournamentsPlayed = userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0;
+                        const totalGames = matchesPlayed + tournamentsPlayed;
+                        const calculatedWinRate = totalGames > 0 ? (wins / totalGames) * 100 : 0;
+                        return calculatedWinRate.toFixed(1);
+                      })()}%
+                    </span>
+                  </div>
+                  <div style={{
+                    background: 'rgba(42, 29, 18, 0.8)',
+                    borderRadius: '9999px',
+                    height: '12px',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(78, 49, 28, 0.5)',
+                    boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)'
+                  }}>
+                    <div 
+                      style={{
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
+                        width: `${(() => {
+                          const matchesPlayed = userPlayer?.matchesPlayed || 0;
+                          const wins = userPlayer?.wins || 0;
+                          const tournamentsPlayed = userPlayer?.tournamentsPlayed ?? userPlayer?.tournamentsWon ?? 0;
+                          const totalGames = matchesPlayed + tournamentsPlayed;
+                          const calculatedWinRate = totalGames > 0 ? (wins / totalGames) * 100 : 0;
+                          return Math.min(100, calculatedWinRate);
+                        })()}%`,
+                        transition: 'width 0.5s',
+                        boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
+                      }}
+                    ></div>
                   </div>
                 </div>
 
@@ -2590,17 +2764,33 @@ export default function Dashboard() {
       />
 
       {/* Avatar Modal */}
-      {isAvatarModalOpen && selectedAvatar && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-900/60">
+      {isAvatarModalOpen && selectedAvatar && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999999] flex items-center justify-center p-4">
+          <div 
+            className="rounded-2xl p-6 max-w-md w-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(52, 28, 15, 0.98) 0%, rgba(65, 34, 18, 0.95) 50%, rgba(52, 28, 15, 0.98) 100%)',
+              border: '2px solid rgba(120, 80, 46, 0.95)',
+              boxShadow: '0 18px 45px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+            }}
+          >
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-amber-300">
+            <div className="flex items-center justify-between mb-4 border-b border-[#9C6B3E]/50 pb-4">
+              <h3 className="text-xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>
                 {selectedAvatar.nickname}'s Avatar
               </h3>
               <button
                 onClick={handleAvatarModalClose}
-                className="text-amber-300 hover:text-orange-300 transition-colors p-2 hover:bg-amber-950/80 rounded-full"
+                style={{
+                  padding: '8px',
+                  background: 'rgba(128, 44, 44, 0.2)',
+                  border: '1px solid rgba(156, 107, 62, 0.5)',
+                  borderRadius: '8px',
+                  color: '#e8a8a8',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:bg-red-500/30"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2610,7 +2800,16 @@ export default function Dashboard() {
             
             {/* Avatar Image */}
             <div className="flex justify-center mb-4">
-              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl">
+              <div 
+                style={{
+                  width: '256px',
+                  height: '256px',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
+                  border: '2px solid rgba(231, 180, 93, 0.7)',
+                  boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25), 0 20px 40px rgba(0, 0, 0, 0.5)'
+                }}
+              >
                 <img
                   src={selectedAvatar.url}
                   alt={`${selectedAvatar.nickname}'s avatar`}
@@ -2621,8 +2820,13 @@ export default function Dashboard() {
                     target.nextElementSibling?.classList.remove('hidden');
                   }}
                 />
-                <div className="w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center hidden">
-                  <span className="text-6xl font-bold text-white">
+                <div 
+                  className="w-full h-full flex items-center justify-center hidden"
+                  style={{
+                    background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)'
+                  }}
+                >
+                  <span className="text-6xl font-bold text-[#2a1d12]">
                     {selectedAvatar.nickname.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -2631,12 +2835,13 @@ export default function Dashboard() {
             
             {/* Footer */}
             <div className="text-center">
-              <p className="text-amber-300 text-sm">
+              <p className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
                 Click outside or press ESC to close
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

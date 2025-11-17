@@ -13,6 +13,7 @@ interface BoardgameStats {
   wins: number;
   mvps: number;
   tournamentsWon: number;
+  tournamentsPlayed?: number; // Optional field for tournaments participated
   winRate: number;
 }
 
@@ -123,8 +124,8 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
         style={{
           ...modalContainerStyle,
           maxWidth: '650px',
-          maxHeight: '600px',
-          aspectRatio: '4/3'
+          maxHeight: '90vh',
+          overflowY: 'auto'
         }}
       >
         {/* Header */}
@@ -150,7 +151,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
         </div>
 
         {/* Content */}
-        <div className="p-4" style={{ maxHeight: 'calc(600px - 60px)' }}>
+        <div className="p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-6 text-[#F4EBD0]">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#E7B45D]"></div>
@@ -434,18 +435,31 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                 </div>
                 
                 <div style={achievementCardStyle}>
-                  <div className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{profile.stats.tournamentsWon}</div>
-                  <div className="text-[#B6AA96] text-xs" style={{ textTransform: 'none' }}>Tournaments</div>
+                  <div className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{profile.stats.tournamentsPlayed ?? profile.stats.tournamentsWon ?? 0}</div>
+                  <div className="text-[#B6AA96] text-xs" style={{ textTransform: 'none' }}>Tournaments Played</div>
                 </div>
               </div>
+              
+              {/* Additional Tournament Stats */}
+              {(profile.stats.tournamentsPlayed !== undefined && profile.stats.tournamentsPlayed !== profile.stats.tournamentsWon) && (
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <div style={achievementCardStyle}>
+                    <div className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>{profile.stats.tournamentsWon}</div>
+                    <div className="text-[#B6AA96] text-xs" style={{ textTransform: 'none' }}>Tournaments Won</div>
+                  </div>
+                </div>
+              )}
 
               {/* Win Rate */}
               <div style={achievementCardStyle}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[#d4b077] font-semibold font-medieval text-sm" style={{ textTransform: 'none' }}>Win Rate</span>
-                  <span className="text-[#B6AA96] text-xs">
+                  <span className="text-xl font-bold text-[#60c878]" style={{ textTransform: 'none' }}>
                     {(() => {
-                      const totalGames = profile.stats.matchesPlayed + profile.stats.tournamentsWon;
+                      // Calculate win rate: total wins / (matches played + tournaments played) * 100
+                      // Use tournamentsPlayed if available, otherwise fall back to tournamentsWon (minimum)
+                      const tournamentsPlayed = profile.stats.tournamentsPlayed ?? profile.stats.tournamentsWon;
+                      const totalGames = profile.stats.matchesPlayed + tournamentsPlayed;
                       const calculatedWinRate = totalGames > 0 ? (profile.stats.wins / totalGames) * 100 : 0;
                       return calculatedWinRate.toFixed(1);
                     })()}%
@@ -464,7 +478,9 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                       height: '100%',
                       background: 'linear-gradient(90deg, #E7B45D 0%, #B17A3D 50%, #9C6B3E 100%)',
                       width: `${(() => {
-                        const totalGames = profile.stats.matchesPlayed + profile.stats.tournamentsWon;
+                        // Calculate win rate: total wins / (matches played + tournaments played) * 100
+                        const tournamentsPlayed = profile.stats.tournamentsPlayed ?? profile.stats.tournamentsWon;
+                        const totalGames = profile.stats.matchesPlayed + tournamentsPlayed;
                         const calculatedWinRate = totalGames > 0 ? (profile.stats.wins / totalGames) * 100 : 0;
                         return Math.min(100, calculatedWinRate);
                       })()}%`,
@@ -472,6 +488,12 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                       boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.2)'
                     }}
                   ></div>
+                </div>
+                <div className="text-center text-xs text-[#9f8f79] mt-1" style={{ textTransform: 'none' }}>
+                  {profile.stats.wins} wins / {(() => {
+                    const tournamentsPlayed = profile.stats.tournamentsPlayed ?? profile.stats.tournamentsWon ?? 0;
+                    return profile.stats.matchesPlayed + tournamentsPlayed;
+                  })()} total games ({profile.stats.matchesPlayed} matches + {(profile.stats.tournamentsPlayed ?? profile.stats.tournamentsWon ?? 0)} tournaments)
                 </div>
               </div>
             </div>

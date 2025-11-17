@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { API_CONFIG, apiRequest } from '@/config/api';
 import UserProfileCard from './UserProfileCard';
 import { tavernPalette } from '@/styles/tavernTheme';
@@ -18,6 +19,8 @@ interface LeaderboardPlayer {
   winRate: number;
   totalScore: number;
   guild?: string;
+  role?: string;
+  Role?: string;
 }
 
 interface LeaderboardProps {
@@ -70,9 +73,10 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       if (response.ok && response.status === 200) {
         const data = response.data;
         const players = data.players || [];
-        // Debug: Log first player's avatarUrl
+        // Debug: Log first player's data including role
         if (players.length > 0) {
-          console.log('First player avatarUrl:', players[0].avatarUrl);
+          console.log('First player data:', players[0]);
+          console.log('First player role:', players[0].role, players[0].Role);
         }
         setLeaderboard(players);
         setPagination({
@@ -431,11 +435,42 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                 </div>
 
                 <div className="flex-1 min-w-[240px]">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-lg font-semibold text-[#F4EBD0] truncate" style={{ fontFamily: 'Arial, Helvetica, sans-serif', textTransform: 'none' }}>
                       {player.nickname}
                     </h3>
                     <span style={guildStyle}>{player.guild || 'No guild'}</span>
+                    {(() => {
+                      // Check for role in multiple possible formats
+                      const role = player.role || player.Role || (player as any).Role || (player as any).role;
+                      const roleStr = typeof role === 'string' ? role.toUpperCase().trim() : '';
+                      const roleNum = typeof role === 'number' ? role : null;
+                      
+                      // Check if player is GM (string 'GM' or number 1)
+                      const isGM = roleStr === 'GM' || roleNum === 1 || roleStr === 'GAME MASTER' || roleStr === 'GAMEMASTER';
+                      
+                      // Debug log for troubleshooting
+                      if (process.env.NODE_ENV === 'development' && role) {
+                        console.log(`Player ${player.nickname} role:`, role, 'isGM:', isGM);
+                      }
+                      
+                      return isGM ? (
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          border: '1px solid rgba(231, 180, 93, 0.5)',
+                          background: 'rgba(231, 180, 93, 0.15)',
+                          color: '#d4b077',
+                          fontSize: '0.65rem',
+                          fontWeight: 600,
+                          letterSpacing: '0.05em',
+                          textTransform: 'none',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          👑 Game Master
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -570,17 +605,33 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
       )}
 
       {/* Avatar Modal */}
-      {isAvatarModalOpen && selectedAvatar && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-2xl p-6 max-w-md w-full border border-amber-400/30">
+      {isAvatarModalOpen && selectedAvatar && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999999] flex items-center justify-center p-4">
+          <div 
+            className="rounded-2xl p-6 max-w-md w-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(52, 28, 15, 0.98) 0%, rgba(65, 34, 18, 0.95) 50%, rgba(52, 28, 15, 0.98) 100%)',
+              border: '2px solid rgba(120, 80, 46, 0.95)',
+              boxShadow: '0 18px 45px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+            }}
+          >
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-amber-300">
+            <div className="flex items-center justify-between mb-4 border-b border-[#9C6B3E]/50 pb-4">
+              <h3 className="text-xl font-bold text-[#F4EBD0] medieval-heading" style={{ textTransform: 'none' }}>
                 {selectedAvatar.nickname}'s Avatar
               </h3>
               <button
                 onClick={handleAvatarModalClose}
-                className="text-purple-300 hover:text-amber-400 transition-colors p-2 hover:bg-purple-800/50 rounded-full"
+                style={{
+                  padding: '8px',
+                  background: 'rgba(128, 44, 44, 0.2)',
+                  border: '1px solid rgba(156, 107, 62, 0.5)',
+                  borderRadius: '8px',
+                  color: '#e8a8a8',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer'
+                }}
+                className="hover:bg-red-500/30"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -590,7 +641,16 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
             
             {/* Avatar Image */}
             <div className="flex justify-center mb-4">
-              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl">
+              <div 
+                style={{
+                  width: '256px',
+                  height: '256px',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
+                  border: '2px solid rgba(231, 180, 93, 0.7)',
+                  boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25), 0 20px 40px rgba(0, 0, 0, 0.5)'
+                }}
+              >
                 <img
                   src={selectedAvatar.url}
                   alt={`${selectedAvatar.nickname}'s avatar`}
@@ -601,8 +661,13 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
                     target.nextElementSibling?.classList.remove('hidden');
                   }}
                 />
-                <div className="w-full h-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center hidden">
-                  <span className="text-6xl font-bold text-purple-900">
+                <div 
+                  className="w-full h-full flex items-center justify-center hidden"
+                  style={{
+                    background: 'radial-gradient(circle at 35% 25%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)'
+                  }}
+                >
+                  <span className="text-6xl font-bold text-[#2a1d12]">
                     {selectedAvatar.nickname.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -611,12 +676,13 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
             
             {/* Footer */}
             <div className="text-center">
-              <p className="text-purple-200 text-sm">
+              <p className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
                 Click outside or press ESC to close
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
