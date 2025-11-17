@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import LoginModal from '@/components/LoginModal';
 import Leaderboard from '@/components/Leaderboard';
 import { isAuthenticated } from '@/utils/auth';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 
 export default function HomePage() {
@@ -212,7 +213,19 @@ export default function HomePage() {
           {/* Login/Registration Button */}
           <button
             onClick={() => setShowLogin(true)}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+            className="font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+            style={{
+              background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+              border: `1px solid ${tavernPalette.border}`,
+              color: tavernPalette.borderDark,
+              boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+            }}
           >
             Login / Register
           </button>
@@ -280,29 +293,28 @@ export default function HomePage() {
 
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="relative w-full max-w-sm sm:max-w-md">
             {/* Close button */}
             <button
               onClick={() => setShowLogin(false)}
-              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors shadow-lg"
+              style={{
+                background: 'rgba(128, 44, 44, 0.2)',
+                border: '1px solid rgba(156, 107, 62, 0.5)',
+                color: '#e8a8a8'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(128, 44, 44, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(128, 44, 44, 0.2)';
+              }}
             >
               ✕
             </button>
             {/* Login form frame only */}
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-8 relative overflow-hidden"
-              style={{
-                backgroundColor: 'rgba(68, 36, 19, 0.92)',
-                background: 'linear-gradient(to bottom right, rgba(68, 36, 19, 0.92) 0%, rgba(87, 44, 23, 0.92) 50%, rgba(68, 36, 19, 0.92) 100%)',
-                backgroundImage: `
-                  linear-gradient(90deg, transparent 0%, rgba(68, 36, 19, 0.08) 50%, transparent 100%),
-                  linear-gradient(0deg, rgba(68, 36, 19, 0.04) 0%, transparent 30%, rgba(68, 36, 19, 0.04) 50%, transparent 70%, rgba(68, 36, 19, 0.04) 100%)
-                `,
-                backgroundSize: '100% 3px, 100% 30px',
-                border: '2px solid rgba(249, 115, 22, 0.8)',
-                boxShadow: '0 0 30px rgba(249, 115, 22, 0.6), 0 0 60px rgba(249, 115, 22, 0.3), 0 0 90px rgba(249, 115, 22, 0.1), inset 0 0 30px rgba(249, 115, 22, 0.15)'
-              }}
-            >
+            <div className="medieval-panel p-4 sm:p-8 relative overflow-hidden">
               
               {/* LoginModal component without background */}
               <div className="relative z-10">

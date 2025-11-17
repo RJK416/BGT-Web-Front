@@ -39,6 +39,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
+  const [selectedPlayerRole, setSelectedPlayerRole] = useState<string | number | null>(null);
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
@@ -137,7 +138,11 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
 
   // Handle player click to show profile
   const handlePlayerClick = (nickname: string) => {
+    // Find the player to get their role
+    const player = leaderboard.find(p => p.nickname === nickname);
+    const role = player ? (player.role || player.Role || (player as any).Role || (player as any).role) : null;
     setSelectedUsername(nickname);
+    setSelectedPlayerRole(role);
     setIsProfileCardOpen(true);
   };
 
@@ -145,6 +150,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
   const handleProfileCardClose = () => {
     setIsProfileCardOpen(false);
     setSelectedUsername(null);
+    setSelectedPlayerRole(null);
   };
 
   const handleAvatarClick = (avatarUrl: string, nickname: string) => {
@@ -601,6 +607,7 @@ export default function Leaderboard({ limit = 10, showTitle = true, className = 
           username={selectedUsername}
           isOpen={isProfileCardOpen}
           onClose={handleProfileCardClose}
+          role={selectedPlayerRole}
         />
       )}
 

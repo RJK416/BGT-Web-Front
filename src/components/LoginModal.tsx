@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { setAuthToken } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 export default function LoginModal() {
   const [email, setEmail] = useState('');
@@ -241,26 +242,65 @@ export default function LoginModal() {
     <div className="relative">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-orange-400 mb-2 tracking-wider"
-          style={{ textShadow: '0 0 10px rgba(249, 115, 22, 0.8), 0 0 20px rgba(249, 115, 22, 0.4)' }}>
+        <h1 className="text-4xl font-bold mb-2 tracking-wider" style={{ 
+          color: tavernPalette.gold, 
+          fontFamily: 'var(--font-medieval), "Cinzel", "Times New Roman", serif',
+          letterSpacing: '0.08em'
+        }}>
           Enter the Realm
         </h1>
-        <p className="text-orange-300/80 text-lg">
+        <p className="text-lg" style={{ color: tavernPalette.ash }}>
           {isRegistering ? 'Join the adventure' : 'Sign in to track your board game collection'}
         </p>
       </div>
 
       {/* Success message */}
       {success && (
-        <div className="mb-4 p-3 bg-green-500/20 border border-green-400/30 rounded-lg">
-          <p className="text-green-300 text-sm">{success}</p>
+        <div className="mb-4 p-4 rounded-lg relative overflow-hidden" style={{
+          background: `linear-gradient(135deg, rgba(60, 122, 87, 0.25) 0%, rgba(34, 75, 57, 0.3) 100%)`,
+          border: `2px solid rgba(60, 122, 87, 0.6)`,
+          boxShadow: `0 0 20px rgba(60, 122, 87, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.2)`
+        }}>
+          <div className="absolute inset-0 opacity-10" style={{
+            background: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(60, 122, 87, 0.1) 10px, rgba(60, 122, 87, 0.1) 20px)`
+          }}></div>
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="flex-shrink-0 flex items-center justify-center" style={{ 
+              fontSize: '1.5rem',
+              width: '32px',
+              height: '32px',
+              background: 'rgba(60, 122, 87, 0.2)',
+              borderRadius: '50%',
+              border: '1px solid rgba(60, 122, 87, 0.4)',
+              fontFamily: 'serif'
+            }}>✦</div>
+            <p className="text-sm font-medium flex-1" style={{ color: '#d7ead3', textTransform: 'none', letterSpacing: '0.02em' }}>{success}</p>
+          </div>
         </div>
       )}
 
       {/* Error message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
-          <p className="text-red-300 text-sm">{error}</p>
+        <div className="mb-4 p-4 rounded-lg relative overflow-hidden" style={{
+          background: `linear-gradient(135deg, rgba(128, 44, 44, 0.25) 0%, rgba(90, 30, 30, 0.3) 100%)`,
+          border: `2px solid rgba(128, 44, 44, 0.6)`,
+          boxShadow: `0 0 20px rgba(128, 44, 44, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.2)`
+        }}>
+          <div className="absolute inset-0 opacity-10" style={{
+            background: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(128, 44, 44, 0.1) 10px, rgba(128, 44, 44, 0.1) 20px)`
+          }}></div>
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="flex-shrink-0 flex items-center justify-center" style={{ 
+              fontSize: '1.5rem',
+              width: '32px',
+              height: '32px',
+              background: 'rgba(128, 44, 44, 0.2)',
+              borderRadius: '50%',
+              border: '1px solid rgba(128, 44, 44, 0.4)',
+              fontFamily: 'serif'
+            }}>⚔️</div>
+            <p className="text-sm font-medium flex-1" style={{ color: '#e8a8a8', textTransform: 'none', letterSpacing: '0.02em' }}>{error}</p>
+          </div>
         </div>
       )}
 
@@ -268,12 +308,12 @@ export default function LoginModal() {
       {!isRegistering && !showOtpInput && !showPasswordInput && (
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-orange-300/70 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Username
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
@@ -281,20 +321,34 @@ export default function LoginModal() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/80 border border-orange-500/50 rounded-lg text-amber-100 placeholder-orange-400/60 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Enter username"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-orange-300/70 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -302,9 +356,23 @@ export default function LoginModal() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/80 border border-orange-500/50 rounded-lg text-amber-100 placeholder-orange-400/60 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Enter password"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
@@ -315,11 +383,21 @@ export default function LoginModal() {
                 type="checkbox" 
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="rounded border-amber-400 text-amber-600 focus:ring-amber-500" 
+                className="h-4 w-4 rounded"
+                style={{
+                  accentColor: tavernPalette.gold,
+                  borderColor: tavernPalette.border
+                }}
               />
-              <span className="ml-2 text-orange-300/70 text-sm">Remember me</span>
+              <span className="ml-2 text-sm" style={{ color: tavernPalette.ash }}>Remember me</span>
             </label>
-            <a href="/password-reset" className="text-orange-400 hover:text-orange-300 text-sm font-medium">
+            <a 
+              href="/password-reset" 
+              className="text-sm font-medium transition-colors"
+              style={{ color: tavernPalette.gold }}
+              onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.goldLight}
+              onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.gold}
+            >
               Forgot password?
             </a>
           </div>
@@ -327,11 +405,27 @@ export default function LoginModal() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            style={{
+              background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+              border: `1px solid ${tavernPalette.border}`,
+              color: tavernPalette.borderDark,
+              boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+              }
+            }}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                 Signing in...
               </div>
             ) : (
@@ -340,11 +434,14 @@ export default function LoginModal() {
           </button>
 
           <div className="text-center">
-            <span className="text-orange-300/70 text-sm">New to the realm? </span>
+            <span className="text-sm" style={{ color: tavernPalette.ash }}>New to the realm? </span>
             <button
               type="button"
               onClick={() => setIsRegistering(true)}
-              className="text-orange-400 hover:text-orange-300 font-medium"
+              className="font-medium transition-colors"
+              style={{ color: tavernPalette.gold }}
+              onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.goldLight}
+              onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.gold}
             >
               Create an account
             </button>
@@ -356,12 +453,12 @@ export default function LoginModal() {
       {isRegistering && !showOtpInput && !showPasswordInput && (
         <form onSubmit={handleRegister} className="space-y-6">
           <div>
-            <label className="block text-amber-300 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Username
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
@@ -369,20 +466,34 @@ export default function LoginModal() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Enter username"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-amber-300 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -390,9 +501,23 @@ export default function LoginModal() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Enter email"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
@@ -400,11 +525,27 @@ export default function LoginModal() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            style={{
+              background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+              border: `1px solid ${tavernPalette.border}`,
+              color: tavernPalette.borderDark,
+              boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+              }
+            }}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                 Sending...
               </div>
             ) : (
@@ -413,11 +554,14 @@ export default function LoginModal() {
           </button>
 
           <div className="text-center">
-            <span className="text-amber-200 text-sm">Already have an account? </span>
+            <span className="text-sm" style={{ color: tavernPalette.ash }}>Already have an account? </span>
             <button
               type="button"
               onClick={() => setIsRegistering(false)}
-              className="text-amber-400 hover:text-amber-300 font-medium"
+              className="font-medium transition-colors"
+              style={{ color: tavernPalette.gold }}
+              onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.goldLight}
+              onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.gold}
             >
               Sign in
             </button>
@@ -429,12 +573,12 @@ export default function LoginModal() {
       {showOtpInput && (
         <form onSubmit={handleOtpVerification} className="space-y-6">
           <div>
-            <label className="block text-amber-300 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Verification Code
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -442,10 +586,24 @@ export default function LoginModal() {
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-center text-lg tracking-widest"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all text-center text-lg tracking-widest"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="000000"
                 maxLength={6}
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
@@ -453,11 +611,27 @@ export default function LoginModal() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            style={{
+              background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+              border: `1px solid ${tavernPalette.border}`,
+              color: tavernPalette.borderDark,
+              boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+              }
+            }}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                 Verifying...
               </div>
             ) : (
@@ -471,12 +645,12 @@ export default function LoginModal() {
       {showPasswordInput && (
         <form onSubmit={handlePasswordCompletion} className="space-y-6">
           <div>
-            <label className="block text-amber-300 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -484,21 +658,35 @@ export default function LoginModal() {
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${passwordError ? '#e8a8a8' : tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Enter password"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${passwordError ? '#e8a8a840' : tavernPalette.gold + '40'}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
-            {passwordError && <p className="text-red-300 text-sm mt-1">{passwordError}</p>}
+            {passwordError && <p className="text-sm mt-1" style={{ color: '#e8a8a8' }}>{passwordError}</p>}
           </div>
 
           <div>
-            <label className="block text-amber-300 text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
               Confirm Password
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -506,22 +694,52 @@ export default function LoginModal() {
                 type="password"
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
-                className="w-full pl-10 pr-4 py-3 bg-amber-950/90 border border-amber-900/60 rounded-lg text-amber-100 placeholder-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                style={{
+                  background: 'rgba(28, 18, 12, 0.98)',
+                  border: `1px solid ${confirmPasswordError ? '#e8a8a8' : tavernPalette.border}`,
+                  color: tavernPalette.parchment,
+                  outline: 'none'
+                }}
                 placeholder="Confirm password"
                 required
+                onFocus={(e) => {
+                  e.target.style.borderColor = confirmPasswordError ? '#e8a8a8' : tavernPalette.gold;
+                  e.target.style.boxShadow = `0 0 0 2px ${confirmPasswordError ? '#e8a8a840' : tavernPalette.gold + '40'}`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = confirmPasswordError ? '#e8a8a8' : tavernPalette.border;
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
-            {confirmPasswordError && <p className="text-red-300 text-sm mt-1">{confirmPasswordError}</p>}
+            {confirmPasswordError && <p className="text-sm mt-1" style={{ color: '#e8a8a8' }}>{confirmPasswordError}</p>}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            style={{
+              background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+              border: `1px solid ${tavernPalette.border}`,
+              color: tavernPalette.borderDark,
+              boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+              }
+            }}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                 Creating...
               </div>
             ) : (

@@ -7,6 +7,7 @@ import { guildService } from '../services/guildService';
 import GuildInviteModal from './GuildInviteModal';
 import type { NotificationType, Notification } from '../types/notification';
 import type { InviteStatus } from '../types/guild';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 interface NotificationBarProps {
   className?: string;
@@ -359,31 +360,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
         className="relative p-2 text-purple-900 hover:text-purple-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-full transition-all duration-200 bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 shadow-lg shadow-amber-400/30"
         aria-label="Notifications"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-5 5v-5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-5 5v-5z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"
-          />
-        </svg>
+        <span className="text-2xl">🕊️</span>
         
         {/* Unread Count Badge */}
         {unreadCount > 0 && (
@@ -397,12 +374,15 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
       {isOpen && buttonRect && createPortal(
         <div 
           ref={dropdownRef}
-          className={`fixed bg-gradient-to-br from-purple-950/90 to-purple-900/90 shadow-2xl border-2 border-amber-400/30 overflow-hidden transition-all duration-300 ${
+          className={`fixed shadow-2xl border-2 overflow-hidden transition-all duration-300 ${
             isMobile 
               ? 'w-full max-w-sm mx-auto rounded-t-xl max-h-[80vh] notification-mobile' 
               : 'w-80 rounded-xl max-h-96'
           }`}
           style={{ 
+            background: tavernPalette.panelGradient,
+            borderColor: tavernPalette.border,
+            boxShadow: `0 18px 45px ${tavernPalette.shadow}, inset 0 1px 0 rgba(255, 255, 255, 0.03)`,
             ...(isMobile 
               ? {
                   bottom: 0,
@@ -423,25 +403,43 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
           onTouchEnd={handleTouchEnd}
         >
           {/* Header */}
-          <div className={`px-4 bg-gradient-to-br from-purple-950/90 to-purple-900/90 border-b-2 border-purple-400 flex items-center justify-between ${
+          <div className={`px-4 border-b-2 flex items-center justify-between ${
             isMobile ? 'py-3' : 'py-4'
-          } ${isMobile ? 'rounded-t-xl' : 'rounded-t-lg'}`}>
+          } ${isMobile ? 'rounded-t-xl' : 'rounded-t-lg'}`}
+          style={{
+            background: `linear-gradient(135deg, rgba(59, 42, 30, 0.95) 0%, rgba(43, 30, 21, 0.95) 100%)`,
+            borderColor: tavernPalette.border
+          }}>
             <div className="flex items-center space-x-3">
-              <div className={`${isMobile ? 'w-7 h-7' : 'w-8 h-8'} bg-emerald-600 rounded-full flex items-center justify-center shadow-lg border border-emerald-400`}>
-                <span className={`text-emerald-100 ${isMobile ? 'text-base' : 'text-lg'}`}>🔔</span>
+              <div className={`${isMobile ? 'w-7 h-7' : 'w-8 h-8'} rounded-full flex items-center justify-center shadow-lg`} style={{
+                background: `linear-gradient(135deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                border: `1px solid ${tavernPalette.border}`
+              }}>
+                <span className={`${isMobile ? 'text-base' : 'text-lg'}`} style={{ color: tavernPalette.borderDark }}>🔔</span>
               </div>
-              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-amber-300 drop-shadow-sm`}>Notifications</h3>
+              <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold drop-shadow-sm`} style={{ color: tavernPalette.gold, fontFamily: 'var(--font-medieval), "Cinzel", "Times New Roman", serif' }}>Notifications</h3>
             </div>
             <div className="flex items-center space-x-2">
               {isMobile && unreadCount > 0 && (
-                <span className="text-xs text-amber-300 font-medium">
+                <span className="text-xs font-medium" style={{ color: tavernPalette.ash }}>
                   {unreadCount} unread
                 </span>
               )}
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                  className={`${isMobile ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'} bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg touch-manipulation`}
+                  className={`${isMobile ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'} font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg touch-manipulation`}
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.borderDark
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+                  }}
                 >
                   {isMobile ? 'Mark All' : 'Mark all read'}
                 </button>
@@ -449,7 +447,10 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
               {isMobile && (
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 text-purple-300 hover:text-amber-400 transition-colors touch-manipulation"
+                  className="p-1 transition-colors touch-manipulation"
+                  style={{ color: tavernPalette.ash }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.gold}
+                  onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.ash}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -461,8 +462,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
 
           {/* Mobile swipe indicator */}
           {isMobile && (
-            <div className="flex justify-center py-2 bg-purple-800/30">
-              <div className="w-8 h-1 bg-amber-400/50 rounded-full"></div>
+            <div className="flex justify-center py-2" style={{ background: `rgba(59, 42, 30, 0.3)` }}>
+              <div className="w-8 h-1 rounded-full" style={{ background: `${tavernPalette.gold}50` }}></div>
             </div>
           )}
 
@@ -470,18 +471,21 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
           {/* Content */}
           <div 
             ref={contentRef}
-            className={`${isMobile ? 'max-h-[60vh]' : 'max-h-80'} overflow-y-auto bg-gradient-to-br from-purple-800/50 to-purple-700/50 custom-scrollbar hide-scrollbar`}
+            className={`${isMobile ? 'max-h-[60vh]' : 'max-h-80'} overflow-y-auto custom-scrollbar hide-scrollbar`}
+            style={{
+              background: `linear-gradient(135deg, rgba(59, 42, 30, 0.5) 0%, rgba(43, 30, 21, 0.5) 100%)`
+            }}
             onTouchStart={handlePullToRefresh}
           >
             {isLoading ? (
               <div className={`${isMobile ? 'p-8' : 'p-6'} text-center`}>
                 <div className="relative">
-                  <div className={`animate-spin rounded-full border-4 border-amber-400/30 mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'}`}></div>
-                  <div className={`animate-spin rounded-full border-4 border-transparent border-t-amber-400 mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'} absolute top-0`}></div>
+                  <div className={`animate-spin rounded-full border-4 mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'}`} style={{ borderColor: `${tavernPalette.gold}30` }}></div>
+                  <div className={`animate-spin rounded-full border-4 border-transparent mx-auto ${isMobile ? 'h-12 w-12' : 'h-10 w-10'} absolute top-0`} style={{ borderTopColor: tavernPalette.gold }}></div>
                 </div>
                 <div className={`${isMobile ? 'mt-4' : 'mt-3'}`}>
-                  <p className={`${isMobile ? 'text-base font-semibold' : 'text-sm font-medium'} text-amber-300`}>Loading notifications...</p>
-                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-amber-400/80 mt-1`}>Fetching your latest updates</p>
+                  <p className={`${isMobile ? 'text-base font-semibold' : 'text-sm font-medium'}`} style={{ color: tavernPalette.gold }}>Loading notifications...</p>
+                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} mt-1`} style={{ color: tavernPalette.ash }}>Fetching your latest updates</p>
                 </div>
               </div>
             ) : error ? (
@@ -492,7 +496,18 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                   <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-red-400/80 mb-4`}>{error}</p>
                 <button
                   onClick={refreshNotifications}
-                    className={`${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl mx-auto`}
+                    className={`${isMobile ? 'px-6 py-3 text-sm' : 'px-4 py-2 text-xs'} font-bold rounded-xl transition-all duration-300 touch-manipulation flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl mx-auto`}
+                    style={{
+                      background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                      border: `1px solid ${tavernPalette.border}`,
+                      color: tavernPalette.borderDark
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+                    }}
                 >
                     <span>🔄</span>
                     <span>Try Again</span>
@@ -504,14 +519,17 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                 <div className="relative">
                   <div className={`${isMobile ? 'text-6xl mb-4' : 'text-5xl mb-3'} animate-float-slow`}>📭</div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={`${isMobile ? 'w-16 h-16' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-amber-400/20 to-orange-500/20 animate-ping`}></div>
+                    <div className={`${isMobile ? 'w-16 h-16' : 'w-12 h-12'} rounded-full animate-ping`} style={{ background: `linear-gradient(135deg, ${tavernPalette.gold}20 0%, ${tavernPalette.bronze}20 100%)` }}></div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-amber-500/10 to-orange-600/10 rounded-xl p-6 border border-amber-400/20">
-                  <h3 className={`${isMobile ? 'text-lg font-bold' : 'text-base font-semibold'} text-amber-300 mb-2`}>All caught up! 🎉</h3>
-                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} text-amber-400/80 mb-3`}>You have no new notifications at the moment.</p>
+                <div className="rounded-xl p-6 border" style={{
+                  background: `linear-gradient(135deg, ${tavernPalette.gold}15 0%, ${tavernPalette.bronze}15 100%)`,
+                  borderColor: `${tavernPalette.gold}30`
+                }}>
+                  <h3 className={`${isMobile ? 'text-lg font-bold' : 'text-base font-semibold'} mb-2`} style={{ color: tavernPalette.gold }}>All caught up! 🎉</h3>
+                  <p className={`${isMobile ? 'text-sm' : 'text-xs'} mb-3`} style={{ color: tavernPalette.ash }}>You have no new notifications at the moment.</p>
                   {isMobile && (
-                    <div className="flex items-center justify-center space-x-2 text-xs text-amber-400/60">
+                    <div className="flex items-center justify-center space-x-2 text-xs" style={{ color: `${tavernPalette.ash}80` }}>
                       <span>💡</span>
                       <span>Pull down to refresh</span>
                     </div>
@@ -637,7 +655,10 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className={`${isMobile ? 'px-4 py-3' : 'px-4 py-3'} border-t border-purple-600/30 bg-purple-800/30`}>
+            <div className={`${isMobile ? 'px-4 py-3' : 'px-4 py-3'} border-t`} style={{
+              borderColor: `${tavernPalette.border}30`,
+              background: `rgba(59, 42, 30, 0.3)`
+            }}>
               <button
                 onClick={() => {
                   refreshNotifications();
@@ -646,13 +667,25 @@ const NotificationBar: React.FC<NotificationBarProps> = ({ className = '' }) => 
                     navigator.vibrate([30, 30, 30]);
                   }
                 }}
-                className={`w-full ${isMobile ? 'text-sm px-4 py-3' : 'text-sm'} text-amber-400 hover:text-amber-300 font-medium touch-manipulation transition-colors bg-amber-500/10 hover:bg-amber-500/20 rounded-lg`}
+                className={`w-full ${isMobile ? 'text-sm px-4 py-3' : 'text-sm'} font-medium touch-manipulation transition-colors rounded-lg`}
+                style={{
+                  color: tavernPalette.gold,
+                  background: `${tavernPalette.gold}10`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = tavernPalette.goldLight;
+                  e.currentTarget.style.background = `${tavernPalette.gold}20`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = tavernPalette.gold;
+                  e.currentTarget.style.background = `${tavernPalette.gold}10`;
+                }}
               >
                 {isMobile ? '🔄 Pull to refresh notifications' : 'Refresh notifications'}
               </button>
               {isMobile && (
                 <div className="text-center mt-2">
-                  <p className="text-xs text-purple-400">
+                  <p className="text-xs" style={{ color: tavernPalette.ash }}>
                     Swipe down to close • Swipe up to refresh
                   </p>
                 </div>

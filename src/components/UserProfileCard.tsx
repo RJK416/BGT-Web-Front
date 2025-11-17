@@ -33,9 +33,10 @@ interface UserProfileCardProps {
   username: string;
   isOpen: boolean;
   onClose: () => void;
+  role?: string | number | null; // Optional role passed from Leaderboard
 }
 
-export default function UserProfileCard({ username, isOpen, onClose }: UserProfileCardProps) {
+export default function UserProfileCard({ username, isOpen, onClose, role: propRole }: UserProfileCardProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +57,7 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
       });
 
       if (response.ok && response.status === 200) {
+        console.log('UserProfileCard - Full API response:', response.data);
         setProfile(response.data);
         setAvatarError(false); // Reset avatar error when profile is fetched
       } else {
@@ -257,8 +259,29 @@ export default function UserProfileCard({ username, isOpen, onClose }: UserProfi
                       </span>
                     )}
                     {(() => {
-                      const role = profile.role || profile.Role;
-                      const isGM = role && (typeof role === 'string' ? role.toUpperCase() === 'GM' : role === 1);
+                      // Check for role in multiple possible formats (matching Leaderboard logic)
+                      // Priority: propRole (from Leaderboard) > profile.role > profile.Role > stats.role
+                      const role = propRole || profile.role || profile.Role || (profile as any).Role || (profile as any).role 
+                        || profile.stats?.role || profile.stats?.Role || (profile.stats as any)?.role || (profile.stats as any)?.Role;
+                      const roleStr = typeof role === 'string' ? role.toUpperCase().trim() : '';
+                      const roleNum = typeof role === 'number' ? role : null;
+                      
+                      // Check if player is GM (string 'GM' or number 1)
+                      const isGM = roleStr === 'GM' || roleNum === 1 || roleStr === 'GAME MASTER' || roleStr === 'GAMEMASTER';
+                      
+                      if (process.env.NODE_ENV === 'development' && role) {
+                        console.log(`UserProfileCard - Player ${profile.userName} role check:`, {
+                          propRole,
+                          profileRole: profile.role,
+                          profileRoleCapital: profile.Role,
+                          statsRole: profile.stats?.role,
+                          finalRole: role,
+                          roleStr,
+                          roleNum,
+                          isGM
+                        });
+                      }
+                      
                       return isGM ? (
                         <span style={{
                           padding: '2px 8px',
