@@ -295,26 +295,77 @@ export default function HomePage() {
       {showLogin && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="relative w-full max-w-sm sm:max-w-md">
-            {/* Close button */}
-            <button
-              onClick={() => setShowLogin(false)}
-              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors shadow-lg"
-              style={{
-                background: 'rgba(128, 44, 44, 0.2)',
-                border: '1px solid rgba(156, 107, 62, 0.5)',
-                color: '#e8a8a8'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(128, 44, 44, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(128, 44, 44, 0.2)';
-              }}
-            >
-              ✕
-            </button>
             {/* Login form frame only */}
             <div className="medieval-panel p-4 sm:p-8 relative overflow-hidden">
+              {/* Integrated Close Button - Diamond Shield on Right Edge */}
+              <button
+                onClick={() => setShowLogin(false)}
+                className="absolute top-4 -right-[18px] sm:-right-[22px] z-20 group"
+                aria-label="Close modal"
+              >
+                {/* Diamond/Shield shape container */}
+                <div 
+                  className="relative w-9 h-9 sm:w-11 sm:h-11 rotate-45 transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    borderRadius: '4px',
+                    boxShadow: `
+                      0 2px 8px rgba(0,0,0,0.5),
+                      inset 0 1px 0 rgba(255,255,255,0.3),
+                      inset 0 -1px 0 rgba(0,0,0,0.3)
+                    `,
+                    border: `2px solid ${tavernPalette.border}`
+                  }}
+                >
+                  {/* Inner dark inset */}
+                  <div 
+                    className="absolute inset-[3px] rounded-[2px]"
+                    style={{
+                      background: `linear-gradient(180deg, ${tavernPalette.panel} 0%, ${tavernPalette.borderDark} 100%)`,
+                      boxShadow: `inset 0 1px 3px rgba(0,0,0,0.5)`
+                    }}
+                  />
+                  
+                  {/* Inner gold ring */}
+                  <div 
+                    className="absolute inset-[5px] rounded-[2px]"
+                    style={{
+                      border: `1px solid ${tavernPalette.bronze}`,
+                      background: 'transparent'
+                    }}
+                  />
+                </div>
+                
+                {/* X Symbol - Counter-rotated to be straight */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-90">
+                    {/* First bar */}
+                    <div 
+                      className="absolute top-1/2 left-1/2 w-full h-[2.5px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, ${tavernPalette.bronze} 0%, ${tavernPalette.gold} 50%, ${tavernPalette.bronze} 100%)`,
+                        boxShadow: `0 1px 2px rgba(0,0,0,0.4)`
+                      }}
+                    />
+                    {/* Second bar */}
+                    <div 
+                      className="absolute top-1/2 left-1/2 w-full h-[2.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, ${tavernPalette.bronze} 0%, ${tavernPalette.gold} 50%, ${tavernPalette.bronze} 100%)`,
+                        boxShadow: `0 1px 2px rgba(0,0,0,0.4)`
+                      }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Hover glow effect */}
+                <div 
+                  className="absolute inset-0 rotate-45 rounded-[4px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(circle, ${tavernPalette.gold}40 0%, transparent 70%)`
+                  }}
+                />
+              </button>
               
               {/* LoginModal component without background */}
               <div className="relative z-10">
