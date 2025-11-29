@@ -297,10 +297,10 @@ export default function HomePage() {
           <div className="relative w-full max-w-sm sm:max-w-md">
             {/* Login form frame only */}
             <div className="medieval-panel p-4 sm:p-8 relative overflow-hidden">
-              {/* Integrated Close Button - Diamond Shield on Right Edge */}
+              {/* Integrated Close Button - Diamond Shield at Corner */}
               <button
                 onClick={() => setShowLogin(false)}
-                className="absolute top-4 -right-[18px] sm:-right-[22px] z-20 group"
+                className="absolute -top-[5px] -right-[330px] sm:-top-[5px] sm:-right-[330px] z-20 group"
                 aria-label="Close modal"
               >
                 {/* Diamond/Shield shape container */}
