@@ -42,7 +42,7 @@ class GuildService {
   }
 
   async getAllGuilds(page: number = 1, pageSize: number = 10): Promise<GuildListResponse> {
-    const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.GUILD.GET_ALL}/Guild/?page=${page}&pageSize=${pageSize}`);
+    const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.GUILD.GET_ALL}?page=${page}&pageSize=${pageSize}`);
     return await apiRequest(url, { method: 'GET', headers: this.getAuthHeaders() }) as unknown as GuildListResponse;
   }
 
