@@ -6,30 +6,7 @@ import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from
 import GuildChat from './GuildChat';
 import { guildService } from '@/services/guildService';
 import { API_CONFIG } from '@/config/api';
-
-// Simple types based on your actual API response
-interface GuildMember {
-  playerId: number;
-  playerName: string;
-  role: string;
-  joinedAt: string;
-  playerLevel?: number;
-  avatarUrl?: string ;
-}
-
-interface Guild {
-  id: number;
-  name: string;
-  description?: string;
-  creatorName: string;
-  created: string;
-  level: number;
-  memberCount: number;
-  maxMember: number;
-  userRole: string;
-  joinedAt: string;
-  members: GuildMember[];
-}
+import type { Guild, GuildMember } from '@/types/guild';
 
 interface InviteRequest {
   guildId: number;
