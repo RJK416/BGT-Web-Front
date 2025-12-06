@@ -2332,28 +2332,6 @@ export default function Dashboard() {
                 })()}
               </div>
 
-              {/* View All Button */}
-              <div className="mt-8 pt-6 border-t border-[#9C6B3E]/50">
-                <button 
-                  style={{
-                    width: '100%',
-                    padding: '12px 0',
-                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
-                    border: '1px solid rgba(156, 107, 62, 0.7)',
-                    borderRadius: '8px',
-                    color: '#2A1D12',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
-                    transition: 'all 0.3s',
-                    cursor: 'pointer'
-                  }}
-                  className="hover:opacity-90"
-                >
-                  View All Tournaments
-                </button>
-              </div>
-
             </div>
 
             {/* Guild Button - Separate Container */}
