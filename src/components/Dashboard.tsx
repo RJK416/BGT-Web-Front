@@ -2196,7 +2196,7 @@ export default function Dashboard() {
                           flexShrink: 0
                         }}
                       >
-                        🏟️
+                        🎲
                       </div>
                       
                       {/* Game Info */}
