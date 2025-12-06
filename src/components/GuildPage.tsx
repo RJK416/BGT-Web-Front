@@ -355,6 +355,40 @@ export default function GuildPage() {
                 {/* Guild Info */}
                 <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
                   <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Guild Emblem */}
+                    <div className="flex-shrink-0 flex justify-center lg:justify-start">
+                      <div className="relative">
+                        {myGuild.emblemUrl ? (
+                          <img
+                            src={myGuild.emblemUrl}
+                            alt={myGuild.name}
+                            className="w-24 h-24 rounded-full object-cover border-4"
+                            style={{
+                              borderColor: '#E7B45D',
+                              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)'
+                            }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold border-4`}
+                          style={{
+                            background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                            borderColor: '#E7B45D',
+                            boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                            color: '#2A1D12',
+                            display: myGuild.emblemUrl ? 'none' : 'flex'
+                          }}
+                        >
+                          {myGuild.name.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
                     <div className="flex-1">
                       <h2 className="text-2xl font-bold text-amber-400 mb-4">{myGuild.name}</h2>
                       <p className="text-purple-300 mb-4">{myGuild.description || 'No description provided.'}</p>
@@ -469,13 +503,47 @@ export default function GuildPage() {
                     className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-amber-300 font-semibold text-lg">{guild.name}</h4>
-                        <p className="text-purple-400 text-sm mb-2">{guild.description || 'No description provided.'}</p>
-                        <div className="flex flex-wrap gap-4 text-sm text-purple-400">
-                          <span>{guild.memberCount}/{guild.maxMember} members</span>
-                          <span>Level {guild.level}</span>
-                          <span>Created by {guild.creatorName}</span>
+                      <div className="flex items-center gap-4 flex-1">
+                        {/* Guild Emblem */}
+                        <div className="relative flex-shrink-0">
+                          {guild.emblemUrl ? (
+                            <img
+                              src={guild.emblemUrl}
+                              alt={guild.name}
+                              className="w-16 h-16 rounded-full object-cover border-2"
+                              style={{
+                                borderColor: '#E7B45D',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                              }}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold border-2`}
+                            style={{
+                              background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                              borderColor: '#E7B45D',
+                              boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                              color: '#2A1D12',
+                              display: guild.emblemUrl ? 'none' : 'flex'
+                            }}
+                          >
+                            {guild.name.charAt(0).toUpperCase()}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-amber-300 font-semibold text-lg truncate">{guild.name}</h4>
+                          <p className="text-purple-400 text-sm mb-2 truncate">{guild.description || 'No description provided.'}</p>
+                          <div className="flex flex-wrap gap-4 text-sm text-purple-400">
+                            <span>{guild.memberCount}/{guild.maxMember} members</span>
+                            <span>Level {guild.level}</span>
+                            <span>Created by {guild.creatorName}</span>
+                          </div>
                         </div>
                       </div>
                       <button

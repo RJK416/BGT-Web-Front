@@ -405,8 +405,46 @@ export default function GuildPageSimple() {
           <div className="space-y-6">
             {/* Guild Info */}
             <div className="rounded-xl p-6" style={panelStyle}>
-              <h2 className="text-3xl font-bold text-orange-300 mb-4">{guild.name}</h2>
-              <p className={`${mutedTextClass} mb-6`}>{guild.description || 'No description provided.'}</p>
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start mb-6">
+                {/* Guild Emblem */}
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    {guild.emblemUrl ? (
+                      <img
+                        src={guild.emblemUrl}
+                        alt={guild.name}
+                        className="w-24 h-24 rounded-full object-cover border-4"
+                        style={{
+                          borderColor: '#E7B45D',
+                          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)'
+                        }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div 
+                      className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold border-4`}
+                      style={{
+                        background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                        borderColor: '#E7B45D',
+                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                        color: '#2A1D12',
+                        display: guild.emblemUrl ? 'none' : 'flex'
+                      }}
+                    >
+                      {guild.name.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-3xl font-bold text-orange-300 mb-4">{guild.name}</h2>
+                  <p className={`${mutedTextClass}`}>{guild.description || 'No description provided.'}</p>
+                </div>
+              </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                 <div className="text-center">
