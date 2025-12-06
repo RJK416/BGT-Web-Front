@@ -73,6 +73,7 @@ export default function Dashboard() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [tournamentFilter, setTournamentFilter] = useState<'all' | 'thisWeek' | 'nextWeek'>('thisWeek');
 
   const pageBackgroundStyle: CSSProperties = {
     minHeight: '100vh',
@@ -653,6 +654,50 @@ export default function Dashboard() {
     setIsAddMemberModalOpen(true);
   };
 
+  // Function to filter tournaments by week
+  const getFilteredTournaments = (tournamentsList: any[]) => {
+    if (tournamentFilter === 'all') {
+      return tournamentsList;
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // Calculate start of this week (Monday)
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfThisWeek = new Date(today);
+    startOfThisWeek.setDate(today.getDate() - daysToMonday);
+    startOfThisWeek.setHours(0, 0, 0, 0);
+
+    // Calculate end of this week (Sunday)
+    const endOfThisWeek = new Date(startOfThisWeek);
+    endOfThisWeek.setDate(startOfThisWeek.getDate() + 6);
+    endOfThisWeek.setHours(23, 59, 59, 999);
+
+    // Calculate start of next week (Monday)
+    const startOfNextWeek = new Date(endOfThisWeek);
+    startOfNextWeek.setDate(endOfThisWeek.getDate() + 1);
+    startOfNextWeek.setHours(0, 0, 0, 0);
+
+    // Calculate end of next week (Sunday)
+    const endOfNextWeek = new Date(startOfNextWeek);
+    endOfNextWeek.setDate(startOfNextWeek.getDate() + 6);
+    endOfNextWeek.setHours(23, 59, 59, 999);
+
+    return tournamentsList.filter((tournament: any) => {
+      const tournamentDate = new Date(tournament.tournamentDate);
+      
+      if (tournamentFilter === 'thisWeek') {
+        return tournamentDate >= startOfThisWeek && tournamentDate <= endOfThisWeek;
+      } else if (tournamentFilter === 'nextWeek') {
+        return tournamentDate >= startOfNextWeek && tournamentDate <= endOfNextWeek;
+      }
+      
+      return true;
+    });
+  };
+
   // Function to handle successful tournament update
   const handleUpdateSuccess = () => {
     // Refresh tournaments data
@@ -1000,7 +1045,7 @@ export default function Dashboard() {
                           <p className="text-[#B6AA96] text-xs sm:text-sm mt-1">{tournament.game}</p>
                           <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-[#B6AA96]">
                             <span>{tournament.memberCount}/{tournament.maxMembers} members</span>
-                            <span>{new Date(tournament.tournamentDate).toLocaleDateString('de-DE')}</span>
+                            <span>{new Date(tournament.tournamentDate).toLocaleDateString('en-US')}</span>
                             <span>{tournament.xpReward || 100} XP</span>
                           </div>
                         </div>
@@ -2048,6 +2093,67 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Filter Buttons */}
+              <div className="mb-4 flex gap-2">
+                <button
+                  onClick={() => setTournamentFilter('thisWeek')}
+                  style={{
+                    padding: '6px 16px',
+                    background: tournamentFilter === 'thisWeek' 
+                      ? 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)'
+                      : 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: `1px solid ${tournamentFilter === 'thisWeek' ? '#E7B45D' : 'rgba(78, 49, 28, 0.7)'}`,
+                    borderRadius: '8px',
+                    color: tournamentFilter === 'thisWeek' ? '#2A1D12' : '#F4EBD0',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:opacity-90"
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => setTournamentFilter('nextWeek')}
+                  style={{
+                    padding: '6px 16px',
+                    background: tournamentFilter === 'nextWeek' 
+                      ? 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)'
+                      : 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: `1px solid ${tournamentFilter === 'nextWeek' ? '#E7B45D' : 'rgba(78, 49, 28, 0.7)'}`,
+                    borderRadius: '8px',
+                    color: tournamentFilter === 'nextWeek' ? '#2A1D12' : '#F4EBD0',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:opacity-90"
+                >
+                  Next Week
+                </button>
+                <button
+                  onClick={() => setTournamentFilter('all')}
+                  style={{
+                    padding: '6px 16px',
+                    background: tournamentFilter === 'all' 
+                      ? 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)'
+                      : 'linear-gradient(180deg, rgba(28, 18, 12, 0.98) 0%, rgba(20, 12, 8, 0.99) 100%)',
+                    border: `1px solid ${tournamentFilter === 'all' ? '#E7B45D' : 'rgba(78, 49, 28, 0.7)'}`,
+                    borderRadius: '8px',
+                    color: tournamentFilter === 'all' ? '#2A1D12' : '#F4EBD0',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:opacity-90"
+                >
+                  All Tournaments
+                </button>
+              </div>
+
               {/* Tournaments List */}
               <div className="space-y-4 max-h-[28rem] overflow-y-auto custom-scrollbar overflow-x-hidden pb-4 pr-4">
                 {tournamentsLoading ? (
@@ -2055,7 +2161,9 @@ export default function Dashboard() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mr-2"></div>
                     <p className="text-orange-300 text-lg">Loading tournaments...</p>
                   </div>
-                ) : tournaments.length > 0 ? tournaments.map((t: any) => (
+                ) : (() => {
+                  const filteredTournaments = getFilteredTournaments(tournaments);
+                  return filteredTournaments.length > 0 ? filteredTournaments.map((t: any) => (
                   <div
                     key={t.id}
                     onClick={() => openTournamentModal(t, false)}
@@ -2115,7 +2223,7 @@ export default function Dashboard() {
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                              {new Date(t.tournamentDate).toLocaleDateString('de-DE')}
+                              {new Date(t.tournamentDate).toLocaleDateString('en-US')}
                             </span>
                             <span className="flex items-center whitespace-nowrap">
                               <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2188,10 +2296,21 @@ export default function Dashboard() {
                   </div>
                 )) : (
                   <div className="text-center py-8">
-                    <div className="text-amber-300 text-lg">No tournaments available</div>
-                    <div className="text-amber-300/80 text-sm mt-2">Tournaments will appear here as they are created</div>
+                    <div className="text-amber-300 text-lg">
+                      {tournamentFilter === 'all' 
+                        ? 'No tournaments available' 
+                        : tournamentFilter === 'thisWeek'
+                        ? 'No tournaments this week'
+                        : 'No tournaments next week'}
+                    </div>
+                    <div className="text-amber-300/80 text-sm mt-2">
+                      {tournamentFilter === 'all' 
+                        ? 'Tournaments will appear here as they are created'
+                        : 'Try selecting a different filter'}
+                    </div>
                   </div>
-                )}
+                );
+                })()}
               </div>
 
               {/* View All Button */}
@@ -2351,7 +2470,7 @@ export default function Dashboard() {
                   }}>
                     <div className="text-sm text-[#d4b077] mb-2 font-medieval" style={{ textTransform: 'none' }}>Tournament Date</div>
                     <div className="text-[#F4EBD0] font-semibold">
-                      {new Date(selectedTournament.tournamentDate).toLocaleDateString('de-DE', {
+                      {new Date(selectedTournament.tournamentDate).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -2489,7 +2608,7 @@ export default function Dashboard() {
                               <div className="min-w-0 flex-1">
                                 <div className="text-[#F4EBD0] font-medium text-sm truncate">{member.nickname}</div>
                                 <div className="text-[#B6AA96] text-xs truncate" style={{ textTransform: 'none' }}>
-                                  Joined: {new Date(member.joinedAt).toLocaleDateString('de-DE')}
+                                  Joined: {new Date(member.joinedAt).toLocaleDateString('en-US')}
                                 </div>
                               </div>
                             </div>

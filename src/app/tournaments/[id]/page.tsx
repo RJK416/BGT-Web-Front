@@ -117,7 +117,7 @@ export default function TournamentDetailPage() {
             </h1>
             {tournament && (
               <div className="text-purple-300 text-xs sm:text-sm mt-1">
-                {tournament.game} • {new Date(tournament.tournamentDate).toLocaleDateString('de-DE')} • {tournament.memberCount}/{tournament.maxMembers} • {tournament.phase}
+                {tournament.game} • {new Date(tournament.tournamentDate).toLocaleDateString('en-US')} • {tournament.memberCount}/{tournament.maxMembers} • {tournament.phase}
               </div>
             )}
           </div>
