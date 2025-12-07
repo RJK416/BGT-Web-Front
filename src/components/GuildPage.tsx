@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { guildService } from '@/services/guildService';
@@ -8,6 +8,7 @@ import { GuildRole, InviteStatus, AppointGMRequest } from '@/types/guild';
 import type { Guild, GuildMember, GuildInvitation } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
 import AppointGMModal from '@/components/AppointGMModal';
+import { tavernPalette } from '@/styles/tavernTheme';
 import { tavernPalette } from '@/styles/tavernTheme';
 
 // ✅ Keep this type if you want typed access to extended claims
@@ -229,41 +230,33 @@ export default function GuildPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={pageBackgroundStyle}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400 mx-auto mb-4"></div>
-          <p className="text-amber-300">Loading guild data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: tavernPalette.gold }}></div>
+          <p style={{ color: tavernPalette.gold }}>Loading guild data...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Floating Particles */}
-        <div className="absolute top-20 left-20 w-2 h-2 bg-purple-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-40 left-40 w-3 h-3 bg-blue-300 rounded-full opacity-40 animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-60 left-60 w-1 h-1 bg-cyan-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '2s' }} />
-        
-        <div className="absolute bottom-32 left-40 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
-        <div className="absolute bottom-40 left-36 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
-        <div className="absolute bottom-36 left-44 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
-        
-        {/* Cosmic Dust/Nebula */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-purple-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-radial from-blue-400/8 via-cyan-400/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
-        
-        {/* Shooting Stars */}
-        <div className="absolute top-20 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
-        <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-blue-300 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '1.5s' }} />
-      </div>
+  const pageBackgroundStyle: CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: tavernPalette.background,
+    backgroundImage: `radial-gradient(circle at top, rgba(15, 35, 29, 0.65), transparent 55%), radial-gradient(circle at bottom, rgba(12, 24, 20, 0.6), transparent 60%)`,
+    color: tavernPalette.parchment
+  };
 
+  return (
+    <div className="min-h-screen" style={pageBackgroundStyle}>
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-sm border-b border-amber-400/30" style={{background: 'linear-gradient(to right, rgba(26, 95, 82, 0.9), rgba(15, 66, 52, 0.9))'}}>
+      <header 
+        className="relative z-10 backdrop-blur-sm border-b" 
+        style={{
+          background: 'linear-gradient(135deg, rgba(21, 49, 39, 0.95), rgba(13, 32, 26, 0.95))',
+          borderBottom: `1px solid ${tavernPalette.border}`,
+          boxShadow: `0 10px 35px ${tavernPalette.shadow}`
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-3 relative">
             {/* Left side - Logo and Title */}
@@ -289,7 +282,7 @@ export default function GuildPage() {
             
             {/* Right side - User controls */}
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
-              <span className="text-purple-200 text-sm sm:text-base">Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
+              <span className="text-sm sm:text-base" style={{ color: tavernPalette.parchment }}>Welcome, {(user as any)?.username || (user as any)?.name || (user as any)?.unique_name || 'User'}</span>
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
@@ -358,11 +351,18 @@ export default function GuildPage() {
         
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
-            <p className="text-red-300">{error}</p>
+          <div 
+            className="mb-6 p-4 rounded-lg border"
+            style={{
+              background: `${tavernPalette.ruby}40`,
+              borderColor: tavernPalette.ruby,
+            }}
+          >
+            <p style={{ color: '#F4C2C2' }}>{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-sm text-red-400 hover:text-red-300"
+              className="mt-2 text-sm"
+              style={{ color: '#F4C2C2' }}
             >
               Dismiss
             </button>
@@ -370,39 +370,67 @@ export default function GuildPage() {
         )}
 
         {/* Tab Navigation */}
-        <div className="mb-6 bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-4 border border-amber-400/30">
+        <div 
+          className="mb-6 rounded-xl p-4 border"
+          style={{
+            background: tavernPalette.panelGradient,
+            border: `1px solid ${tavernPalette.border}`,
+            boxShadow: `0 4px 12px ${tavernPalette.shadow}`
+          }}
+        >
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setActiveTab('my-guild')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'my-guild'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 shadow-lg'
-                  : 'bg-purple-800/50 text-amber-300 hover:bg-purple-700/50'
-              }`}
+              className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+              style={activeTab === 'my-guild' ? {
+                background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                color: tavernPalette.borderDark,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)'
+              } : {
+                background: tavernPalette.backgroundAlt,
+                color: tavernPalette.parchment,
+                border: `1px solid ${tavernPalette.border}`,
+                boxShadow: tavernPalette.insetShadow
+              }}
             >
               🏰 My Guild
             </button>
             <button
               onClick={() => setActiveTab('all-guilds')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'all-guilds'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 shadow-lg'
-                  : 'bg-purple-800/50 text-amber-300 hover:bg-purple-700/50'
-              }`}
+              className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+              style={activeTab === 'all-guilds' ? {
+                background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                color: tavernPalette.borderDark,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)'
+              } : {
+                background: tavernPalette.backgroundAlt,
+                color: tavernPalette.parchment,
+                border: `1px solid ${tavernPalette.border}`,
+                boxShadow: tavernPalette.insetShadow
+              }}
             >
               🌍 All Guilds
             </button>
             <button
               onClick={() => setActiveTab('invitations')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 relative ${
-                activeTab === 'invitations'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-purple-900 shadow-lg'
-                  : 'bg-purple-800/50 text-amber-300 hover:bg-purple-700/50'
-              }`}
+              className="px-4 py-2 rounded-lg font-medium transition-all duration-200 relative"
+              style={activeTab === 'invitations' ? {
+                background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                color: tavernPalette.borderDark,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)'
+              } : {
+                background: tavernPalette.backgroundAlt,
+                color: tavernPalette.parchment,
+                border: `1px solid ${tavernPalette.border}`,
+                boxShadow: tavernPalette.insetShadow
+              }}
             >
               📬 Invitations
               {myInvitations.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span 
+                  className="absolute -top-1 -right-1 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  style={{ background: tavernPalette.ruby }}
+                >
                   {myInvitations.length}
                 </span>
               )}
@@ -416,7 +444,14 @@ export default function GuildPage() {
             {myGuild ? (
               <>
                 {/* Guild Info */}
-                <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
+                <div 
+                  className="rounded-xl p-6 border"
+                  style={{
+                    background: tavernPalette.panelGradient,
+                    border: `1px solid ${tavernPalette.border}`,
+                    boxShadow: `0 8px 24px ${tavernPalette.shadow}`
+                  }}
+                >
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Guild Emblem */}
                     <div className="flex-shrink-0 flex justify-center lg:justify-start">
@@ -453,29 +488,29 @@ export default function GuildPage() {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-2xl font-bold text-amber-400 mb-4">{myGuild.name}</h2>
-                      <p className="text-purple-300 mb-4">{myGuild.description || 'No description provided.'}</p>
+                      <h2 className="text-2xl font-bold mb-4" style={{ color: tavernPalette.gold }}>{myGuild.name}</h2>
+                      <p className="mb-4" style={{ color: tavernPalette.parchment }}>{myGuild.description || 'No description provided.'}</p>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-amber-300">{myGuild.memberCount}</div>
-                          <div className="text-sm text-purple-400">Members</div>
+                          <div className="text-2xl font-bold" style={{ color: tavernPalette.goldLight }}>{myGuild.memberCount}</div>
+                          <div className="text-sm" style={{ color: tavernPalette.ash }}>Members</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-amber-300">{myGuild.maxMember}</div>
-                          <div className="text-sm text-purple-400">Max Members</div>
+                          <div className="text-2xl font-bold" style={{ color: tavernPalette.goldLight }}>{myGuild.maxMember}</div>
+                          <div className="text-sm" style={{ color: tavernPalette.ash }}>Max Members</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-amber-300">{myGuild.level}</div>
-                          <div className="text-sm text-purple-400">Guild Level</div>
+                          <div className="text-2xl font-bold" style={{ color: tavernPalette.goldLight }}>{myGuild.level}</div>
+                          <div className="text-sm" style={{ color: tavernPalette.ash }}>Guild Level</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-amber-300">{myGuild.userRole}</div>
-                          <div className="text-sm text-purple-400">Your Role</div>
+                          <div className="text-2xl font-bold" style={{ color: tavernPalette.goldLight }}>{myGuild.userRole}</div>
+                          <div className="text-sm" style={{ color: tavernPalette.ash }}>Your Role</div>
                         </div>
                       </div>
                       
-                      <div className="text-sm text-purple-400">
+                      <div className="text-sm" style={{ color: tavernPalette.ash }}>
                         Created by {myGuild.creatorName} on {new Date(myGuild.created).toLocaleDateString()}
                       </div>
                     </div>
@@ -483,14 +518,27 @@ export default function GuildPage() {
                 </div>
 
                 {/* Guild Members */}
-                <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
+                <div 
+                  className="rounded-xl p-6 border"
+                  style={{
+                    background: tavernPalette.panelGradient,
+                    border: `1px solid ${tavernPalette.border}`,
+                    boxShadow: `0 8px 24px ${tavernPalette.shadow}`
+                  }}
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-amber-400">Guild Members</h3>
+                    <h3 className="text-xl font-bold" style={{ color: tavernPalette.gold }}>Guild Members</h3>
                     {/* Only show appoint GM button for current GMs */}
                     {isGM && (
                       <button
                         onClick={() => setIsAppointGMModalOpen(true)}
-                        className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+                        className="px-4 py-2 font-medium rounded-lg transition-all duration-300"
+                        style={{
+                          background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                          color: tavernPalette.borderDark,
+                          border: `1px solid ${tavernPalette.border}`,
+                          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                        }}
                       >
                         Appoint GM
                       </button>
@@ -500,7 +548,12 @@ export default function GuildPage() {
                     {myGuild.members.map((member) => (
                       <div
                         key={member.playerId}
-                        className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20"
+                        className="rounded-lg p-4 border"
+                        style={{
+                          background: tavernPalette.backgroundAlt,
+                          border: `1px solid ${tavernPalette.border}`,
+                          boxShadow: tavernPalette.insetShadow
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
@@ -509,7 +562,8 @@ export default function GuildPage() {
                                 <img
                                   src={member.avatarUrl}
                                   alt={member.playerName}
-                                  className="w-10 h-10 rounded-full object-cover border-2 border-amber-400"
+                                  className="w-10 h-10 rounded-full object-cover border-2"
+                                  style={{ borderColor: tavernPalette.gold }}
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
@@ -517,20 +571,27 @@ export default function GuildPage() {
                                   }}
                                 />
                               ) : null}
-                              <div className={`w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold ${member.avatarUrl ? 'hidden' : ''}`}>
+                              <div 
+                                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${member.avatarUrl ? 'hidden' : ''}`}
+                                style={{
+                                  background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                                  color: tavernPalette.borderDark,
+                                  border: `2px solid ${tavernPalette.gold}`
+                                }}
+                              >
                                 {member.playerName.charAt(0).toUpperCase()}
                               </div>
                             </div>
                             <div>
-                              <h4 className="text-amber-300 font-semibold">{member.playerName}</h4>
-                              <p className="text-purple-400 text-sm">Level {member.playerLevel || 'N/A'}</p>
+                              <h4 className="font-semibold" style={{ color: tavernPalette.goldLight }}>{member.playerName}</h4>
+                              <p className="text-sm" style={{ color: tavernPalette.ash }}>Level {member.playerLevel || 'N/A'}</p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-medium text-amber-300">
+                            <div className="font-medium" style={{ color: tavernPalette.goldLight }}>
                               {member.role}
                             </div>
-                            <div className="text-purple-400 text-sm">
+                            <div className="text-sm" style={{ color: tavernPalette.ash }}>
                               Joined {new Date(member.joinedAt).toLocaleDateString()}
                             </div>
                           </div>
@@ -541,9 +602,16 @@ export default function GuildPage() {
                 </div>
               </>
             ) : (
-              <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-8 border border-amber-400/30 text-center">
-                <h3 className="text-xl font-bold text-amber-400 mb-4">No Guild</h3>
-                <p className="text-purple-300 mb-6">You are not currently a member of any guild.</p>
+              <div 
+                className="rounded-xl p-8 border text-center"
+                style={{
+                  background: tavernPalette.panelGradient,
+                  border: `1px solid ${tavernPalette.border}`,
+                  boxShadow: `0 8px 24px ${tavernPalette.shadow}`
+                }}
+              >
+                <h3 className="text-xl font-bold mb-4" style={{ color: tavernPalette.gold }}>No Guild</h3>
+                <p className="mb-6" style={{ color: tavernPalette.parchment }}>You are not currently a member of any guild.</p>
                 <div className="flex gap-4 justify-center flex-wrap">
                   <button
                     onClick={openCreateGuildModal}
@@ -589,9 +657,16 @@ export default function GuildPage() {
 
         {activeTab === 'all-guilds' && (
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
+            <div 
+              className="rounded-xl p-6 border"
+              style={{
+                background: tavernPalette.panelGradient,
+                border: `1px solid ${tavernPalette.border}`,
+                boxShadow: `0 8px 24px ${tavernPalette.shadow}`
+              }}
+            >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-amber-400">All Guilds</h3>
+                <h3 className="text-xl font-bold" style={{ color: tavernPalette.gold }}>All Guilds</h3>
                 <button
                   onClick={openCreateGuildModal}
                   style={{
@@ -615,7 +690,12 @@ export default function GuildPage() {
                 {allGuilds.map((guild) => (
                   <div
                     key={guild.id}
-                    className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20"
+                    className="rounded-lg p-4 border"
+                    style={{
+                      background: tavernPalette.backgroundAlt,
+                      border: `1px solid ${tavernPalette.border}`,
+                      boxShadow: tavernPalette.insetShadow
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 flex-1">
@@ -627,7 +707,7 @@ export default function GuildPage() {
                               alt={guild.name}
                               className="w-16 h-16 rounded-lg object-cover border-2"
                               style={{
-                                borderColor: '#E7B45D',
+                                borderColor: tavernPalette.gold,
                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                               }}
                               onError={(e) => {
@@ -642,9 +722,9 @@ export default function GuildPage() {
                             className={`w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold border-2`}
                             style={{
                               background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
-                              borderColor: '#E7B45D',
+                              borderColor: tavernPalette.gold,
                               boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
-                              color: '#2A1D12',
+                              color: tavernPalette.borderDark,
                               display: guild.emblemUrl ? 'none' : 'flex'
                             }}
                           >
@@ -652,9 +732,9 @@ export default function GuildPage() {
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-amber-300 font-semibold text-lg truncate">{guild.name}</h4>
-                          <p className="text-purple-400 text-sm mb-2 truncate">{guild.description || 'No description provided.'}</p>
-                          <div className="flex flex-wrap gap-4 text-sm text-purple-400">
+                          <h4 className="font-semibold text-lg truncate" style={{ color: tavernPalette.goldLight }}>{guild.name}</h4>
+                          <p className="text-sm mb-2 truncate" style={{ color: tavernPalette.ash }}>{guild.description || 'No description provided.'}</p>
+                          <div className="flex flex-wrap gap-4 text-sm" style={{ color: tavernPalette.ash }}>
                             <span>{guild.memberCount}/{guild.maxMember} members</span>
                             <span>Level {guild.level}</span>
                             <span>Created by {guild.creatorName}</span>
@@ -662,7 +742,13 @@ export default function GuildPage() {
                         </div>
                       </div>
                       <button
-                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300"
+                        className="px-4 py-2 font-medium rounded-lg transition-all duration-300"
+                        style={{
+                          background: `linear-gradient(180deg, ${tavernPalette.emerald} 0%, ${tavernPalette.emeraldDark} 100%)`,
+                          color: tavernPalette.parchment,
+                          border: `1px solid ${tavernPalette.border}`,
+                          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                        }}
                         onClick={() => {
                           // TODO: Implement join guild functionality
                           console.log('Join guild:', guild.id);
@@ -680,42 +766,66 @@ export default function GuildPage() {
 
         {activeTab === 'invitations' && (
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 rounded-xl p-6 border border-amber-400/30">
-              <h3 className="text-xl font-bold text-amber-400 mb-4">Guild Invitations</h3>
+            <div 
+              className="rounded-xl p-6 border"
+              style={{
+                background: tavernPalette.panelGradient,
+                border: `1px solid ${tavernPalette.border}`,
+                boxShadow: `0 8px 24px ${tavernPalette.shadow}`
+              }}
+            >
+              <h3 className="text-xl font-bold mb-4" style={{ color: tavernPalette.gold }}>Guild Invitations</h3>
               {myInvitations.length > 0 ? (
                 <div className="space-y-4">
                   {myInvitations.map((invitation) => (
                     <div
                       key={invitation.id}
-                      className="bg-gradient-to-r from-purple-800/50 to-purple-700/50 rounded-lg p-4 border border-amber-400/20"
+                      className="rounded-lg p-4 border"
+                      style={{
+                        background: tavernPalette.backgroundAlt,
+                        border: `1px solid ${tavernPalette.border}`,
+                        boxShadow: tavernPalette.insetShadow
+                      }}
                     >
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex-1">
-                          <h4 className="text-amber-300 font-semibold text-lg">{invitation.guild.name}</h4>
-                          <p className="text-purple-400 text-sm mb-2">{invitation.guild.description || 'No description provided.'}</p>
-                          <div className="flex flex-wrap gap-4 text-sm text-purple-400 mb-2">
+                          <h4 className="font-semibold text-lg" style={{ color: tavernPalette.goldLight }}>{invitation.guild.name}</h4>
+                          <p className="text-sm mb-2" style={{ color: tavernPalette.ash }}>{invitation.guild.description || 'No description provided.'}</p>
+                          <div className="flex flex-wrap gap-4 text-sm mb-2" style={{ color: tavernPalette.ash }}>
                             <span>{invitation.guild.memberCount}/{invitation.guild.maxMembers} members</span>
                           </div>
-                          <p className="text-amber-300 text-sm">
+                          <p className="text-sm" style={{ color: tavernPalette.goldLight }}>
                             Invited by <span className="font-semibold">{invitation.inviter.nickname}</span>
                           </p>
                           {invitation.message && (
-                            <p className="text-purple-300 text-sm mt-2 italic">"{invitation.message}"</p>
+                            <p className="text-sm mt-2 italic" style={{ color: tavernPalette.parchment }}>"{invitation.message}"</p>
                           )}
-                          <p className="text-purple-400 text-xs mt-2">
+                          <p className="text-xs mt-2" style={{ color: tavernPalette.ash }}>
                             Expires: {new Date(invitation.expiresAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleInvitationResponse(invitation.id, InviteStatus.Accepted)}
-                            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300"
+                            className="px-4 py-2 font-medium rounded-lg transition-all duration-300"
+                            style={{
+                              background: `linear-gradient(180deg, ${tavernPalette.emerald} 0%, ${tavernPalette.emeraldDark} 100%)`,
+                              color: tavernPalette.parchment,
+                              border: `1px solid ${tavernPalette.border}`,
+                              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                            }}
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleInvitationResponse(invitation.id, InviteStatus.Declined)}
-                            className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-lg transition-all duration-300"
+                            className="px-4 py-2 font-medium rounded-lg transition-all duration-300"
+                            style={{
+                              background: `linear-gradient(180deg, ${tavernPalette.ruby} 0%, rgba(90, 25, 25, 0.95) 100%)`,
+                              color: tavernPalette.parchment,
+                              border: `1px solid ${tavernPalette.border}`,
+                              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4)'
+                            }}
                           >
                             Decline
                           </button>
@@ -726,7 +836,7 @@ export default function GuildPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-purple-300">No pending invitations</p>
+                  <p style={{ color: tavernPalette.parchment }}>No pending invitations</p>
                 </div>
               )}
             </div>

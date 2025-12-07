@@ -944,7 +944,7 @@ export default function Dashboard() {
                             <img
                               src={g.emblemUrl}
                               alt={g.name}
-                              className="w-12 h-12 rounded-full object-cover border-2"
+                              className="w-12 h-12 rounded-lg object-cover border-2"
                               style={{
                                 borderColor: 'rgba(231, 180, 93, 0.7)',
                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
@@ -961,11 +961,11 @@ export default function Dashboard() {
                             style={{
                               width: '48px',
                               height: '48px',
-                              borderRadius: '9999px',
-                              background: 'radial-gradient(circle at 30% 30%, #6c4729 0%, #2f1b10 70%)',
+                              borderRadius: '8px',
+                              background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
                               border: '2px solid rgba(231, 180, 93, 0.7)',
-                              boxShadow: 'inset 0 2px 4px rgba(255, 255, 255, 0.12), 0 6px 10px rgba(0, 0, 0, 0.45)',
-                              color: '#f4ebd0',
+                              boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                              color: '#2A1D12',
                               fontSize: '1.1rem',
                               fontWeight: 700,
                               display: g.emblemUrl ? 'none' : 'flex',
