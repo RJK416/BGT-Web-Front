@@ -115,6 +115,10 @@ export default function GuildPageSimple() {
   const [isUploadingEmblem, setIsUploadingEmblem] = useState(false);
   const [emblemError, setEmblemError] = useState<string | null>(null);
   const [emblemSuccess, setEmblemSuccess] = useState<string | null>(null);
+  const [showDisbandModal, setShowDisbandModal] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [disbandLoading, setDisbandLoading] = useState(false);
+  const [leaveLoading, setLeaveLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -263,6 +267,62 @@ export default function GuildPageSimple() {
     setGuildName('');
     setGuildDescription('');
     setCreateGuildMessage(null);
+  };
+
+  const handleDisbandGuild = async () => {
+    if (!guild) return;
+
+    try {
+      setDisbandLoading(true);
+      const response = await guildService.disbandGuild();
+
+      if (response.status === 200 || response.isSuccess) {
+        // Guild disbanded successfully, redirect to guild page (will show no guild)
+        setGuild(null);
+        setError('Guild has been disbanded');
+        setShowDisbandModal(false);
+        // Refresh to show no guild state
+        setTimeout(async () => {
+          const guildData = await fetchMyGuild();
+          setGuild(guildData);
+        }, 1000);
+      } else {
+        alert(response.message || 'Failed to disband guild');
+      }
+    } catch (error: any) {
+      console.error('Error disbanding guild:', error);
+      alert(error.message || 'Failed to disband guild. Please try again.');
+    } finally {
+      setDisbandLoading(false);
+    }
+  };
+
+  const handleLeaveGuild = async () => {
+    if (!guild) return;
+
+    try {
+      setLeaveLoading(true);
+      const response = await guildService.leaveGuild();
+
+      if (response.status === 200 || response.isSuccess) {
+        // Left guild successfully, refresh guild data
+        setShowLeaveModal(false);
+        const guildData = await fetchMyGuild();
+        if (guildData) {
+          setGuild(guildData);
+        } else {
+          setGuild(null);
+          setError('You have left the guild');
+        }
+      } else {
+        alert(response.message || 'Failed to leave guild');
+      }
+    } catch (error: any) {
+      console.error('Error leaving guild:', error);
+      alert(error.message || 'Failed to leave guild. Please try again.');
+    } finally {
+      setLeaveLoading(false);
+    }
   };
 
   const handleEmblemUpload = async (file: File) => {
@@ -567,7 +627,7 @@ export default function GuildPageSimple() {
               </div>
               
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 {/* Chat Button */}
                 <button
                   onClick={() => setShowChat(true)}
@@ -611,6 +671,52 @@ export default function GuildPageSimple() {
                     }}
                   >
                     ✨ Invite Player
+                  </button>
+                )}
+
+                {/* Leave Guild Button */}
+                <button
+                  onClick={() => setShowLeaveModal(true)}
+                  className="px-6 py-3 font-medium rounded-lg transition-all duration-300"
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.ruby} 0%, rgba(90, 25, 25, 0.95) 100%)`,
+                    color: tavernPalette.parchment,
+                    border: `1px solid ${tavernPalette.border}`,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.4)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  🚪 Leave Guild
+                </button>
+
+                {/* Disband Guild Button - Only for Leader */}
+                {guild.userRole === 'Leader' && (
+                  <button
+                    onClick={() => setShowDisbandModal(true)}
+                    className="px-6 py-3 font-medium rounded-lg transition-all duration-300"
+                    style={{
+                      background: `linear-gradient(180deg, rgba(128, 44, 44, 0.9) 0%, rgba(90, 25, 25, 0.95) 100%)`,
+                      color: tavernPalette.parchment,
+                      border: `2px solid ${tavernPalette.ruby}`,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.5)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    ⚔️ Disband Guild
                   </button>
                 )}
               </div>
@@ -1027,6 +1133,193 @@ export default function GuildPageSimple() {
           guildName={guild.name}
           onClose={() => setShowChat(false)}
         />
+      )}
+
+      {/* Disband Guild Confirmation Modal */}
+      {showDisbandModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div 
+            className="rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl"
+            style={{
+              background: tavernPalette.panelGradient,
+              border: `2px solid ${tavernPalette.ruby}`,
+              boxShadow: `0 20px 60px ${tavernPalette.shadow}, ${tavernPalette.glow}`
+            }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: tavernPalette.ruby }}
+              >
+                ⚔️ Disband Guild
+              </h3>
+              <button
+                onClick={() => setShowDisbandModal(false)}
+                className="text-2xl font-bold transition-colors hover:opacity-70"
+                style={{ color: tavernPalette.parchment }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p style={{ color: tavernPalette.parchment }}>
+                Are you sure you want to <strong style={{ color: tavernPalette.ruby }}>permanently disband</strong> this guild?
+              </p>
+              <p className="text-sm" style={{ color: tavernPalette.ash }}>
+                This action cannot be undone. All members will be removed and the guild will be deleted forever.
+              </p>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowDisbandModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  disabled={disbandLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDisbandGuild}
+                  disabled={disbandLoading}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: disbandLoading
+                      ? '#4A4A4A'
+                      : `linear-gradient(180deg, ${tavernPalette.ruby} 0%, rgba(90, 25, 25, 0.95) 100%)`,
+                    border: `1px solid ${tavernPalette.ruby}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: disbandLoading
+                      ? 'none'
+                      : 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                    cursor: disbandLoading ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!disbandLoading) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {disbandLoading ? 'Disbanding...' : 'Yes, Disband Guild'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leave Guild Confirmation Modal */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div 
+            className="rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl"
+            style={{
+              background: tavernPalette.panelGradient,
+              border: `2px solid ${tavernPalette.border}`,
+              boxShadow: `0 20px 60px ${tavernPalette.shadow}, ${tavernPalette.glow}`
+            }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: tavernPalette.gold }}
+              >
+                🚪 Leave Guild
+              </h3>
+              <button
+                onClick={() => setShowLeaveModal(false)}
+                className="text-2xl font-bold transition-colors hover:opacity-70"
+                style={{ color: tavernPalette.parchment }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p style={{ color: tavernPalette.parchment }}>
+                Are you sure you want to leave <strong style={{ color: tavernPalette.gold }}>{guild?.name}</strong>?
+              </p>
+              {guild?.userRole === 'Leader' && (
+                <p className="text-sm" style={{ color: tavernPalette.ruby }}>
+                  ⚠️ Warning: You are the Leader. If you leave, you may want to appoint a new Leader first or disband the guild.
+                </p>
+              )}
+              <p className="text-sm" style={{ color: tavernPalette.ash }}>
+                You will lose all guild privileges and will need to be re-invited to rejoin.
+              </p>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowLeaveModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  disabled={leaveLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLeaveGuild}
+                  disabled={leaveLoading}
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: leaveLoading
+                      ? '#4A4A4A'
+                      : `linear-gradient(180deg, ${tavernPalette.ruby} 0%, rgba(90, 25, 25, 0.95) 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: leaveLoading
+                      ? 'none'
+                      : 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                    cursor: leaveLoading ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!leaveLoading) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {leaveLoading ? 'Leaving...' : 'Yes, Leave Guild'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

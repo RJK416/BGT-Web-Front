@@ -169,6 +169,14 @@ class GuildService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  async leaveGuild(): Promise<GuildActionResponse> {
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.GUILD.LEAVE_GUILD);
+    return await apiRequest(url, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+    });
+  }
 }
 
 export const guildService = new GuildService();

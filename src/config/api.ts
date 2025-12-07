@@ -63,6 +63,7 @@ export const API_CONFIG = {
       APPOINT_GM: '/Guild/Appoint-GM',
       UPLOAD_EMBLEM: '/Guild/Emblem/Upload',
       DISBAND_GUILD: '/Guild/Disband',
+      LEAVE_GUILD: '/Guild/Leave-Guild',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',
