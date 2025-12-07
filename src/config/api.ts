@@ -61,6 +61,7 @@ export const API_CONFIG = {
       GET_ALL_MEMBERS: '/Guild/Get-All-Guild-Members',
       GET_MY_MEMBERS: '/Guild/Get-My-Guild-Members',
       APPOINT_GM: '/Guild/Appoint-GM',
+      UPLOAD_EMBLEM: '/Guild/Emblem/Upload',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',
@@ -163,4 +164,11 @@ export const getAvatarUrl = (avatarPath: string | null | undefined): string | nu
     : API_CONFIG.ASSETS_BASE_URL;
   
   return `${baseUrl}/${cleanPath}`;
-}; 
+};
+
+/**
+ * Helper function to build full emblem URL from relative path (same logic as avatar)
+ * @param emblemPath - Relative path from database (e.g., "emblems/1/915cb1546f274393a9066c33540ca9bc.png")
+ * @returns Full URL to the emblem image, or null if path is invalid
+ */
+export const getEmblemUrl = getAvatarUrl; // Same logic for both avatars and emblems 

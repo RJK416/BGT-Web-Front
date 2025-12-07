@@ -8,6 +8,7 @@ import { GuildRole, InviteStatus, AppointGMRequest } from '@/types/guild';
 import type { Guild, GuildMember, GuildInvitation } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
 import AppointGMModal from '@/components/AppointGMModal';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -424,7 +425,7 @@ export default function GuildPage() {
                           <img
                             src={myGuild.emblemUrl}
                             alt={myGuild.name}
-                            className="w-24 h-24 rounded-full object-cover border-4"
+                            className="w-24 h-24 rounded-lg object-cover border-4"
                             style={{
                               borderColor: '#E7B45D',
                               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)'
@@ -438,7 +439,7 @@ export default function GuildPage() {
                           />
                         ) : null}
                         <div 
-                          className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold border-4`}
+                          className={`w-24 h-24 rounded-lg flex items-center justify-center text-3xl font-bold border-4`}
                           style={{
                             background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
                             borderColor: '#E7B45D',
@@ -546,13 +547,37 @@ export default function GuildPage() {
                 <div className="flex gap-4 justify-center flex-wrap">
                   <button
                     onClick={openCreateGuildModal}
-                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                    style={{
+                      padding: '12px 24px',
+                      background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                      border: `1px solid ${tavernPalette.border}`,
+                      borderRadius: '8px',
+                      color: tavernPalette.borderDark,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                      transition: 'all 0.3s',
+                      cursor: 'pointer'
+                    }}
+                    className="hover:opacity-90 hover:shadow-lg"
                   >
                     🏰 Create New Guild
                   </button>
                   <button
                     onClick={() => setActiveTab('all-guilds')}
-                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-medium rounded-lg transition-all duration-300"
+                    style={{
+                      padding: '12px 24px',
+                      background: `linear-gradient(180deg, ${tavernPalette.emerald} 0%, ${tavernPalette.emeraldDark} 100%)`,
+                      border: `1px solid ${tavernPalette.border}`,
+                      borderRadius: '8px',
+                      color: tavernPalette.parchment,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                      transition: 'all 0.3s',
+                      cursor: 'pointer'
+                    }}
+                    className="hover:opacity-90 hover:shadow-lg"
                   >
                     Browse Guilds
                   </button>
@@ -569,7 +594,19 @@ export default function GuildPage() {
                 <h3 className="text-xl font-bold text-amber-400">All Guilds</h3>
                 <button
                   onClick={openCreateGuildModal}
-                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                  style={{
+                    padding: '10px 20px',
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    borderRadius: '8px',
+                    color: tavernPalette.borderDark,
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                    transition: 'all 0.3s',
+                    cursor: 'pointer'
+                  }}
+                  className="hover:opacity-90 hover:shadow-lg"
                 >
                   🏰 Create New Guild
                 </button>
@@ -588,7 +625,7 @@ export default function GuildPage() {
                             <img
                               src={guild.emblemUrl}
                               alt={guild.name}
-                              className="w-16 h-16 rounded-full object-cover border-2"
+                              className="w-16 h-16 rounded-lg object-cover border-2"
                               style={{
                                 borderColor: '#E7B45D',
                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
@@ -602,7 +639,7 @@ export default function GuildPage() {
                             />
                           ) : null}
                           <div 
-                            className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold border-2`}
+                            className={`w-16 h-16 rounded-lg flex items-center justify-center text-xl font-bold border-2`}
                             style={{
                               background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
                               borderColor: '#E7B45D',
@@ -710,13 +747,26 @@ export default function GuildPage() {
 
       {/* Create Guild Modal */}
       {showCreateGuildModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="rounded-xl p-6 border-2 border-amber-400/50 w-full max-w-md mx-4 bg-gradient-to-br from-purple-950/95 to-purple-900/95 shadow-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div 
+            className="rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl"
+            style={{
+              background: tavernPalette.panelGradient,
+              border: `2px solid ${tavernPalette.border}`,
+              boxShadow: `0 20px 60px ${tavernPalette.shadow}, ${tavernPalette.glow}`
+            }}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-amber-400">Create New Guild</h3>
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: tavernPalette.gold }}
+              >
+                Create New Guild
+              </h3>
               <button
                 onClick={closeCreateGuildModal}
-                className="text-amber-200 hover:text-orange-300 text-2xl font-bold transition-colors"
+                className="text-2xl font-bold transition-colors hover:opacity-70"
+                style={{ color: tavernPalette.parchment }}
               >
                 ×
               </button>
@@ -724,7 +774,10 @@ export default function GuildPage() {
 
             <form onSubmit={handleCreateGuild} className="space-y-4">
               <div>
-                <label className="block text-amber-200 text-sm font-medium mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: tavernPalette.parchment }}
+                >
                   Guild Name *
                 </label>
                 <input
@@ -732,14 +785,31 @@ export default function GuildPage() {
                   value={guildName}
                   onChange={(e) => setGuildName(e.target.value)}
                   placeholder="Enter guild name (3-20 characters)"
-                  className="w-full px-3 py-2 bg-purple-900/70 border border-amber-400/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.gold;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.border;
+                    e.currentTarget.style.boxShadow = tavernPalette.insetShadow;
+                  }}
                   required
                   maxLength={20}
                 />
               </div>
 
               <div>
-                <label className="block text-amber-200 text-sm font-medium mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: tavernPalette.parchment }}
+                >
                   Description (Optional)
                 </label>
                 <textarea
@@ -747,17 +817,38 @@ export default function GuildPage() {
                   onChange={(e) => setGuildDescription(e.target.value)}
                   placeholder="Enter guild description"
                   rows={3}
-                  className="w-full px-3 py-2 bg-purple-900/70 border border-amber-400/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 resize-none transition-all duration-200"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.gold;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.border;
+                    e.currentTarget.style.boxShadow = tavernPalette.insetShadow;
+                  }}
                 />
               </div>
 
               {createGuildMessage && (
                 <div
-                  className={`p-3 rounded-lg text-sm border ${
-                    createGuildMessage.includes('successfully')
-                      ? 'bg-emerald-900/40 text-emerald-200 border-emerald-500/40'
-                      : 'bg-red-900/40 text-red-200 border-red-500/40'
-                  }`}
+                  className="p-3 rounded-lg text-sm border"
+                  style={{
+                    background: createGuildMessage.includes('successfully') 
+                      ? `${tavernPalette.emerald}40` 
+                      : `${tavernPalette.ruby}40`,
+                    color: createGuildMessage.includes('successfully')
+                      ? tavernPalette.parchment
+                      : '#F4C2C2',
+                    borderColor: createGuildMessage.includes('successfully')
+                      ? tavernPalette.emerald
+                      : tavernPalette.ruby
+                  }}
                 >
                   {createGuildMessage}
                 </div>
@@ -767,14 +858,49 @@ export default function GuildPage() {
                 <button
                   type="button"
                   onClick={closeCreateGuildModal}
-                  className="flex-1 px-4 py-2 bg-purple-900/70 hover:bg-purple-800/60 border border-amber-400/40 text-amber-200 rounded-lg transition-all duration-300"
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createGuildLoading || !guildName.trim()}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium"
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: createGuildLoading || !guildName.trim()
+                      ? '#4A4A4A'
+                      : `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: createGuildLoading || !guildName.trim()
+                      ? '#888'
+                      : tavernPalette.borderDark,
+                    boxShadow: createGuildLoading || !guildName.trim()
+                      ? 'none'
+                      : 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                    cursor: createGuildLoading || !guildName.trim() ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!createGuildLoading && guildName.trim()) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
                   {createGuildLoading ? 'Creating...' : 'Create Guild'}
                 </button>

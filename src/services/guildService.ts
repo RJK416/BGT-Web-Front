@@ -129,6 +129,38 @@ class GuildService {
       body: JSON.stringify({ Username: username }),
     });
   }
+
+  async uploadEmblem(file: File): Promise<GuildActionResponse> {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.GUILD.UPLOAD_EMBLEM);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+    
+    if (!response.ok || result.status !== 200) {
+      throw new Error(result.error || result.message || 'Failed to upload emblem');
+    }
+
+    return {
+      status: result.status || 200,
+      message: result.message || 'Emblem uploaded successfully',
+      data: result.data !== undefined ? result.data : true,
+      isSuccess: result.status === 200,
+    };
+  }
 }
 
 export const guildService = new GuildService();

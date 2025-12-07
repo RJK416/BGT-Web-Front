@@ -7,6 +7,7 @@ import GuildChat from './GuildChat';
 import { guildService } from '@/services/guildService';
 import { API_CONFIG } from '@/config/api';
 import type { Guild, GuildMember } from '@/types/guild';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 interface InviteRequest {
   guildId: number;
@@ -111,6 +112,9 @@ export default function GuildPageSimple() {
   const [guildDescription, setGuildDescription] = useState('');
   const [createGuildLoading, setCreateGuildLoading] = useState(false);
   const [createGuildMessage, setCreateGuildMessage] = useState<string | null>(null);
+  const [isUploadingEmblem, setIsUploadingEmblem] = useState(false);
+  const [emblemError, setEmblemError] = useState<string | null>(null);
+  const [emblemSuccess, setEmblemSuccess] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -261,6 +265,55 @@ export default function GuildPageSimple() {
     setCreateGuildMessage(null);
   };
 
+  const handleEmblemUpload = async (file: File) => {
+    if (!file || !guild) return;
+
+    setEmblemError(null);
+    setEmblemSuccess(null);
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setEmblemError('Please select a valid image file (JPG, PNG, or WebP)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setEmblemError('File size must be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingEmblem(true);
+      await guildService.uploadEmblem(file);
+      setEmblemSuccess('Emblem uploaded successfully!');
+      
+      // Refresh guild data
+      const guildData = await fetchMyGuild();
+      if (guildData) {
+        setGuild(guildData);
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setEmblemSuccess(null);
+      }, 3000);
+    } catch (error: any) {
+      console.error('Error uploading emblem:', error);
+      setEmblemError(error.message || 'Failed to upload emblem');
+      setTimeout(() => {
+        setEmblemError(null);
+      }, 5000);
+    } finally {
+      setIsUploadingEmblem(false);
+    }
+  };
+
+  // Check if user can upload emblem (Leader or Officer)
+  const canUploadEmblem = guild && (guild.userRole === 'Leader' || guild.userRole === 'Officer');
+
   const pageBackgroundStyle: CSSProperties = {
     backgroundColor: 'rgba(8, 47, 35, 1)',
     backgroundImage: `
@@ -375,8 +428,27 @@ export default function GuildPageSimple() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {error ? (
-          <div className="rounded-lg p-6 text-center" style={toastStyle}>
-            <p className="text-lg">{error}</p>
+          <div className="rounded-xl p-8 text-center" style={panelStyle}>
+            <h3 className="text-2xl font-bold text-orange-300 mb-4">No Guild Found</h3>
+            <p className={`${mutedTextClass} text-lg mb-6`}>{error}</p>
+            <button
+              onClick={openCreateGuildModal}
+              style={{
+                padding: '12px 24px',
+                background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                border: `1px solid ${tavernPalette.border}`,
+                borderRadius: '8px',
+                color: tavernPalette.borderDark,
+                fontSize: '1rem',
+                fontWeight: 600,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                transition: 'all 0.3s',
+                cursor: 'pointer'
+              }}
+              className="hover:opacity-90 hover:shadow-lg"
+            >
+              🏰 Create New Guild
+            </button>
           </div>
         ) : guild ? (
           <div className="space-y-6">
@@ -386,35 +458,91 @@ export default function GuildPageSimple() {
                 {/* Guild Emblem */}
                 <div className="flex-shrink-0">
                   <div className="relative">
-                    {guild.emblemUrl ? (
-                      <img
-                        src={guild.emblemUrl}
-                        alt={guild.name}
-                        className="w-24 h-24 rounded-full object-cover border-4"
-                        style={{
-                          borderColor: '#E7B45D',
-                          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)'
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div 
-                      className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold border-4`}
-                      style={{
-                        background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
-                        borderColor: '#E7B45D',
-                        boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
-                        color: '#2A1D12',
-                        display: guild.emblemUrl ? 'none' : 'flex'
+                    <input
+                      type="file"
+                      id="emblem-upload"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleEmblemUpload(file);
+                        }
+                        // Reset input so same file can be selected again
+                        e.target.value = '';
                       }}
+                      className="hidden"
+                      disabled={isUploadingEmblem || !canUploadEmblem}
+                    />
+                    <label
+                      htmlFor="emblem-upload"
+                      className={`block ${canUploadEmblem && !isUploadingEmblem ? 'cursor-pointer hover:opacity-90' : 'cursor-default'}`}
+                      title={canUploadEmblem ? 'Click to upload emblem' : ''}
                     >
-                      {guild.name.charAt(0).toUpperCase()}
-                    </div>
+                      {guild.emblemUrl ? (
+                        <img
+                          src={guild.emblemUrl}
+                          alt={guild.name}
+                          className="w-24 h-24 rounded-lg object-cover border-4 transition-all duration-200"
+                          style={{
+                            borderColor: '#E7B45D',
+                            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)',
+                            opacity: isUploadingEmblem ? 0.5 : 1
+                          }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-24 h-24 rounded-lg flex items-center justify-center text-3xl font-bold border-4 transition-all duration-200 relative`}
+                        style={{
+                          background: 'radial-gradient(circle at 30% 30%, #f1c980 0%, #b37a3c 55%, #7a4a21 100%)',
+                          borderColor: '#E7B45D',
+                          boxShadow: 'inset 0 2px 6px rgba(255, 255, 255, 0.28), 0 6px 14px rgba(231, 180, 93, 0.25)',
+                          color: '#2A1D12',
+                          display: guild.emblemUrl ? 'none' : 'flex',
+                          opacity: isUploadingEmblem ? 0.5 : 1
+                        }}
+                      >
+                        {isUploadingEmblem ? (
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2A1D12]"></div>
+                        ) : (
+                          guild.name.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                    </label>
+                    {/* Error/Success Messages */}
+                    {emblemError && (
+                      <div 
+                        className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded text-xs"
+                        style={{
+                          background: `${tavernPalette.ruby}CC`,
+                          color: '#F4C2C2',
+                          border: `1px solid ${tavernPalette.ruby}`,
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+                          zIndex: 10
+                        }}
+                      >
+                        {emblemError}
+                      </div>
+                    )}
+                    {emblemSuccess && (
+                      <div 
+                        className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded text-xs"
+                        style={{
+                          background: `${tavernPalette.emerald}CC`,
+                          color: tavernPalette.parchment,
+                          border: `1px solid ${tavernPalette.emerald}`,
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+                          zIndex: 10
+                        }}
+                      >
+                        {emblemSuccess}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex-1 text-center md:text-left">
@@ -521,7 +649,19 @@ export default function GuildPageSimple() {
             <p className={`${mutedTextClass} text-lg mb-6`}>You are not currently a member of any guild.</p>
             <button
               onClick={openCreateGuildModal}
-              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                padding: '12px 24px',
+                background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                border: `1px solid ${tavernPalette.border}`,
+                borderRadius: '8px',
+                color: tavernPalette.borderDark,
+                fontSize: '1rem',
+                fontWeight: 600,
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                transition: 'all 0.3s',
+                cursor: 'pointer'
+              }}
+              className="hover:opacity-90 hover:shadow-lg"
             >
               🏰 Create New Guild
             </button>
@@ -606,13 +746,26 @@ export default function GuildPageSimple() {
 
       {/* Create Guild Modal */}
       {showCreateGuildModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="rounded-xl p-6 border-2 border-amber-900/50 w-full max-w-md mx-4 bg-amber-950/80 shadow-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div 
+            className="rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl"
+            style={{
+              background: tavernPalette.panelGradient,
+              border: `2px solid ${tavernPalette.border}`,
+              boxShadow: `0 20px 60px ${tavernPalette.shadow}, ${tavernPalette.glow}`
+            }}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-orange-300">Create New Guild</h3>
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: tavernPalette.gold }}
+              >
+                Create New Guild
+              </h3>
               <button
                 onClick={closeCreateGuildModal}
-                className="text-amber-200 hover:text-orange-300 text-2xl"
+                className="text-2xl font-bold transition-colors hover:opacity-70"
+                style={{ color: tavernPalette.parchment }}
               >
                 ×
               </button>
@@ -620,7 +773,10 @@ export default function GuildPageSimple() {
 
             <form onSubmit={handleCreateGuild} className="space-y-4">
               <div>
-                <label className="block text-amber-200 text-sm font-medium mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: tavernPalette.parchment }}
+                >
                   Guild Name *
                 </label>
                 <input
@@ -628,14 +784,31 @@ export default function GuildPageSimple() {
                   value={guildName}
                   onChange={(e) => setGuildName(e.target.value)}
                   placeholder="Enter guild name (3-20 characters)"
-                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.gold;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.border;
+                    e.currentTarget.style.boxShadow = tavernPalette.insetShadow;
+                  }}
                   required
                   maxLength={20}
                 />
               </div>
 
               <div>
-                <label className="block text-amber-200 text-sm font-medium mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: tavernPalette.parchment }}
+                >
                   Description (Optional)
                 </label>
                 <textarea
@@ -643,17 +816,38 @@ export default function GuildPageSimple() {
                   onChange={(e) => setGuildDescription(e.target.value)}
                   placeholder="Enter guild description"
                   rows={3}
-                  className="w-full px-3 py-2 bg-amber-950/70 border border-amber-900/40 rounded-lg text-amber-100 placeholder-amber-500/70 focus:outline-none focus:ring-2 focus:ring-orange-500/40 resize-none"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 resize-none transition-all duration-200"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.gold;
+                    e.currentTarget.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = tavernPalette.border;
+                    e.currentTarget.style.boxShadow = tavernPalette.insetShadow;
+                  }}
                 />
               </div>
 
               {createGuildMessage && (
                 <div
-                  className={`p-3 rounded-lg text-sm border ${
-                    createGuildMessage.includes('successfully')
-                      ? 'bg-emerald-900/40 text-emerald-200 border-emerald-500/40'
-                      : 'bg-red-900/40 text-red-200 border-red-500/40'
-                  }`}
+                  className="p-3 rounded-lg text-sm border"
+                  style={{
+                    background: createGuildMessage.includes('successfully') 
+                      ? `${tavernPalette.emerald}40` 
+                      : `${tavernPalette.ruby}40`,
+                    color: createGuildMessage.includes('successfully')
+                      ? tavernPalette.parchment
+                      : '#F4C2C2',
+                    borderColor: createGuildMessage.includes('successfully')
+                      ? tavernPalette.emerald
+                      : tavernPalette.ruby
+                  }}
                 >
                   {createGuildMessage}
                 </div>
@@ -663,14 +857,49 @@ export default function GuildPageSimple() {
                 <button
                   type="button"
                   onClick={closeCreateGuildModal}
-                  className="flex-1 px-4 py-2 bg-amber-950/70 hover:bg-amber-900/60 border border-amber-900/40 text-amber-200 rounded-lg transition-all duration-300"
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: tavernPalette.backgroundAlt,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.parchment,
+                    boxShadow: tavernPalette.insetShadow
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createGuildLoading || !guildName.trim()}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-lg transition-all duration-300"
+                  className="flex-1 px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+                  style={{
+                    background: createGuildLoading || !guildName.trim()
+                      ? '#4A4A4A'
+                      : `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: createGuildLoading || !guildName.trim()
+                      ? '#888'
+                      : tavernPalette.borderDark,
+                    boxShadow: createGuildLoading || !guildName.trim()
+                      ? 'none'
+                      : 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)',
+                    cursor: createGuildLoading || !guildName.trim() ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!createGuildLoading && guildName.trim()) {
+                      e.currentTarget.style.opacity = '0.9';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
                   {createGuildLoading ? 'Creating...' : 'Create Guild'}
                 </button>

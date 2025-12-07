@@ -33,6 +33,8 @@ export default function Dashboard() {
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
   const [guilds, setGuilds] = useState<Guild[]>([]);
   const [guildsLoading, setGuildsLoading] = useState(true);
+  const [myGuild, setMyGuild] = useState<Guild | null>(null);
+  const [myGuildLoading, setMyGuildLoading] = useState(true);
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userPlayer, setUserPlayer] = useState<any>(null);
@@ -141,6 +143,24 @@ export default function Dashboard() {
       setGuildsLoading(false);
     }
   };
+
+  const fetchMyGuild = async () => {
+    try {
+      setMyGuildLoading(true);
+      const response = await guildService.getMyGuild();
+      if (response.isSuccess && response.data) {
+        setMyGuild(response.data);
+      } else {
+        setMyGuild(null);
+      }
+    } catch (error) {
+      console.error('Error fetching my guild:', error);
+      setMyGuild(null);
+    } finally {
+      setMyGuildLoading(false);
+    }
+  };
+
 
   const fetchUserProfile = async () => {
     try {
@@ -352,7 +372,7 @@ export default function Dashboard() {
           joinDate: '2024-01-15',
         });
 
-        await Promise.all([fetchUserPlayer(), fetchUserProfile(), fetchTournaments(), fetchGuilds()]);
+        await Promise.all([fetchUserPlayer(), fetchUserProfile(), fetchTournaments(), fetchGuilds(), fetchMyGuild()]);
       } finally {
         setIsLoading(false);
       }
@@ -976,7 +996,7 @@ export default function Dashboard() {
                 <div className="text-center py-6 text-[#F4EBD0]">No guilds found</div>
               )}
 
-              <div className="mt-4">
+              <div className="mt-4 space-y-2">
                 <button
                   onClick={() => router.push('/guild')}
                   style={{
@@ -2958,6 +2978,7 @@ export default function Dashboard() {
         </div>,
         document.body
       )}
+
 
     </div>
   );
