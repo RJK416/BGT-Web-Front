@@ -9,7 +9,6 @@ import type { Guild, GuildMember, GuildInvitation } from '@/types/guild';
 import NotificationBar from '@/components/NotificationBar';
 import AppointGMModal from '@/components/AppointGMModal';
 import { tavernPalette } from '@/styles/tavernTheme';
-import { tavernPalette } from '@/styles/tavernTheme';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -228,6 +227,13 @@ export default function GuildPage() {
     setCreateGuildMessage(null);
   };
 
+  const pageBackgroundStyle: CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: tavernPalette.background,
+    backgroundImage: `radial-gradient(circle at top, rgba(15, 35, 29, 0.65), transparent 55%), radial-gradient(circle at bottom, rgba(12, 24, 20, 0.6), transparent 60%)`,
+    color: tavernPalette.parchment
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={pageBackgroundStyle}>
@@ -238,13 +244,6 @@ export default function GuildPage() {
       </div>
     );
   }
-
-  const pageBackgroundStyle: CSSProperties = {
-    minHeight: '100vh',
-    backgroundColor: tavernPalette.background,
-    backgroundImage: `radial-gradient(circle at top, rgba(15, 35, 29, 0.65), transparent 55%), radial-gradient(circle at bottom, rgba(12, 24, 20, 0.6), transparent 60%)`,
-    color: tavernPalette.parchment
-  };
 
   return (
     <div className="min-h-screen" style={pageBackgroundStyle}>
@@ -275,8 +274,8 @@ export default function GuildPage() {
                 }}
               />
               <div>
-                <h1 className="text-2xl font-bold text-amber-400">Guild</h1>
-                <p className="text-emerald-200 text-sm">Chronicle Your Adventures</p>
+                <h1 className="text-2xl font-bold" style={{ color: tavernPalette.gold }}>Guild</h1>
+                <p className="text-sm" style={{ color: tavernPalette.parchment }}>Chronicle Your Adventures</p>
               </div>
             </div>
             

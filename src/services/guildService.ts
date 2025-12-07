@@ -161,6 +161,14 @@ class GuildService {
       isSuccess: result.status === 200,
     };
   }
+
+  async disbandGuild(): Promise<GuildActionResponse> {
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.GUILD.DISBAND_GUILD);
+    return await apiRequest(url, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    });
+  }
 }
 
 export const guildService = new GuildService();
