@@ -800,10 +800,17 @@ export default function Dashboard() {
       if (response.ok && response.status === 200 && response.data) {
         // Handle both PascalCase (from backend) and camelCase
         const qrData = response.data;
-        setQrData({
-          dataUrl: qrData.DataUrl || qrData.dataUrl,
-          payload: qrData.Payload || qrData.payload
-        });
+        const dataUrl = qrData.DataUrl || qrData.dataUrl || '';
+        const payload = qrData.Payload || qrData.payload || '';
+        
+        if (dataUrl && payload) {
+          setQrData({
+            dataUrl,
+            payload
+          });
+        } else {
+          setQrError('Invalid QR code response format');
+        }
       } else {
         setQrError(response.error || response.message || 'Failed to generate QR code');
       }
