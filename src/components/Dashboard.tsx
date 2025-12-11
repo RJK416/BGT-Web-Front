@@ -17,6 +17,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import InfoModal from '@/components/InfoModal';
 import NotificationBar from '@/components/NotificationBar';
 import { tavernPalette } from '@/styles/tavernTheme';
+import { accountService } from '@/services/accountService';
 
 // ✅ Keep this type if you want typed access to extended claims
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
@@ -27,6 +28,7 @@ type MyJwtPayload = import('jwt-decode').JwtPayload & {
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
+  const [gitBranch, setGitBranch] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [myTournaments, setMyTournaments] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
@@ -76,6 +78,10 @@ export default function Dashboard() {
   const [selectedAvatar, setSelectedAvatar] = useState<{url: string, nickname: string} | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [tournamentFilter, setTournamentFilter] = useState<'all' | 'thisWeek' | 'nextWeek'>('thisWeek');
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [qrData, setQrData] = useState<{ dataUrl: string; payload: string } | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState<string | null>(null);
 
   const pageBackgroundStyle: CSSProperties = {
     minHeight: '100vh',
@@ -381,6 +387,22 @@ export default function Dashboard() {
 
     checkAuth();
   }, [router]); 
+
+  // Fetch git branch from server-side API (exposed by /api/git-branch)
+  useEffect(() => {
+    const fetchBranch = async () => {
+      try {
+        const res = await fetch('/api/git-branch');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.branch) setGitBranch(data.branch);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchBranch();
+  }, []);
 
   // Function to fetch my tournaments
   const fetchMyTournaments = async () => {
@@ -786,6 +808,28 @@ export default function Dashboard() {
   };
 
 
+  const handleGenerateQr = async () => {
+    setQrError(null);
+    setQrLoading(true);
+    try {
+      const response = await accountService.getQrCode();
+      if (response.ok && response.status === 200 && response.data) {
+        // Handle both PascalCase (from backend) and camelCase
+        const qrData = response.data;
+        setQrData({
+          dataUrl: qrData.DataUrl || qrData.dataUrl,
+          payload: qrData.Payload || qrData.payload
+        });
+      } else {
+        setQrError(response.error || response.message || 'Failed to generate QR code');
+      }
+    } catch (error: any) {
+      setQrError(error?.message || 'Failed to generate QR code');
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     // Remove the JWT token
     removeAuthToken();
@@ -841,6 +885,54 @@ export default function Dashboard() {
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
+              {/* Git branch label (between bell and settings) */}
+              {gitBranch && (
+                <div className="hidden sm:inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-emerald-200" style={{background: 'rgba(22,60,51,0.12)', border: '1px solid rgba(10,30,26,0.4)'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" aria-hidden>
+                    <path fillRule="evenodd" d="M6 3a1 1 0 011 1v2.586a2 2 0 01-.586 1.414L5 9.414V12a1 1 0 11-2 0V9.414l-1.414-1.414A2 2 0 01.586 6.586V5a1 1 0 011-1h4zM14 3a1 1 0 011 1v1.586a2 2 0 01-.586 1.414L13 8.414V12a1 1 0 11-2 0V8.414l-1.414-1.414A2 2 0 018.586 6.586V5a1 1 0 011-1h4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="ml-2">{gitBranch}</span>
+                </div>
+              )}
+              
+              {/* QR Code Button */}
+              <button
+                onClick={async () => {
+                  setIsQrModalOpen(true);
+                  if (!qrData) {
+                    await handleGenerateQr();
+                  }
+                }}
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                  border: '1px solid rgba(156, 107, 62, 0.7)',
+                  borderRadius: '8px',
+                  color: '#2A1D12',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                className="hover:opacity-90"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)';
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                QR Code
+              </button>
               
               <button
                 onClick={() => router.push('/settings')}
@@ -2971,6 +3063,149 @@ export default function Dashboard() {
             {/* Footer */}
             <div className="text-center">
               <p className="text-[#B6AA96] text-sm" style={{ textTransform: 'none' }}>
+                Click outside or press ESC to close
+              </p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* QR Code Modal */}
+      {isQrModalOpen && createPortal(
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000] p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsQrModalOpen(false);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setIsQrModalOpen(false);
+            }
+          }}
+        >
+          <div 
+            className="rounded-2xl p-6 max-w-md w-full"
+            style={{
+              background: 'linear-gradient(135deg, rgba(52, 28, 15, 0.98) 0%, rgba(65, 34, 18, 0.95) 50%, rgba(52, 28, 15, 0.98) 100%)',
+              border: '2px solid rgba(120, 80, 46, 0.95)',
+              boxShadow: '0 18px 45px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+            }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 border-b border-[#9C6B3E]/50 pb-4">
+              <h3 className="text-xl font-bold text-[#F4EBD0] medieval-heading">
+                My QR Code
+              </h3>
+              <button
+                onClick={() => setIsQrModalOpen(false)}
+                style={{
+                  padding: '8px',
+                  background: 'rgba(128, 44, 44, 0.2)',
+                  border: '1px solid rgba(156, 107, 62, 0.5)',
+                  borderRadius: '8px',
+                  color: '#F4EBD0',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+                className="hover:opacity-80"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-4">
+              {qrLoading ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E7B45D] mb-4"></div>
+                  <p className="text-[#F4EBD0] text-sm">Generating QR Code...</p>
+                </div>
+              ) : qrError ? (
+                <div className="p-4 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
+                  <p className="text-[#F4EBD0] text-sm flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {qrError}
+                  </p>
+                  <button
+                    onClick={handleGenerateQr}
+                    style={{
+                      marginTop: '12px',
+                      padding: '8px 16px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      cursor: 'pointer'
+                    }}
+                    className="hover:opacity-90"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : qrData && qrData.dataUrl ? (
+                <>
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 rounded-lg" style={{background: 'rgba(255, 255, 255, 0.95)', border: '2px solid rgba(231, 180, 93, 0.5)'}}>
+                      <img
+                        src={qrData.dataUrl}
+                        alt="User QR code"
+                        className="w-48 h-48"
+                      />
+                    </div>
+                    <p className="text-[#B6AA96] text-xs text-center">Scan to view profile</p>
+                  </div>
+                  {qrData.payload && (
+                    <div className="mt-4">
+                      <h4 className="text-[#F4EBD0] font-semibold mb-2 text-sm">QR Code Payload</h4>
+                      <div className="p-3 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
+                        <p className="text-[#B6AA96] text-xs break-all font-mono">
+                          {qrData.payload}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <p className="text-[#B6AA96] text-sm mb-4">Click the button below to generate your QR code</p>
+                  <button
+                    onClick={handleGenerateQr}
+                    style={{
+                      padding: '12px 24px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      color: '#2A1D12',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                    className="hover:opacity-90"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                    Generate QR Code
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 text-center border-t border-[#9C6B3E]/50 pt-4">
+              <p className="text-[#B6AA96] text-xs">
                 Click outside or press ESC to close
               </p>
             </div>
