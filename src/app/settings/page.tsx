@@ -61,7 +61,12 @@ export default function SettingsPage() {
     try {
       const response = await accountService.getQrCode();
       if (response.ok && response.status === 200 && response.data) {
-        setQrData(response.data);
+        // Handle both PascalCase (from backend) and camelCase
+        const qrData = response.data;
+        setQrData({
+          dataUrl: qrData.DataUrl || qrData.dataUrl,
+          payload: qrData.Payload || qrData.payload
+        });
       } else {
         setQrError(response.error || response.message || 'Failed to generate QR code');
       }
@@ -567,44 +572,103 @@ Back to Dashboard
             {activeSection === 'qr' && (
               <div className="medieval-panel p-4 sm:p-6 lg:p-8">
                 <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">MY QR CODE</h2>
-                <p className="text-[#B6AA96] text-sm sm:text-base mb-4">
+                <p className="text-[#B6AA96] text-sm sm:text-base mb-6">
                   Generate a QR code for your account. Stay logged in to create and display it.
                 </p>
 
-                <button
-                  onClick={handleGenerateQr}
-                  disabled={qrLoading}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold"
-                  style={{
-                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
-                    color: '#2A1D12',
-                    border: '1px solid rgba(156, 107, 62, 0.7)',
-                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
-                    opacity: qrLoading ? 0.7 : 1,
-                    cursor: qrLoading ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {qrLoading ? 'Generating...' : 'Generate QR Code'}
-                </button>
+                {/* Generate QR Code Button */}
+                <div className="mb-6">
+                  <button
+                    onClick={handleGenerateQr}
+                    disabled={qrLoading}
+                    style={{
+                      width: '100%',
+                      padding: '12px 24px',
+                      background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                      color: '#2A1D12',
+                      border: '1px solid rgba(156, 107, 62, 0.7)',
+                      borderRadius: '8px',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s',
+                      opacity: qrLoading ? 0.7 : 1,
+                      cursor: qrLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    className="hover:opacity-90"
+                    onMouseEnter={(e) => {
+                      if (!qrLoading) {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!qrLoading) {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)';
+                      }
+                    }}
+                  >
+                    {qrLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#2A1D12]"></div>
+                        <span>Generating QR Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <span>Generate QR Code</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
+                {/* Error Message */}
                 {qrError && (
-                  <div className="mt-4 p-3 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
-                    <p className="text-[#F4EBD0] text-sm">{qrError}</p>
+                  <div className="mb-6 p-4 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
+                    <p className="text-[#F4EBD0] text-sm flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {qrError}
+                    </p>
                   </div>
                 )}
 
-                {qrData && (
-                  <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <img
-                      src={qrData.dataUrl}
-                      alt="User QR code"
-                      className="w-40 h-40 border border-[#E7B45D]/60 rounded-lg shadow-lg"
-                    />
-                    <div className="text-[#B6AA96] text-sm break-all">
-                      <div className="text-[#F4EBD0] font-semibold mb-1">Payload</div>
-                      <div className="px-3 py-2 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
-                        {qrData.payload}
+                {/* QR Code Display */}
+                {qrData && qrData.dataUrl && (
+                  <div className="mt-6 space-y-6">
+                    <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 p-6 rounded-lg" style={{background: 'linear-gradient(135deg, rgba(42, 29, 18, 0.5) 0%, rgba(52, 28, 15, 0.5) 100%)', border: '1px solid rgba(156, 107, 62, 0.3)'}}>
+                      {/* QR Code Image */}
+                      <div className="flex-shrink-0">
+                        <div className="p-4 rounded-lg" style={{background: 'rgba(255, 255, 255, 0.95)', border: '2px solid rgba(231, 180, 93, 0.5)'}}>
+                          <img
+                            src={qrData.dataUrl}
+                            alt="User QR code"
+                            className="w-48 h-48 sm:w-56 sm:h-56"
+                          />
+                        </div>
+                        <p className="text-center text-[#B6AA96] text-xs mt-2">Scan to view profile</p>
                       </div>
+                      
+                      {/* Payload Info */}
+                      {qrData.payload && (
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-[#F4EBD0] font-semibold mb-2 text-sm sm:text-base">QR Code Payload</h3>
+                          <div className="p-3 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
+                            <p className="text-[#B6AA96] text-xs sm:text-sm break-all font-mono">
+                              {qrData.payload}
+                            </p>
+                          </div>
+                          <p className="text-[#B6AA96] text-xs mt-2">This payload contains your account information</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
