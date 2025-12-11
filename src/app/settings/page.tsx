@@ -60,13 +60,24 @@ export default function SettingsPage() {
     setQrLoading(true);
     try {
       const response = await accountService.getQrCode();
-      if (response.ok && response.status === 200 && response.data) {
-        // Handle both PascalCase (from backend) and camelCase
-        const qrData = response.data;
-        setQrData({
-          dataUrl: qrData.DataUrl || qrData.dataUrl,
-          payload: qrData.Payload || qrData.payload
-        });
+      if (response.ok && response.status === 200) {
+        // Handle both direct properties and nested data object
+        if (response.data) {
+          // Backend returns nested data object
+          const qrData = response.data;
+          setQrData({
+            dataUrl: qrData.DataUrl || qrData.dataUrl || '',
+            payload: qrData.Payload || qrData.payload || ''
+          });
+        } else if (response.dataUrl && response.payload) {
+          // Direct properties (fallback)
+          setQrData({
+            dataUrl: response.dataUrl,
+            payload: response.payload
+          });
+        } else {
+          setQrError('Invalid QR code response format');
+        }
       } else {
         setQrError(response.error || response.message || 'Failed to generate QR code');
       }

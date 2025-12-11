@@ -2,8 +2,14 @@ import { API_CONFIG, apiRequest, buildApiUrl } from '@/config/api';
 import { getAuthToken } from '@/utils/auth';
 
 export interface QrCodeResponse {
-  dataUrl: string;
-  payload: string;
+  dataUrl?: string;
+  payload?: string;
+  data?: {
+    DataUrl?: string;
+    dataUrl?: string;
+    Payload?: string;
+    payload?: string;
+  };
   status?: number;
   message?: string;
   error?: string;
