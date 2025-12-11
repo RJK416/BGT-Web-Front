@@ -656,19 +656,6 @@ Back to Dashboard
                         </div>
                         <p className="text-center text-[#B6AA96] text-xs mt-2">Scan to view profile</p>
                       </div>
-                      
-                      {/* Payload Info */}
-                      {qrData.payload && (
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-[#F4EBD0] font-semibold mb-2 text-sm sm:text-base">QR Code Payload</h3>
-                          <div className="p-3 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
-                            <p className="text-[#B6AA96] text-xs sm:text-sm break-all font-mono">
-                              {qrData.payload}
-                            </p>
-                          </div>
-                          <p className="text-[#B6AA96] text-xs mt-2">This payload contains your account information</p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}

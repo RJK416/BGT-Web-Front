@@ -28,7 +28,6 @@ type MyJwtPayload = import('jwt-decode').JwtPayload & {
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
-  const [gitBranch, setGitBranch] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [myTournaments, setMyTournaments] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
@@ -388,21 +387,6 @@ export default function Dashboard() {
     checkAuth();
   }, [router]); 
 
-  // Fetch git branch from server-side API (exposed by /api/git-branch)
-  useEffect(() => {
-    const fetchBranch = async () => {
-      try {
-        const res = await fetch('/api/git-branch');
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.branch) setGitBranch(data.branch);
-        }
-      } catch (e) {
-        // ignore
-      }
-    };
-    fetchBranch();
-  }, []);
 
   // Function to fetch my tournaments
   const fetchMyTournaments = async () => {
@@ -885,15 +869,6 @@ export default function Dashboard() {
               
               {/* Notification Bar */}
               <NotificationBar className="flex-shrink-0" />
-              {/* Git branch label (between bell and settings) */}
-              {gitBranch && (
-                <div className="hidden sm:inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-emerald-200" style={{background: 'rgba(22,60,51,0.12)', border: '1px solid rgba(10,30,26,0.4)'}}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" aria-hidden>
-                    <path fillRule="evenodd" d="M6 3a1 1 0 011 1v2.586a2 2 0 01-.586 1.414L5 9.414V12a1 1 0 11-2 0V9.414l-1.414-1.414A2 2 0 01.586 6.586V5a1 1 0 011-1h4zM14 3a1 1 0 011 1v1.586a2 2 0 01-.586 1.414L13 8.414V12a1 1 0 11-2 0V8.414l-1.414-1.414A2 2 0 018.586 6.586V5a1 1 0 011-1h4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="ml-2">{gitBranch}</span>
-                </div>
-              )}
               
               {/* QR Code Button */}
               <button
@@ -3162,16 +3137,6 @@ export default function Dashboard() {
                     </div>
                     <p className="text-[#B6AA96] text-xs text-center">Scan to view profile</p>
                   </div>
-                  {qrData.payload && (
-                    <div className="mt-4">
-                      <h4 className="text-[#F4EBD0] font-semibold mb-2 text-sm">QR Code Payload</h4>
-                      <div className="p-3 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
-                        <p className="text-[#B6AA96] text-xs break-all font-mono">
-                          {qrData.payload}
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
