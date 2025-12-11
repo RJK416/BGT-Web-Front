@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, removeAuthToken, getUserFromToken, isAuthenticated } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
+import { accountService } from '@/services/accountService';
 
 type MyJwtPayload = import('jwt-decode').JwtPayload & {
   name?: string;
@@ -27,6 +28,9 @@ export default function SettingsPage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarSuccess, setAvatarSuccess] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<{ dataUrl: string; payload: string } | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchUserProfile = async () => {
@@ -48,6 +52,23 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+    }
+  };
+
+  const handleGenerateQr = async () => {
+    setQrError(null);
+    setQrLoading(true);
+    try {
+      const response = await accountService.getQrCode();
+      if (response.ok && response.status === 200 && response.data) {
+        setQrData(response.data);
+      } else {
+        setQrError(response.error || response.message || 'Failed to generate QR code');
+      }
+    } catch (error: any) {
+      setQrError(error?.message || 'Failed to generate QR code');
+    } finally {
+      setQrLoading(false);
     }
   };
 
@@ -284,6 +305,16 @@ Back to Dashboard
                   }`}
                 >
                   Change Email
+                </button>
+                <button
+                  onClick={() => setActiveSection('qr')}
+                  className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base ${
+                    activeSection === 'qr'
+                      ? 'bg-[#E7B45D]/20 text-[#F4EBD0] border border-[#E7B45D]/50'
+                      : 'text-[#B6AA96] hover:bg-[#2A1D12]/50 hover:text-[#F4EBD0]'
+                  }`}
+                >
+                  My QR Code
                 </button>
               </nav>
             </div>
@@ -530,6 +561,53 @@ Back to Dashboard
               <div className="medieval-panel p-4 sm:p-6 lg:p-8">
                 <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">CHANGE EMAIL</h2>
                 <p className="text-[#B6AA96] text-sm sm:text-base">Email change functionality coming soon...</p>
+              </div>
+            )}
+
+            {activeSection === 'qr' && (
+              <div className="medieval-panel p-4 sm:p-6 lg:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#F4EBD0] medieval-heading mb-4 sm:mb-6">MY QR CODE</h2>
+                <p className="text-[#B6AA96] text-sm sm:text-base mb-4">
+                  Generate a QR code for your account. Stay logged in to create and display it.
+                </p>
+
+                <button
+                  onClick={handleGenerateQr}
+                  disabled={qrLoading}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold"
+                  style={{
+                    background: 'linear-gradient(180deg, #E7B45D 0%, #B17A3D 100%)',
+                    color: '#2A1D12',
+                    border: '1px solid rgba(156, 107, 62, 0.7)',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)',
+                    opacity: qrLoading ? 0.7 : 1,
+                    cursor: qrLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {qrLoading ? 'Generating...' : 'Generate QR Code'}
+                </button>
+
+                {qrError && (
+                  <div className="mt-4 p-3 rounded-lg" style={{background: 'rgba(128, 44, 44, 0.2)', border: '1px solid rgba(128, 44, 44, 0.5)'}}>
+                    <p className="text-[#F4EBD0] text-sm">{qrError}</p>
+                  </div>
+                )}
+
+                {qrData && (
+                  <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <img
+                      src={qrData.dataUrl}
+                      alt="User QR code"
+                      className="w-40 h-40 border border-[#E7B45D]/60 rounded-lg shadow-lg"
+                    />
+                    <div className="text-[#B6AA96] text-sm break-all">
+                      <div className="text-[#F4EBD0] font-semibold mb-1">Payload</div>
+                      <div className="px-3 py-2 rounded-md border border-[#9C6B3E]/40 bg-[#1F140D]/60">
+                        {qrData.payload}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

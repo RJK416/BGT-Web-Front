@@ -20,6 +20,7 @@ export const API_CONFIG = {
       GET_PROFILE: '/Account/Profile',
       GET_PROFILE_BY_USERNAME: '/Account/Profile/:username',
       UPLOAD_AVATAR: '/Account/Avatar/Upload',
+      QR_CODE: '/Account/QrCode',
     },
     // Board Game Service Endpoints
     BOARDGAME: {
