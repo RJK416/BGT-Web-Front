@@ -1,0 +1,105 @@
+import { useState, useEffect, useCallback } from 'react';
+import { notificationService } from '../services/notificationService';
+import type { Notification } from '../types/notification';
+
+export const useNotifications = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Get unread notifications from the dedicated endpoint
+      const response = await notificationService.getUnreadNotifications();
+      
+      if (response.status === 200 && response.data && Array.isArray(response.data)) {
+        // The endpoint already returns only unread notifications
+        setNotifications(response.data);
+        setError(null);
+      } else {
+        console.error('Invalid response:', response);
+        setError('Failed to load notifications - invalid response format');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError('Error loading notifications - network or server error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      // Try to get unread count from dedicated endpoint
+      const response = await notificationService.getUnreadCount();
+      if (response.status === 200 && typeof response.data === 'number') {
+        setUnreadCount(response.data);
+      } else {
+        // Fallback: calculate count from notifications array
+        console.warn('Unread count endpoint failed, calculating from notifications');
+        setUnreadCount(notifications.length);
+      }
+    } catch (err) {
+      console.error('Error fetching unread count:', err);
+      // Fallback: calculate count from notifications array
+      console.warn('Unread count endpoint failed, calculating from notifications');
+      setUnreadCount(notifications.length);
+    }
+  }, [notifications.length]);
+
+  const markAsRead = useCallback(async (notificationId: number) => {
+    try {
+      console.log('useNotifications: Attempting to mark notification as read:', notificationId);
+      const response = await notificationService.markAsRead(notificationId);
+      console.log('useNotifications: Mark as read response:', response);
+      
+      if (response.status === 200) {
+        console.log('useNotifications: Successfully marked as read, updating UI');
+        // Remove the notification from the list since we only show unread notifications
+        setNotifications(prev => prev.filter(notification => notification.id !== notificationId));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      } else {
+        console.error('useNotifications: Mark as read failed with status:', response.status);
+      }
+    } catch (err) {
+      console.error('useNotifications: Error marking notification as read:', err);
+    }
+  }, []);
+
+  const markAllAsRead = useCallback(async () => {
+    try {
+      const response = await notificationService.markAllAsRead();
+      if (response.status === 200) {
+        // Clear all notifications since we only show unread ones
+        setNotifications([]);
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+    }
+  }, []);
+
+  const refreshNotifications = useCallback(async () => {
+    await Promise.all([fetchNotifications(), fetchUnreadCount()]);
+  }, [fetchNotifications, fetchUnreadCount]);
+
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+  }, [fetchNotifications, fetchUnreadCount]);
+
+  return {
+    notifications,
+    unreadCount,
+    isLoading,
+    error,
+    markAsRead,
+    markAllAsRead,
+    refreshNotifications,
+    fetchUnreadCount
+  };
+};

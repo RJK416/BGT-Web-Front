@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { setAuthToken } from '@/utils/auth';
+import { setAuthToken, decodeToken } from '@/utils/auth';
 import { API_CONFIG, apiRequest } from '@/config/api';
+import Leaderboard from '@/components/Leaderboard';
+import { tavernPalette } from '@/styles/tavernTheme';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +14,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  type MyJwtPayload = {
+    [k: string]: unknown;
+    sub?: string | undefined;
+    name?: string | undefined;
+    unique_name?: string | undefined;
+    email?: string | undefined;
+}
+
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
@@ -76,6 +87,7 @@ export default function LoginPage() {
       }
 
       const jwtToken = data.data || data.token || data.jwt;
+      
       if (jwtToken) {
         setAuthToken(jwtToken, rememberMe);
       }
@@ -180,9 +192,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     
-    console.log('Starting OTP verification...');
-    console.log('Current sessionId:', sessionId);
-    console.log('Current OTP:', otp);
     
     try {
       // Step 2: Verify OTP using the session ID from step 1
@@ -203,31 +212,22 @@ export default function LoginPage() {
         otp: otp,
         purpose: 1 // Registration
       };
-      
-      console.log('Sending OTP verification request:', requestBody);
 
       const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.VERIFY_OTP}`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
       });
 
-      console.log('OTP verification response:', data);
-
       if (!data.ok || data.status !== 200) {
-        console.error('OTP verification failed:', data);
         throw new Error(data.error || data.message || 'OTP verification failed');
       }
 
       // Store the JWT token from the response as the reset token
       if (data.data) {
         setSessionId(data.data); // Store JWT token as sessionId for use as ResetToken
-        console.log('JWT token stored for account creation:', data.data);
-      } else {
-        console.error('No JWT token found in OTP verification response:', data);
       }
 
       // Display the message from the server
-      console.log('OTP verification successful, transitioning to password step');
       setSuccess(data.message || 'OTP verified! Now please set your password.');
       setShowOtpInput(false);
       setShowPasswordInput(true);
@@ -243,11 +243,6 @@ export default function LoginPage() {
   const handlePasswordCompletion = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Starting password completion...');
-    console.log('Current sessionId:', sessionId);
-    console.log('Password length:', password.length);
-    console.log('Confirm password length:', confirmPassword.length);
-    
     // Validate passwords
     if (!validatePassword(password)) {
       return;
@@ -258,7 +253,6 @@ export default function LoginPage() {
     }
     
     if (!sessionId) {
-      console.error('No session ID available for account creation');
       setError('Session expired. Please start registration again.');
       return;
     }
@@ -274,17 +268,10 @@ export default function LoginPage() {
         ConfirmNewPassword: confirmPassword
       };
       
-      console.log('Sending account creation request:', requestBody);
-      console.log('ResetToken length:', requestBody.ResetToken?.length);
-      console.log('ResetToken starts with:', requestBody.ResetToken?.substring(0, 20) + '...');
-      console.log('Full URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`);
-      
       const data = await apiRequest(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACCOUNT.COMPLETE_REGISTRATION}`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
       });
-      
-      console.log('Account creation response:', data);
 
       if (!data.ok || data.status !== 200) {
         const errorMessage = data.error || data.message || 'Account creation failed';
@@ -294,7 +281,6 @@ export default function LoginPage() {
       }
 
       // Display the message from the server
-      console.log('Account creation successful, resetting form state');
       setSuccess(data.message || 'Account created successfully! You can now login.');
       setShowPasswordInput(false);
       setIsRegistering(false);
@@ -310,7 +296,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-purple-800 relative overflow-hidden" suppressHydrationWarning>
+    <div 
+      className="min-h-screen relative overflow-hidden" 
+      style={{
+        background: tavernPalette.background,
+        backgroundImage: `radial-gradient(circle at top, rgba(15, 35, 29, 0.65), transparent 55%), radial-gradient(circle at bottom, rgba(12, 24, 20, 0.6), transparent 60%)`
+      }}
+      suppressHydrationWarning
+    >
              {/* Medieval Fantasy Background Artwork */}
        <div className="absolute inset-0 z-0 pointer-events-none">
         {/* Distant Castle Silhouette */}
@@ -354,6 +347,80 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-20 w-12 h-28">
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-20 bg-purple-600 rounded-full"></div>
             <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-purple-500 rounded-full opacity-80"></div>
+          </div>
+        </div>
+
+        {/* Additional Geometric Shapes */}
+        <div className="absolute inset-0 opacity-15">
+          {/* Modern geometric shapes */}
+          <div className="absolute top-1/4 left-1/4 w-20 h-20 border-2 border-amber-300 transform rotate-45 rounded-lg"></div>
+          <div className="absolute top-3/4 right-1/4 w-16 h-16 border-2 border-amber-400 transform -rotate-12 rounded-full"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-24 h-24 border-2 border-amber-500 transform rotate-30 rounded-lg"></div>
+          <div className="absolute top-1/2 right-1/3 w-12 h-12 border-2 border-amber-300 transform -rotate-45 rounded-full"></div>
+          <div className="absolute bottom-1/4 right-1/2 w-18 h-18 border-2 border-amber-400 transform rotate-60 rounded-lg"></div>
+          
+          {/* Floating geometric orbs */}
+          <div className="absolute top-1/3 right-1/3 w-4 h-4 bg-amber-400 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-1/3 left-1/2 w-3 h-3 bg-amber-300 rounded-full animate-pulse delay-500"></div>
+          <div className="absolute top-2/3 left-1/4 w-2 h-2 bg-amber-500 rounded-full animate-pulse delay-1000"></div>
+          
+          {/* Stars */}
+          <div className="absolute inset-0">
+            {[...Array(25)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Star Clusters */}
+          <div className="absolute top-40 left-40 w-3 h-3 bg-cyan-300 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-52 left-36 w-2 h-2 bg-cyan-200 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.2s' }} />
+          <div className="absolute top-48 left-44 w-3 h-3 bg-cyan-400 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '0.8s' }} />
+          
+          <div className="absolute bottom-40 left-60 w-2 h-2 bg-purple-300 rounded-full opacity-80 animate-pulse" style={{ animationDelay: '1.8s' }} />
+          <div className="absolute bottom-48 left-56 w-3 h-3 bg-purple-200 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.7s' }} />
+          <div className="absolute bottom-44 left-64 w-1 h-1 bg-purple-400 rounded-full opacity-100 animate-pulse" style={{ animationDelay: '1.4s' }} />
+          
+          {/* Cosmic Dust/Nebula */}
+          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-gradient-radial from-cyan-500/8 via-blue-500/4 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-1/3 left-1/2 w-48 h-48 bg-gradient-radial from-purple-500/6 via-blue-500/3 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+          
+          {/* Shooting Stars */}
+          <div className="absolute top-40 left-1/4 w-1 h-1 bg-white rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '2.5s' }} />
+          <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '4s' }} />
+          
+          {/* Draco Constellation */}
+          <div className="absolute top-1/4 right-1/4 opacity-60">
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-0 left-0"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-2 left-3"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-4 left-6"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-6 left-9"></div>
+            <div className="absolute w-1.5 h-1.5 bg-cyan-300 rounded-full top-8 left-12"></div>
+            {/* Connecting lines */}
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-1 left-0"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-3 left-3"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-5 left-6"></div>
+            <div className="absolute w-3 h-px bg-cyan-400/30 top-7 left-9"></div>
+          </div>
+          
+          {/* Cygnus (Northern Cross) */}
+          <div className="absolute bottom-1/4 left-1/4 opacity-60">
+            <div className="absolute w-2 h-2 bg-white rounded-full top-0 left-8"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-4 left-0"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-4 left-16"></div>
+            <div className="absolute w-1.5 h-1.5 bg-blue-300 rounded-full top-8 left-8"></div>
+            {/* Connecting lines */}
+            <div className="absolute w-8 h-px bg-blue-400/30 top-1 left-8"></div>
+            <div className="absolute w-16 h-px bg-blue-400/30 top-5 left-0"></div>
+            <div className="absolute w-8 h-px bg-blue-400/30 top-9 left-8"></div>
           </div>
         </div>
 
@@ -438,7 +505,10 @@ export default function LoginPage() {
 
              {/* Main content */}
        <div className="relative z-50 flex items-center justify-center min-h-screen p-6">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="flex gap-8 items-center">
+            {/* Left side - Login Form */}
+            <div className="flex-1 max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mb-4">
@@ -477,54 +547,27 @@ export default function LoginPage() {
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-amber-300 rounded-full animate-pulse delay-1500"></div>
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-amber-600 mb-2 tracking-wider">
+            <h1 className="text-4xl font-bold mb-2 tracking-wider" style={{ color: tavernPalette.gold, fontFamily: 'var(--font-medieval), "Cinzel", "Times New Roman", serif' }}>
               Board Games Tracker
             </h1>
-            <p className="text-purple-300 text-lg">
+            <p className="text-lg" style={{ color: tavernPalette.ash }}>
               Chronicle Your Adventures
             </p>
           </div>
 
-x                     {/* Form */}
-           <div className="bg-gradient-to-br from-purple-950/90 to-purple-900/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-amber-400/30 relative overflow-hidden z-[60] pointer-events-auto">
-            {/* Medieval Corner Decorations */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400/50 rounded-tl-2xl"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400/50 rounded-tr-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400/50 rounded-bl-2xl"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/50 rounded-br-2xl"></div>
-            
-            {/* Mystical Border Pattern */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-2 left-2 right-2 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-              <div className="absolute bottom-2 left-2 right-2 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-              <div className="absolute left-2 top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-amber-400 to-transparent"></div>
-              <div className="absolute right-2 top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-amber-400 to-transparent"></div>
-            </div>
-            
-            {/* Decorative columns */}
-            <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full"></div>
-            <div className="absolute -right-2 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full"></div>
-            
-            {/* Curtain-like form header */}
-            <div className="absolute -top-1 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600 rounded-t-2xl"></div>
-            <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600 rounded-b-2xl"></div>
-            
-            {/* Floating mystical particles inside form */}
-            <div className="absolute top-4 right-4 w-2 h-2 bg-amber-300/40 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-4 left-4 w-1.5 h-1.5 bg-amber-400/40 rounded-full animate-pulse delay-1000"></div>
-            <div className="absolute top-1/2 left-4 w-1 h-1 bg-amber-300/30 rounded-full animate-pulse delay-500"></div>
-            <div className="absolute top-1/2 right-4 w-1 h-1 bg-amber-300/30 rounded-full animate-pulse delay-1500"></div>
+            {/* Form */}
+            <div className="medieval-panel p-8 relative overflow-hidden z-[60] pointer-events-auto">
 
             {/* Form header */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-amber-400 mb-2">
+              <h2 className="text-2xl font-bold mb-2" style={{ color: tavernPalette.gold, fontFamily: 'var(--font-medieval), "Cinzel", "Times New Roman", serif', letterSpacing: '0.08em' }}>
                 {isRegistering ? (
                   showPasswordInput ? 'Set Your Password' : 
                   showOtpInput ? 'Verify Your Email' : 
                   'Join the Realm'
                 ) : 'Enter the Realm'}
               </h2>
-              <p className="text-purple-200 text-sm">
+              <p className="text-sm" style={{ color: tavernPalette.ash }}>
                 {isRegistering ? (
                   showPasswordInput ? 'Complete your account setup' :
                   showOtpInput ? 'Enter the code sent to your email' :
@@ -535,15 +578,51 @@ x                     {/* Form */}
 
             {/* Success message */}
             {success && (
-              <div className="mb-4 p-3 bg-green-500/20 border border-green-400/30 rounded-lg">
-                <p className="text-green-300 text-sm">{success}</p>
+              <div className="mb-4 p-4 rounded-lg relative overflow-hidden" style={{
+                background: `linear-gradient(135deg, rgba(60, 122, 87, 0.25) 0%, rgba(34, 75, 57, 0.3) 100%)`,
+                border: `2px solid rgba(60, 122, 87, 0.6)`,
+                boxShadow: `0 0 20px rgba(60, 122, 87, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.2)`
+              }}>
+                <div className="absolute inset-0 opacity-10" style={{
+                  background: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(60, 122, 87, 0.1) 10px, rgba(60, 122, 87, 0.1) 20px)`
+                }}></div>
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="flex-shrink-0 flex items-center justify-center" style={{ 
+                    fontSize: '1.5rem',
+                    width: '32px',
+                    height: '32px',
+                    background: 'rgba(60, 122, 87, 0.2)',
+                    borderRadius: '50%',
+                    border: '1px solid rgba(60, 122, 87, 0.4)',
+                    fontFamily: 'serif'
+                  }}>✦</div>
+                  <p className="text-sm font-medium flex-1" style={{ color: '#d7ead3', textTransform: 'none', letterSpacing: '0.02em' }}>{success}</p>
+                </div>
               </div>
             )}
 
             {/* Error message */}
             {error && (
-              <div className="mb-4 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
-                <p className="text-red-300 text-sm">{error}</p>
+              <div className="mb-4 p-4 rounded-lg relative overflow-hidden" style={{
+                background: `linear-gradient(135deg, rgba(128, 44, 44, 0.25) 0%, rgba(90, 30, 30, 0.3) 100%)`,
+                border: `2px solid rgba(128, 44, 44, 0.6)`,
+                boxShadow: `0 0 20px rgba(128, 44, 44, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.2)`
+              }}>
+                <div className="absolute inset-0 opacity-10" style={{
+                  background: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(128, 44, 44, 0.1) 10px, rgba(128, 44, 44, 0.1) 20px)`
+                }}></div>
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="flex-shrink-0 flex items-center justify-center" style={{ 
+                    fontSize: '1.5rem',
+                    width: '32px',
+                    height: '32px',
+                    background: 'rgba(128, 44, 44, 0.2)',
+                    borderRadius: '50%',
+                    border: '1px solid rgba(128, 44, 44, 0.4)',
+                    fontFamily: 'serif'
+                  }}>⚔️</div>
+                  <p className="text-sm font-medium flex-1" style={{ color: '#e8a8a8', textTransform: 'none', letterSpacing: '0.02em' }}>{error}</p>
+                </div>
               </div>
             )}
 
@@ -552,12 +631,12 @@ x                     {/* Form */}
                 {/* Username field (for registration) */}
                 {isRegistering && (
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                       Username
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
@@ -565,9 +644,23 @@ x                     {/* Form */}
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                        style={{
+                          background: 'rgba(28, 18, 12, 0.98)',
+                          border: `1px solid ${tavernPalette.border}`,
+                          color: tavernPalette.parchment,
+                          outline: 'none'
+                        }}
                         placeholder="Enter username"
                         required={isRegistering}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = tavernPalette.gold;
+                          e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = tavernPalette.border;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -576,12 +669,12 @@ x                     {/* Form */}
                 {/* Username field (for login) */}
                 {!isRegistering && (
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                       Username
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
@@ -589,9 +682,23 @@ x                     {/* Form */}
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                        style={{
+                          background: 'rgba(28, 18, 12, 0.98)',
+                          border: `1px solid ${tavernPalette.border}`,
+                          color: tavernPalette.parchment,
+                          outline: 'none'
+                        }}
                         placeholder="Enter username"
                         required
+                        onFocus={(e) => {
+                          e.target.style.borderColor = tavernPalette.gold;
+                          e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = tavernPalette.border;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -600,12 +707,12 @@ x                     {/* Form */}
                 {/* Email field (for registration only) */}
                 {isRegistering && (
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                       Email Address
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                         </svg>
                       </div>
@@ -613,9 +720,23 @@ x                     {/* Form */}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                        style={{
+                          background: 'rgba(28, 18, 12, 0.98)',
+                          border: `1px solid ${tavernPalette.border}`,
+                          color: tavernPalette.parchment,
+                          outline: 'none'
+                        }}
                         placeholder="your@email.com"
                         required
+                        onFocus={(e) => {
+                          e.target.style.borderColor = tavernPalette.gold;
+                          e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = tavernPalette.border;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                     </div>
                   </div>
@@ -624,12 +745,12 @@ x                     {/* Form */}
                 {/* Password field (for login only) */}
                 {!isRegistering && (
                   <div>
-                    <label className="block text-amber-300 text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                       Password
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                       </div>
@@ -637,50 +758,85 @@ x                     {/* Form */}
                         type="password"
                         value={password}
                         onChange={handlePasswordChange}
-                        className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
-                          passwordError ? 'border-red-400' : 'border-amber-400/40'
-                        }`}
+                        className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                        style={{
+                          background: 'rgba(28, 18, 12, 0.98)',
+                          border: `1px solid ${passwordError ? '#e8a8a8' : tavernPalette.border}`,
+                          color: tavernPalette.parchment,
+                          outline: 'none'
+                        }}
                         placeholder="••••••••"
                         required
                         minLength={6}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.gold;
+                          e.target.style.boxShadow = `0 0 0 2px ${passwordError ? '#e8a8a840' : tavernPalette.gold + '40'}`;
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.border;
+                          e.target.style.boxShadow = 'none';
+                        }}
                       />
                       {passwordError && (
-                        <p className="text-red-300 text-xs mt-1">{passwordError}</p>
+                        <p className="text-xs mt-1" style={{ color: '#e8a8a8' }}>{passwordError}</p>
                       )}
                     </div>
                   </div>
                 )}
 
-                                 {/* Remember me (only for login) */}
-                 {!isRegistering && (
-                   <div className="flex items-center justify-between relative z-[70]">
-                                         <label className="flex items-center">
-                       <input
-                         type="checkbox"
-                         checked={rememberMe}
-                         onChange={(e) => setRememberMe(e.target.checked)}
-                         className="h-4 w-4 text-amber-400 focus:ring-amber-400 border-amber-400/40 rounded bg-purple-950/70"
-                       />
-                       <span className="ml-2 text-sm text-purple-200">Remember me</span>
-                     </label>
-                                         <a
-                       href="/password-reset"
-                       className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-                     >
-                       Forgot password?
-                     </a>
+                {/* Remember me (only for login) */}
+                {!isRegistering && (
+                  <div className="flex items-center justify-between relative z-[70]">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="h-4 w-4 rounded"
+                        style={{
+                          accentColor: tavernPalette.gold,
+                          borderColor: tavernPalette.border
+                        }}
+                      />
+                      <span className="ml-2 text-sm" style={{ color: tavernPalette.ash }}>Remember me</span>
+                    </label>
+                    <a
+                      href="/password-reset"
+                      className="text-sm transition-colors"
+                      style={{ color: tavernPalette.gold }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.goldLight}
+                      onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.gold}
+                    >
+                      Forgot password?
+                    </a>
                   </div>
                 )}
 
-                                 {/* Submit button */}
-                 <button
-                   type="submit"
-                   disabled={isLoading}
-                   className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
-                 >
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.borderDark,
+                    boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+                    }
+                  }}
+                >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                       {isRegistering ? 'Creating...' : 'Entering...'}
                     </div>
                   ) : (
@@ -693,15 +849,14 @@ x                     {/* Form */}
             )}
 
             {showOtpInput && (
-              /* OTP Verification Form */
               <form onSubmit={handleOtpVerification} className="space-y-6 relative z-[70]">
                 <div>
-                  <label className="block text-amber-300 text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                     Enter OTP
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -709,21 +864,51 @@ x                     {/* Form */}
                       type="text"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-purple-950/70 border border-amber-400/40 rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                      className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                      style={{
+                        background: 'rgba(28, 18, 12, 0.98)',
+                        border: `1px solid ${tavernPalette.border}`,
+                        color: tavernPalette.parchment,
+                        outline: 'none'
+                      }}
                       placeholder="Enter 6-digit OTP"
                       required
+                      onFocus={(e) => {
+                        e.target.style.borderColor = tavernPalette.gold;
+                        e.target.style.boxShadow = `0 0 0 2px ${tavernPalette.gold}40`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = tavernPalette.border;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                 </div>
 
-                                 <button
-                   type="submit"
-                   disabled={isLoading}
-                   className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
-                 >
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.borderDark,
+                    boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+                    }
+                  }}
+                >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                       Verifying...
                     </div>
                   ) : (
@@ -734,16 +919,15 @@ x                     {/* Form */}
             )}
 
             {showPasswordInput && (
-              /* Password Setup Form */
               <form onSubmit={handlePasswordCompletion} className="space-y-6 relative z-[70]">
                 {/* Password field */}
                 <div>
-                  <label className="block text-amber-300 text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                     Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -751,27 +935,39 @@ x                     {/* Form */}
                       type="password"
                       value={password}
                       onChange={handlePasswordChange}
-                      className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
-                        passwordError ? 'border-red-400' : 'border-amber-400/40'
-                      }`}
+                      className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                      style={{
+                        background: 'rgba(28, 18, 12, 0.98)',
+                        border: `1px solid ${passwordError ? '#e8a8a8' : tavernPalette.border}`,
+                        color: tavernPalette.parchment,
+                        outline: 'none'
+                      }}
                       placeholder="••••••••"
                       required
                       minLength={6}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.gold;
+                        e.target.style.boxShadow = `0 0 0 2px ${passwordError ? '#e8a8a840' : tavernPalette.gold + '40'}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = passwordError ? '#e8a8a8' : tavernPalette.border;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                     {passwordError && (
-                      <p className="text-red-300 text-xs mt-1">{passwordError}</p>
+                      <p className="text-xs mt-1" style={{ color: '#e8a8a8' }}>{passwordError}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Confirm Password field */}
                 <div>
-                  <label className="block text-amber-300 text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: tavernPalette.ash }}>
                     Confirm Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: tavernPalette.gold }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
@@ -787,15 +983,27 @@ x                     {/* Form */}
                           setConfirmPasswordError(null);
                         }
                       }}
-                      className={`w-full pl-10 pr-4 py-3 bg-purple-950/70 border rounded-lg text-purple-100 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all ${
-                        confirmPasswordError ? 'border-red-400' : 'border-amber-400/40'
-                      }`}
+                      className="w-full pl-10 pr-4 py-3 rounded-lg transition-all"
+                      style={{
+                        background: 'rgba(28, 18, 12, 0.98)',
+                        border: `1px solid ${confirmPasswordError ? '#e8a8a8' : tavernPalette.border}`,
+                        color: tavernPalette.parchment,
+                        outline: 'none'
+                      }}
                       placeholder="••••••••"
                       required
                       minLength={6}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = confirmPasswordError ? '#e8a8a8' : tavernPalette.gold;
+                        e.target.style.boxShadow = `0 0 0 2px ${confirmPasswordError ? '#e8a8a840' : tavernPalette.gold + '40'}`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = confirmPasswordError ? '#e8a8a8' : tavernPalette.border;
+                        e.target.style.boxShadow = 'none';
+                      }}
                     />
                     {confirmPasswordError && (
-                      <p className="text-red-300 text-xs mt-1">{confirmPasswordError}</p>
+                      <p className="text-xs mt-1" style={{ color: '#e8a8a8' }}>{confirmPasswordError}</p>
                     )}
                   </div>
                 </div>
@@ -803,11 +1011,27 @@ x                     {/* Form */}
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-purple-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
+                  className="w-full font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg relative z-[80]"
+                  style={{
+                    background: `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`,
+                    border: `1px solid ${tavernPalette.border}`,
+                    color: tavernPalette.borderDark,
+                    boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3)`
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.goldLight} 0%, ${tavernPalette.gold} 100%)`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.background = `linear-gradient(180deg, ${tavernPalette.gold} 0%, ${tavernPalette.bronze} 100%)`;
+                    }
+                  }}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-900 mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 mr-2" style={{ borderColor: tavernPalette.borderDark }}></div>
                       Creating Account...
                     </div>
                   ) : (
@@ -817,25 +1041,28 @@ x                     {/* Form */}
               </form>
             )}
 
-                         {/* Toggle between login and register */}
-             <div className="mt-6 text-center relative z-[70]">
-              <p className="text-purple-200 text-sm">
+            {/* Toggle between login and register */}
+            <div className="mt-6 text-center relative z-[70]">
+              <p className="text-sm" style={{ color: tavernPalette.ash }}>
                 {isRegistering ? 'Already have an account? ' : 'New to the realm? '}
-                                 <button
-                   onClick={() => {
-                     setIsRegistering(!isRegistering);
-                     setError(null);
-                     setSuccess(null);
-                     setShowOtpInput(false);
-                     setShowPasswordInput(false);
-                     setSessionId(null);
-                     setPassword('');
-                     setConfirmPassword('');
-                     setPasswordError(null);
-                     setConfirmPasswordError(null);
-                   }}
-                   className="text-amber-400 hover:text-amber-300 font-medium transition-colors relative z-[80]"
-                 >
+                <button
+                  onClick={() => {
+                    setIsRegistering(!isRegistering);
+                    setError(null);
+                    setSuccess(null);
+                    setShowOtpInput(false);
+                    setShowPasswordInput(false);
+                    setSessionId(null);
+                    setPassword('');
+                    setConfirmPassword('');
+                    setPasswordError(null);
+                    setConfirmPasswordError(null);
+                  }}
+                  className="font-medium transition-colors relative z-[80]"
+                  style={{ color: tavernPalette.gold }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = tavernPalette.goldLight}
+                  onMouseLeave={(e) => e.currentTarget.style.color = tavernPalette.gold}
+                >
                   {isRegistering ? 'Sign in' : 'Create an account'}
                 </button>
               </p>
@@ -844,9 +1071,16 @@ x                     {/* Form */}
 
           {/* Footer */}
           <div className="text-center mt-8">
-            <p className="text-purple-400 text-sm">
+            <p className="text-sm" style={{ color: tavernPalette.ash }}>
               © 2024 Board Games Tracker • All rights reserved Biber
             </p>
+          </div>
+            </div>
+
+            {/* Right side - Leaderboard */}
+            <div className="hidden lg:block w-96 flex-shrink-0">
+              <Leaderboard limit={5} showTitle={true} />
+            </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,56 @@
+.font-medieval {
+  font-family: var(--font-medieval), "Cinzel", "Times New Roman", serif;
+}
+
+.medieval-panel {
+  position: relative;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(52, 28, 15, 0.98) 0%, rgba(65, 34, 18, 0.95) 50%, rgba(52, 28, 15, 0.98) 100%);
+  border: 2px solid rgba(120, 80, 46, 0.95);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Subtle linear beveled edge effect - follows border curve */
+.medieval-panel::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: 
+    /* Top edge - subtle linear highlight */
+    linear-gradient(180deg, rgba(231, 180, 93, 0.3) 0%, rgba(231, 180, 93, 0.15) 2px, transparent 4px),
+    /* Top-left corner highlight */
+    radial-gradient(circle at 0% 0%, rgba(231, 180, 93, 0.25) 0%, transparent 20px),
+    /* Top-right corner highlight */
+    radial-gradient(circle at 100% 0%, rgba(231, 180, 93, 0.25) 0%, transparent 20px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Inner border */
+.medieval-panel::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(33, 19, 12, 0.8);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(15, 9, 6, 0.6) inset;
+  z-index: 1;
+}
+
+/* Content area - needs to be above the frames */
+.medieval-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #1e3a8a;
   --foreground: #171717;
 }
 
@@ -10,12 +59,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-medieval: var(--font-medieval);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1e40af;
+    --foreground: #171717;
   }
 }
 
@@ -23,6 +73,41 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.medieval-heading {
+  font-family: var(--font-medieval), "Cinzel", "Times New Roman", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h4,
+h5,
+h6,
+.medieval-text {
+  font-family: var(--font-medieval), "Cinzel", "Times New Roman", serif;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile defaults */
+@media (max-width: 640px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* Hide number input spinners for a cleaner look */
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input.no-spinner[type=number] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
 /* Medieval Fantasy Animations */
@@ -80,27 +165,569 @@ body {
 
 /* Custom Scrollbar for Board Games List */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(147, 51, 234, 0.1);
-  border-radius: 3px;
+  background: #1C352D;
+  border: 1px solid #2A1D12;
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track-piece {
+  background: #1C352D;
+  border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #f59e0b, #d97706);
-  border-radius: 3px;
-  transition: all 0.3s ease;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #E7B45D 0%, #9C6B3E 100%);
+  border: 1px solid #B17A3D;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #fbbf24, #f59e0b);
-  transform: scaleX(1.2);
+  transform: scale(1.05);
+  background: linear-gradient(180deg, #F1C980 0%, #B17A3D 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 3px 10px rgba(231, 180, 93, 0.5);
 }
 
 /* Firefox scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #f59e0b rgba(147, 51, 234, 0.1);
+  scrollbar-color: #E7B45D #1C352D;
+}
+
+/* Cosmic Background Utilities */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Dice Shapes */
+.dice {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
+}
+
+.dice::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 6px;
+}
+
+/* Dice dots */
+.dice-dots {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.dice-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #1f2937;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Dice face 1 */
+.dice-1 .dice-dot:nth-child(1) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Dice face 2 */
+.dice-2 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-2 .dice-dot:nth-child(2) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 3 */
+.dice-3 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-3 .dice-dot:nth-child(2) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.dice-3 .dice-dot:nth-child(3) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 4 */
+.dice-4 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-4 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-4 .dice-dot:nth-child(3) {
+  top: 70%;
+  left: 30%;
+}
+.dice-4 .dice-dot:nth-child(4) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 5 */
+.dice-5 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-5 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-5 .dice-dot:nth-child(3) {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.dice-5 .dice-dot:nth-child(4) {
+  top: 70%;
+  left: 30%;
+}
+.dice-5 .dice-dot:nth-child(5) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Dice face 6 */
+.dice-6 .dice-dot:nth-child(1) {
+  top: 30%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(2) {
+  top: 30%;
+  left: 70%;
+}
+.dice-6 .dice-dot:nth-child(3) {
+  top: 50%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(4) {
+  top: 50%;
+  left: 70%;
+}
+.dice-6 .dice-dot:nth-child(5) {
+  top: 70%;
+  left: 30%;
+}
+.dice-6 .dice-dot:nth-child(6) {
+  top: 70%;
+  left: 70%;
+}
+
+/* Logo Blend Mode */
+.logo {
+  mix-blend-mode: multiply;
+}
+
+/* Chain Link Structure */
+.chain-link {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f59e0b;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chain-link::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f59e0b;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chain-link::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f59e0b;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chain-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.chain-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Mobile Notification Enhancements */
+@media (max-width: 768px) {
+  /* Better touch targets */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile notification animations */
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%) translateX(-50%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) translateX(-50%);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideDownMobile {
+    from {
+      transform: translateY(0) translateX(-50%);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%) translateX(-50%);
+      opacity: 0;
+    }
+  }
+  
+  /* Mobile notification positioning */
+  .notification-mobile {
+    animation: slideUpMobile 0.3s ease-out;
+  }
+  
+  .notification-mobile.closing {
+    animation: slideDownMobile 0.3s ease-in;
+  }
+  
+  /* Mobile swipe indicators */
+  .swipe-indicator {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .swipe-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .swipe-indicator.swiping::before {
+    left: 100%;
+  }
+  
+  /* Mobile pull-to-refresh */
+  .pull-to-refresh {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pull-to-refresh::after {
+    content: 'Pull to refresh';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f59e0b;
+    font-size: 12px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .pull-to-refresh.pulling::after {
+    top: 10px;
+    opacity: 1;
+  }
+}
+
+/* Enhanced mobile scrollbar - Hidden for notifications */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* Alternative: Completely hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Mobile-specific notification styles */
+@media (max-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 0px;
+  }
+  
+  .notification-item {
+    /* Removed transitions and transforms */
+  }
+  
+  .notification-item:active {
+    /* No scaling animation */
+  }
+  
+  /* Mobile haptic feedback simulation */
+  .haptic-light {
+    animation: hapticLight 0.1s ease;
+  }
+  
+  .haptic-medium {
+    animation: hapticMedium 0.15s ease;
+  }
+  
+  .haptic-heavy {
+    animation: hapticHeavy 0.2s ease;
+  }
+}
+
+@keyframes hapticLight {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes hapticMedium {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(0.98); }
+  75% { transform: scale(1.02); }
+}
+
+@keyframes hapticHeavy {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(0.95); }
+  40% { transform: scale(1.05); }
+  60% { transform: scale(0.98); }
+  80% { transform: scale(1.02); }
+}
+
+/* Enhanced Notification Animations */
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+  }
+}
+
+@keyframes notificationGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6));
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Notification Item Enhancements */
+.notification-item {
+  /* Removed all animations - completely static */
+}
+
+.notification-item:hover {
+  /* Simple glow effect only */
+}
+
+.notification-item.unread {
+  /* No pulsing animation */
+}
+
+.notification-item.unread .notification-icon {
+  /* No glow animation */
+}
+
+/* Enhanced Button Animations */
+.notification-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.notification-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.notification-button:hover::before {
+  left: 100%;
+}
+
+/* Mobile Notification Enhancements */
+@media (max-width: 768px) {
+  .notification-item {
+    margin-bottom: 8px;
+  }
+  
+  .notification-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Mobile-specific glow effects */
+  .notification-item.unread {
+    box-shadow: 
+      0 4px 15px rgba(139, 92, 246, 0.2),
+      0 2px 8px rgba(139, 92, 246, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Enhanced touch feedback - removed scaling */
+  .notification-item:active {
+    /* No scaling animation */
+  }
+  
+  /* Mobile button enhancements */
+  .notification-button {
+    min-height: 44px; /* iOS recommended touch target */
+    border-radius: 12px;
+  }
+  
+  .notification-button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Notification Type Specific Styling */
+.notification-guild-invite {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  border-left: 4px solid #3b82f6;
+}
+
+.notification-tournament {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+  border-left: 4px solid #f59e0b;
+}
+
+.notification-achievement {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(245, 158, 11, 0.1));
+  border-left: 4px solid #eab308;
+}
+
+.notification-system {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.1));
+  border-left: 4px solid #6b7280;
+}
+
+/* Floating animation for icons */
+.notification-icon-floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Success/Error state animations */
+.notification-success {
+  animation: notificationSlideIn 0.4s ease-out, notificationPulse 1s ease-in-out;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+  border-left: 4px solid #22c55e;
+}
+
+.notification-error {
+  animation: notificationSlideIn 0.4s ease-out, notificationPulse 1s ease-in-out;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+  border-left: 4px solid #ef4444;
 }

@@ -1,7 +1,11 @@
 // API Configuration
 export const API_CONFIG = {
   // Base URL for your API
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7056',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://guild-api-1011546854121.europe-west3.run.app',
+  
+  // Base URL for static assets (avatars, images, etc.)
+  // Google Cloud Storage bucket for hosting pictures
+  ASSETS_BASE_URL: process.env.NEXT_PUBLIC_ASSETS_URL || 'https://storage.googleapis.com/guild-hosting-pictures',
   
   // API Endpoints
   ENDPOINTS: {
@@ -13,11 +17,54 @@ export const API_CONFIG = {
       COMPLETE_REGISTRATION: '/Account/Account-Creation/Complete',
       CHANGE_PASSWORD: '/Account/PasswordChange',
       RESET_PASSWORD: '/Account/Passwrod-Reset/Complete',
+      GET_PROFILE: '/Account/Profile',
+      GET_PROFILE_BY_USERNAME: '/Account/Profile/:username',
+      UPLOAD_AVATAR: '/Account/Avatar/Upload',
+      QR_CODE: '/Account/QrCode',
     },
     // Board Game Service Endpoints
     BOARDGAME: {
-      ADD: '/api/Boardgame/Add-Boardgame',
-      ADD_OWNER: '/api/Boardgame/Add-Boardgame-Owner',
+      ADD: '/Boardgame/Add-Boardgame',
+      ADD_OWNER: '/Boardgame/Add-Boardgame-Owner',
+      GET_LEADERBOARD: '/Boardgame/Get-Leaderboard',
+      GET_BOARDGAMES: '/Boardgame/Get-Boardgames', // legacy
+      GET_TOURNAMENTS: '/Boardgame/Get-Tournaments',
+      GET_TOURNAMENTS_WITH_GM: '/Boardgame/Get-Tournaments-With-GM',
+      GET_TOURNAMENT_MEMBERS: '/Boardgame/Get-Tournament-Members',
+      GET_MY_TOURNAMENTS: '/Boardgame/Get-My-Tournaments',
+      GET_MY_TOURNAMENTS_WITH_GM: '/Boardgame/My-Tournaments-With-GM',
+      GET_USER_PLAYER: '/Boardgame/Get-User-Player',
+      CREATE_TOURNAMENT: '/Boardgame/Create-Boardgame-Tournament',
+      ADD_TOURNAMENT_MEMBER: '/Boardgame/Add-Tournament-Member',
+      REMOVE_TOURNAMENT_MEMBER: '/Boardgame/Remove-Tournament-Member',
+      UPDATE_TOURNAMENT: '/Boardgame/Update-Tournament',
+      APPOINT_GM_BY_USERNAME: '/Boardgame/Appoint-GM-By-Username',
+    },
+    // Notification Service Endpoints
+    NOTIFICATION: {
+      GET_ALL: '/api/Notification/Get-My-Notifications',
+      GET_UNREAD: '/api/Notification/Get-Unread-Notifications',
+      GET_UNREAD_COUNT: '/api/Notification/Get-Unread-Count',
+      MARK_AS_READ: '/api/Notification/Mark-As-Read',
+      MARK_ALL_AS_READ: '/api/Notification/Mark-All-As-Read',
+    },
+    // Guild Service Endpoints
+    GUILD: {
+      ADD: '/Guild/Add-Guild',
+      GET_MY_GUILD: '/Guild/Get-My-Guild',
+      GET_ALL: '/Guild/Get-All-Guilds',
+      GET_BY_ID: '/Guild/Get-Guild-By-Id',
+      GET_BY_NAME: '/Guild/Get-Guild-By-Name',
+      SEND_INVITATION: '/Guild/Send-Guild-Invitation',
+      RESPOND_INVITATION: '/Recieve-Guild-Invitation-Respond',
+      GET_MEMBER_BY_USERNAME: '/Guild/Get-Guild-Member-By-Username',
+      GET_MY_INVITATIONS: '/Guild/Get-My-Received-Invitations',
+      GET_ALL_MEMBERS: '/Guild/Get-All-Guild-Members',
+      GET_MY_MEMBERS: '/Guild/Get-My-Guild-Members',
+      APPOINT_GM: '/Guild/Appoint-GM',
+      UPLOAD_EMBLEM: '/Guild/Emblem/Upload',
+      DISBAND_GUILD: '/Guild/Disband',
+      LEAVE_GUILD: '/Guild/Leave-Guild',
     },
     // Legacy endpoints
     PRODUCTS: '/api/products',
@@ -48,9 +95,6 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
   
   try {
-    console.log('Making API request to:', url);
-    console.log('Request options:', options);
-    
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
@@ -62,11 +106,30 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     
     clearTimeout(timeoutId);
     
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
     
-    const data = await response.json();
-    console.log('Response data:', data);
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response:', jsonError);
+        data = { error: 'Invalid JSON response from server' };
+      }
+    } else {
+      // Handle non-JSON responses (HTML error pages, etc.)
+      const textResponse = await response.text();
+      console.error('Non-JSON response received:', {
+        status: response.status,
+        contentType,
+        body: textResponse.substring(0, 200) // First 200 chars for debugging
+      });
+      data = { 
+        error: `Server returned ${response.status} ${response.statusText}`,
+        details: textResponse.substring(0, 200)
+      };
+    }
     
     // Return data with status for error handling in components
     return {
@@ -76,7 +139,39 @@ export const apiRequest = async (url: string, options?: RequestInit) => {
     };
   } catch (error) {
     clearTimeout(timeoutId);
-    console.error('API request error:', error);
     throw error;
   }
-}; 
+};
+
+/**
+ * Helper function to build full avatar URL from relative path
+ * @param avatarPath - Relative path from database (e.g., "avatars/1/915cb1546f274393a9066c33540ca9bc.png")
+ * @returns Full URL to the avatar image, or null if path is invalid
+ */
+export const getAvatarUrl = (avatarPath: string | null | undefined): string | null => {
+  if (!avatarPath || avatarPath.trim() === '') {
+    return null;
+  }
+  
+  // If it's already a full URL, return as is
+  if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
+    return avatarPath;
+  }
+  
+  // Remove leading slash if present to avoid double slashes
+  const cleanPath = avatarPath.startsWith('/') ? avatarPath.slice(1) : avatarPath;
+  
+  // Construct full URL
+  const baseUrl = API_CONFIG.ASSETS_BASE_URL.endsWith('/') 
+    ? API_CONFIG.ASSETS_BASE_URL.slice(0, -1) 
+    : API_CONFIG.ASSETS_BASE_URL;
+  
+  return `${baseUrl}/${cleanPath}`;
+};
+
+/**
+ * Helper function to build full emblem URL from relative path (same logic as avatar)
+ * @param emblemPath - Relative path from database (e.g., "emblems/1/915cb1546f274393a9066c33540ca9bc.png")
+ * @returns Full URL to the emblem image, or null if path is invalid
+ */
+export const getEmblemUrl = getAvatarUrl; // Same logic for both avatars and emblems 
